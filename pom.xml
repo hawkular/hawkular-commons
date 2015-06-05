@@ -27,7 +27,7 @@
   </parent>
 
   <groupId>org.hawkular.commons</groupId>
-  <artifactId>hawkular-common-parent</artifactId>
+  <artifactId>hawkular-commons-parent</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
@@ -294,5 +294,3 @@
     </profile>
   </profiles>
 </project>
-
-
