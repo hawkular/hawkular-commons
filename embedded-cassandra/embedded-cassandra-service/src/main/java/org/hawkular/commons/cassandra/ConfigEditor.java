@@ -32,7 +32,7 @@ import static org.hawkular.metrics.embedded.EmbeddedConstants.CASSANDRA_CONFIG;
 import static org.hawkular.metrics.embedded.EmbeddedConstants.CASSANDRA_LISTEN_ADDRESS_DEFAULT;
 import static org.hawkular.metrics.embedded.EmbeddedConstants.CASSANDRA_NATIVE_PORT_DEFAULT;
 import static org.hawkular.metrics.embedded.EmbeddedConstants.CASSANDRA_YAML;
-import static org.hawkular.metrics.embedded.EmbeddedConstants.HAWKULAR_METRICS;
+import static org.hawkular.metrics.embedded.EmbeddedConstants.HAWKULAR_DATA;
 import static org.hawkular.metrics.embedded.EmbeddedConstants.JBOSS_DATA_DIR;
 
 /**
@@ -73,7 +73,7 @@ public class ConfigEditor {
     @SuppressWarnings("unchecked")
     public void initEmbeddedConfiguration() throws Exception {
 
-        File basedir = new File(System.getProperty(JBOSS_DATA_DIR, "./"), HAWKULAR_METRICS);
+        File basedir = new File(System.getProperty(JBOSS_DATA_DIR, "./"), HAWKULAR_DATA);
         File confDir = new File(basedir, "conf");
         File yamlFile = new File(confDir, CASSANDRA_YAML);
 
@@ -92,7 +92,7 @@ public class ConfigEditor {
             this.setCommitLogDirectory(new File(basedir, "commitlog").getAbsolutePath());
             this.setSavedCachesDirectory(new File(basedir, "saved_caches").getAbsolutePath());
 
-            this.setClusterName(HAWKULAR_METRICS);
+            this.setClusterName(HAWKULAR_DATA);
             this.setSeeds(CASSANDRA_LISTEN_ADDRESS_DEFAULT);
             this.setListenAddress(CASSANDRA_LISTEN_ADDRESS_DEFAULT);
             this.setRpcAddress(CASSANDRA_LISTEN_ADDRESS_DEFAULT);
