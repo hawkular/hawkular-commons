@@ -69,8 +69,8 @@
   </developers>
 
   <modules>
-    <!--module>embedded-cassandra/embedded-cassandra-service</module>
-    <module>embedded-cassandra/embedded-cassandra-ear</module-->
+    <module>embedded-cassandra/embedded-cassandra-service</module>
+    <module>embedded-cassandra/embedded-cassandra-ear</module>
   </modules>
 
   <scm>
