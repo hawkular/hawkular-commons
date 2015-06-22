@@ -28,7 +28,7 @@
 
   <groupId>org.hawkular.commons</groupId>
   <artifactId>hawkular-commons-parent</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Hawkular Commons</name>
