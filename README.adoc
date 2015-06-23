@@ -1,0 +1,16 @@
+= hawkular-commons
+
+A common modules for Hawkular projects.
+
+ifdef::env-github[]
+[link=https://travis-ci.org/hawkular/hawkular-commons]
+image:https://travis-ci.org/hawkular/hawkular-commons.svg["Build Status", link="https://travis-ci.org/hawkular/hawkular-commons"]{nbsp}
+endif::[]
+
+== Build
+`mvn install`
+
+
+== License
+
+Hawkular is released under Apache License, Version 2.0 as described in the link:LICENSE[LICENSE] document
