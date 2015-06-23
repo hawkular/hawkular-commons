@@ -34,23 +34,6 @@
   <name>Embedded Cassandra EAR for Hawkular</name>
   <description>Embedded Cassandra Server EAR for Hawkular</description>
 
-  <properties>
-    <version.ear.plugin>2.9.1</version.ear.plugin>
-    <version.compiler.plugin>3.1</version.compiler.plugin>
-  </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.wildfly.bom</groupId>
-        <artifactId>jboss-javaee-7.0-with-resteasy</artifactId>
-        <version>${version.org.wildfly}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>org.hawkular.commons</groupId>
@@ -62,12 +45,12 @@
 
   <build>
     <finalName>hawkular-commons-embedded-cassandra</finalName>
+
     <plugins>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-ear-plugin</artifactId>
-        <version>${version.ear.plugin}</version>
         <configuration>
           <version>6</version>
           <defaultLibBundleDir>lib</defaultLibBundleDir>

@@ -34,28 +34,10 @@
   <name>Embedded Cassandra Service for Hawkular</name>
   <description>Embedded Cassandra server for Hawkular</description>
 
-  <properties>
-    <version.compiler.plugin>3.1</version.compiler.plugin>
-    <version.ejb.plugin>2.3</version.ejb.plugin>
-  </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.wildfly.bom</groupId>
-        <artifactId>jboss-javaee-7.0-with-resteasy</artifactId>
-        <version>${version.org.wildfly}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.cassandra</groupId>
       <artifactId>cassandra-all</artifactId>
-      <version>2.1.6</version>
     </dependency>
 
     <!-- Wildfly provided -->
@@ -78,7 +60,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-ejb-plugin</artifactId>
-        <version>${version.ejb.plugin}</version>
         <configuration>
           <ejbVersion>3.2</ejbVersion>
           <generateClient>false</generateClient>
