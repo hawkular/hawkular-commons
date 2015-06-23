@@ -14,19 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.metrics.embedded;
+package org.hawkular.commons.cassandra;
+
+import org.apache.cassandra.service.CassandraDaemon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 
-import org.apache.cassandra.service.CassandraDaemon;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static org.hawkular.metrics.embedded.EmbeddedConstants.EMBEDDED_CASSANDRA_OPTION;
-import static org.hawkular.metrics.embedded.EmbeddedConstants.HAWKULAR_BACKEND_PROPERTY;
+import static org.hawkular.commons.cassandra.EmbeddedConstants.EMBEDDED_CASSANDRA_OPTION;
+import static org.hawkular.commons.cassandra.EmbeddedConstants.HAWKULAR_BACKEND_PROPERTY;
 
 /**
  * App initialization
