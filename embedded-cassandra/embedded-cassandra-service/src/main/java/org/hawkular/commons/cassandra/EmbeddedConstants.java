@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.metrics.embedded;
+package org.hawkular.commons.cassandra;
 
 public class EmbeddedConstants {
     protected static final String CASSANDRA_CONFIG = "cassandra.config";

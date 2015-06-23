@@ -81,8 +81,6 @@
         <version>${version.ejb.plugin}</version>
         <configuration>
           <ejbVersion>3.2</ejbVersion>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.source}</target>
           <generateClient>false</generateClient>
           <archive>
             <addMavenDescriptor>false</addMavenDescriptor>

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.metrics.embedded;
+package org.hawkular.commons.cassandra;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -28,12 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
-import static org.hawkular.metrics.embedded.EmbeddedConstants.CASSANDRA_CONFIG;
-import static org.hawkular.metrics.embedded.EmbeddedConstants.CASSANDRA_LISTEN_ADDRESS_DEFAULT;
-import static org.hawkular.metrics.embedded.EmbeddedConstants.CASSANDRA_NATIVE_PORT_DEFAULT;
-import static org.hawkular.metrics.embedded.EmbeddedConstants.CASSANDRA_YAML;
-import static org.hawkular.metrics.embedded.EmbeddedConstants.HAWKULAR_DATA;
-import static org.hawkular.metrics.embedded.EmbeddedConstants.JBOSS_DATA_DIR;
+import static org.hawkular.commons.cassandra.EmbeddedConstants.*;
 
 /**
  * @author Stefan Negrea
