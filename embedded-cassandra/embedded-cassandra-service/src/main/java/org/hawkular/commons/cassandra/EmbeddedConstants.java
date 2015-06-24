@@ -26,4 +26,5 @@ public class EmbeddedConstants {
     protected static final String HAWKULAR_DATA = "hawkular-data";
     protected static final String EMBEDDED_CASSANDRA_OPTION = "embedded_cassandra";
     protected static final String HAWKULAR_BACKEND_PROPERTY = "hawkular.backend";
+    protected static final String HAWKULAR_BACKEND_ENV_NAME = "HAWKULAR_BACKEND";
 }
