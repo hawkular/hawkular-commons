@@ -26,6 +26,7 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 
 import static org.hawkular.commons.cassandra.EmbeddedConstants.EMBEDDED_CASSANDRA_OPTION;
+import static org.hawkular.commons.cassandra.EmbeddedConstants.HAWKULAR_BACKEND_ENV_NAME;
 import static org.hawkular.commons.cassandra.EmbeddedConstants.HAWKULAR_BACKEND_PROPERTY;
 
 /**
@@ -50,6 +51,12 @@ public class EmbeddedCassandraService {
     public void start() {
         synchronized (this) {
             String backend = System.getProperty(HAWKULAR_BACKEND_PROPERTY);
+
+            String tmp = System.getenv(HAWKULAR_BACKEND_ENV_NAME);
+            if (tmp!=null) {
+                backend = tmp;
+                logger.debug("== Using backend setting from environment: " + tmp);
+            }
             if (cassandraDaemon == null && EMBEDDED_CASSANDRA_OPTION.equals(backend)) {
                 try {
                     ConfigEditor editor = new ConfigEditor();
@@ -58,8 +65,11 @@ public class EmbeddedCassandraService {
                     cassandraDaemon = new CassandraDaemon();
                     cassandraDaemon.activate();
                 } catch (Exception e) {
-                    logger.error("Error initializing embbeded Cassandra server", e);
+                    logger.error("Error initializing embedded Cassandra server", e);
                 }
+            }
+            else {
+                logger.info("== Embedded Cassandra not started as selected backend was " + backend + " ==");
             }
         }
     }
