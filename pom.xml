@@ -74,8 +74,8 @@
   </modules>
 
   <scm>
-    <connection>scm:git:ssh://github.com/hawkular/hawkular-commons</connection>
-    <developerConnection>scm:git:ssh://github.com/hawkular/hawkular-commons</developerConnection>
+    <connection>scm:git:git@github.com:hawkular/hawkular-commons</connection>
+    <developerConnection>scm:git:git@github.com:hawkular/hawkular-commons</developerConnection>
     <url>https://github.com/hawkular/hawkular-commons</url>
   </scm>
   <ciManagement>
