@@ -16,18 +16,18 @@
  */
 package org.hawkular.commons.cassandra;
 
-import org.apache.cassandra.service.CassandraDaemon;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.hawkular.commons.cassandra.EmbeddedConstants.EMBEDDED_CASSANDRA_OPTION;
+import static org.hawkular.commons.cassandra.EmbeddedConstants.HAWKULAR_BACKEND_ENV_NAME;
+import static org.hawkular.commons.cassandra.EmbeddedConstants.HAWKULAR_BACKEND_PROPERTY;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 
-import static org.hawkular.commons.cassandra.EmbeddedConstants.EMBEDDED_CASSANDRA_OPTION;
-import static org.hawkular.commons.cassandra.EmbeddedConstants.HAWKULAR_BACKEND_ENV_NAME;
-import static org.hawkular.commons.cassandra.EmbeddedConstants.HAWKULAR_BACKEND_PROPERTY;
+import org.apache.cassandra.service.CassandraDaemon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * App initialization

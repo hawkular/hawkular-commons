@@ -16,8 +16,14 @@
  */
 package org.hawkular.commons.cassandra;
 
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
+import static java.util.Arrays.asList;
+
+import static org.hawkular.commons.cassandra.EmbeddedConstants.CASSANDRA_CONFIG;
+import static org.hawkular.commons.cassandra.EmbeddedConstants.CASSANDRA_LISTEN_ADDRESS_DEFAULT;
+import static org.hawkular.commons.cassandra.EmbeddedConstants.CASSANDRA_NATIVE_PORT_DEFAULT;
+import static org.hawkular.commons.cassandra.EmbeddedConstants.CASSANDRA_YAML;
+import static org.hawkular.commons.cassandra.EmbeddedConstants.HAWKULAR_DATA;
+import static org.hawkular.commons.cassandra.EmbeddedConstants.JBOSS_DATA_DIR;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,8 +33,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Arrays.asList;
-import static org.hawkular.commons.cassandra.EmbeddedConstants.*;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * @author Stefan Negrea
