@@ -104,7 +104,6 @@
         Ordering: alphabetic
     -->
     <version.findbugs-maven-plugin>3.0.0</version.findbugs-maven-plugin>
-    <version.maven-bundle-plugin>2.5.3</version.maven-bundle-plugin>
     <version.maven-ejb-plugin>2.3</version.maven-ejb-plugin>
     <version.maven-project-info-reports-plugin>2.7</version.maven-project-info-reports-plugin>
     <version.maven-surefire-report-plugin>2.6</version.maven-surefire-report-plugin>
@@ -158,12 +157,6 @@
         </plugin>
 
         <plugin>
-          <groupId>org.apache.felix</groupId>
-          <artifactId>maven-bundle-plugin</artifactId>
-          <version>${version.maven-bundle-plugin}</version>
-        </plugin>
-
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-ejb-plugin</artifactId>
           <version>${version.maven-ejb-plugin}</version>
@@ -177,12 +170,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
       </plugin>
 
       <plugin>
