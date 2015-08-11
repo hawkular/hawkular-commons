@@ -193,21 +193,4 @@
 
   </reporting>
 
-  <profiles>
-
-    <!-- Note that the test.debug profile has moved to hawkular-parent -->
-
-    <profile>
-      <id>download_wildfly</id>
-      <dependencies>
-        <dependency>
-          <groupId>org.wildfly</groupId>
-          <artifactId>wildfly-dist</artifactId>
-          <version>${version.org.wildfly}</version>
-          <type>zip</type>
-        </dependency>
-      </dependencies>
-    </profile>
-
-  </profiles>
 </project>
