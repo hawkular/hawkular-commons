@@ -103,7 +103,6 @@
         Naming convention: version.${artifactId} whenever unique enough; otherwise version.${groupId}.${artifactId}
         Ordering: alphabetic
     -->
-    <version.animal-sniffer-maven-plugin>1.11</version.animal-sniffer-maven-plugin>
     <version.findbugs-maven-plugin>3.0.0</version.findbugs-maven-plugin>
     <version.maven-bundle-plugin>2.5.3</version.maven-bundle-plugin>
     <version.maven-ejb-plugin>2.3</version.maven-ejb-plugin>
@@ -154,12 +153,6 @@
 
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
-          <artifactId>animal-sniffer-maven-plugin</artifactId>
-          <version>${version.animal-sniffer-maven-plugin}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
           <artifactId>findbugs-maven-plugin</artifactId>
           <version>${version.findbugs-maven-plugin}</version>
         </plugin>
@@ -180,39 +173,6 @@
     </pluginManagement>
 
     <plugins>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>animal-sniffer-maven-plugin</artifactId>
-        <!-- This depedency upgrade is a workaround for MANIMALSNIFFER-45 -->
-        <!-- MANIMALSNIFFER-45 only affects users building with a JDK 8 -->
-        <!-- It can be removed once MANIMALSNIFFER-45 is fixed -->
-        <!-- See https://jira.codehaus.org/browse/MANIMALSNIFFER-45 -->
-        <dependencies>
-          <dependency>
-            <groupId>org.ow2.asm</groupId>
-            <artifactId>asm-all</artifactId>
-            <version>5.0.3</version>
-          </dependency>
-        </dependencies>
-        <!-- Copy paste and uncomment the following block in sub-projects where Java 7 compatibility is required -->
-        <!--<executions>-->
-          <!--<execution>-->
-            <!--<id>java-api-check</id>-->
-            <!--<configuration>-->
-              <!--<signature>-->
-                <!--<groupId>org.codehaus.mojo.signature</groupId>-->
-                <!--<artifactId>java17</artifactId>-->
-                <!--<version>1.0</version>-->
-              <!--</signature>-->
-            <!--</configuration>-->
-            <!--<phase>verify</phase>-->
-            <!--<goals>-->
-              <!--<goal>check</goal>-->
-            <!--</goals>-->
-          <!--</execution>-->
-        <!--</executions>-->
-      </plugin>
 
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
