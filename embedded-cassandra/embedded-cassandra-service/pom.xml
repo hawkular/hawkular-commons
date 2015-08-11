@@ -22,9 +22,8 @@
 
   <parent>
     <groupId>org.hawkular.commons</groupId>
-    <artifactId>hawkular-commons-parent</artifactId>
+    <artifactId>hawkular-commons-embedded-cassandra</artifactId>
     <version>0.1.2.Final-SNAPSHOT</version>
-    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <artifactId>hawkular-commons-embedded-cassandra-service</artifactId>

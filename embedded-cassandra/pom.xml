@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2014-2015 Red Hat, Inc. and/or its affiliates
+    and other contributors as indicated by the @author tags.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.hawkular.commons</groupId>
+    <artifactId>hawkular-commons-parent</artifactId>
+    <version>0.1.2.Final-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>hawkular-commons-embedded-cassandra</artifactId>
+  <packaging>pom</packaging>
+
+  <name>Embedded Cassandra for Hawkular</name>
+  <description>Embedded Cassandra Server for Hawkular</description>
+
+  <properties>
+
+    <test.keyspace>hawkulartest</test.keyspace>
+    <nodes>127.0.0.1</nodes>
+
+    <!--
+      Versions of dependencies
+        Naming convention: version.${groupId} whenever unique enough; otherwise version.${groupId}.${artifactId}
+        Ordering: alphabetic
+    -->
+    <version.org.apache.cassandra>2.1.6</version.org.apache.cassandra>
+
+  </properties>
+
+  <modules>
+    <module>embedded-cassandra-service</module>
+    <module>embedded-cassandra-ear</module>
+  </modules>
+
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.apache.cassandra</groupId>
+        <artifactId>cassandra-all</artifactId>
+        <version>${version.org.apache.cassandra}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.wildfly.bom</groupId>
+        <artifactId>jboss-javaee-7.0-wildfly</artifactId>
+        <version>${version.org.wildfly}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+</project>
