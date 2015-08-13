@@ -69,8 +69,7 @@
   </developers>
 
   <modules>
-    <module>embedded-cassandra/embedded-cassandra-service</module>
-    <module>embedded-cassandra/embedded-cassandra-ear</module>
+    <module>embedded-cassandra</module>
   </modules>
 
   <scm>
@@ -95,51 +94,18 @@
   <properties>
     <maven.test.skip>${skipTests}</maven.test.skip>
 
-    <test.keyspace>hawkulartest</test.keyspace>
-    <nodes>127.0.0.1</nodes>
-
     <!--
       Maven plugin versions
         Naming convention: version.${artifactId} whenever unique enough; otherwise version.${groupId}.${artifactId}
         Ordering: alphabetic
     -->
-    <version.animal-sniffer-maven-plugin>1.11</version.animal-sniffer-maven-plugin>
     <version.findbugs-maven-plugin>3.0.0</version.findbugs-maven-plugin>
-    <version.maven-bundle-plugin>2.5.3</version.maven-bundle-plugin>
     <version.maven-ejb-plugin>2.3</version.maven-ejb-plugin>
     <version.maven-project-info-reports-plugin>2.7</version.maven-project-info-reports-plugin>
     <version.maven-surefire-report-plugin>2.6</version.maven-surefire-report-plugin>
     <version.dashboard-maven-plugin>1.0.0-beta-1</version.dashboard-maven-plugin>
 
-    <!--
-      Versions of dependencies
-        Naming convention: version.${groupId} whenever unique enough; otherwise version.${groupId}.${artifactId}
-        Ordering: alphabetic
-    -->
-    <version.org.apache.cassandra>2.1.6</version.org.apache.cassandra>
-
-
   </properties>
-
-  <dependencyManagement>
-    <dependencies>
-
-      <dependency>
-        <groupId>org.apache.cassandra</groupId>
-        <artifactId>cassandra-all</artifactId>
-        <version>${version.org.apache.cassandra}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.wildfly.bom</groupId>
-        <artifactId>jboss-javaee-7.0-wildfly</artifactId>
-        <version>${version.org.wildfly}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-
-    </dependencies>
-  </dependencyManagement>
 
   <build>
     <pluginManagement>
@@ -154,20 +120,8 @@
 
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
-          <artifactId>animal-sniffer-maven-plugin</artifactId>
-          <version>${version.animal-sniffer-maven-plugin}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
           <artifactId>findbugs-maven-plugin</artifactId>
           <version>${version.findbugs-maven-plugin}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.felix</groupId>
-          <artifactId>maven-bundle-plugin</artifactId>
-          <version>${version.maven-bundle-plugin}</version>
         </plugin>
 
         <plugin>
@@ -183,46 +137,7 @@
 
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
-        <artifactId>animal-sniffer-maven-plugin</artifactId>
-        <!-- This depedency upgrade is a workaround for MANIMALSNIFFER-45 -->
-        <!-- MANIMALSNIFFER-45 only affects users building with a JDK 8 -->
-        <!-- It can be removed once MANIMALSNIFFER-45 is fixed -->
-        <!-- See https://jira.codehaus.org/browse/MANIMALSNIFFER-45 -->
-        <dependencies>
-          <dependency>
-            <groupId>org.ow2.asm</groupId>
-            <artifactId>asm-all</artifactId>
-            <version>5.0.3</version>
-          </dependency>
-        </dependencies>
-        <!-- Copy paste and uncomment the following block in sub-projects where Java 7 compatibility is required -->
-        <!--<executions>-->
-          <!--<execution>-->
-            <!--<id>java-api-check</id>-->
-            <!--<configuration>-->
-              <!--<signature>-->
-                <!--<groupId>org.codehaus.mojo.signature</groupId>-->
-                <!--<artifactId>java17</artifactId>-->
-                <!--<version>1.0</version>-->
-              <!--</signature>-->
-            <!--</configuration>-->
-            <!--<phase>verify</phase>-->
-            <!--<goals>-->
-              <!--<goal>check</goal>-->
-            <!--</goals>-->
-          <!--</execution>-->
-        <!--</executions>-->
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
       </plugin>
 
       <plugin>
@@ -278,21 +193,4 @@
 
   </reporting>
 
-  <profiles>
-
-    <!-- Note that the test.debug profile has moved to hawkular-parent -->
-
-    <profile>
-      <id>download_wildfly</id>
-      <dependencies>
-        <dependency>
-          <groupId>org.wildfly</groupId>
-          <artifactId>wildfly-dist</artifactId>
-          <version>${version.org.wildfly}</version>
-          <type>zip</type>
-        </dependency>
-      </dependencies>
-    </profile>
-
-  </profiles>
 </project>
