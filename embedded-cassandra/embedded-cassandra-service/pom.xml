@@ -33,9 +33,23 @@
   <description>Embedded Cassandra server for Hawkular</description>
 
   <dependencies>
+    <!-- A workaround for CASSANDRA-10071 -->
+    <dependency>
+      <groupId>com.thinkaurelius.thrift</groupId>
+      <artifactId>thrift-server</artifactId>
+      <version>0.3.7</version>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.cassandra</groupId>
       <artifactId>cassandra-all</artifactId>
+      <exclusions>
+        <!-- A workaround for CASSANDRA-10071 -->
+        <exclusion>
+          <groupId>com.thinkaurelius.thrift</groupId>
+          <artifactId>thrift-server</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Wildfly provided -->

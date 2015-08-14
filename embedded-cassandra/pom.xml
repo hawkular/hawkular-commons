@@ -42,7 +42,6 @@
         Naming convention: version.${groupId} whenever unique enough; otherwise version.${groupId}.${artifactId}
         Ordering: alphabetic
     -->
-    <version.org.apache.cassandra>2.1.6</version.org.apache.cassandra>
 
   </properties>
 
@@ -51,15 +50,8 @@
     <module>embedded-cassandra-ear</module>
   </modules>
 
-
   <dependencyManagement>
     <dependencies>
-
-      <dependency>
-        <groupId>org.apache.cassandra</groupId>
-        <artifactId>cassandra-all</artifactId>
-        <version>${version.org.apache.cassandra}</version>
-      </dependency>
 
       <dependency>
         <groupId>org.wildfly.bom</groupId>

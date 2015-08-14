@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.hawkular</groupId>
     <artifactId>hawkular-parent</artifactId>
-    <version>19</version>
+    <version>20</version>
   </parent>
 
   <groupId>org.hawkular.commons</groupId>
@@ -100,7 +100,6 @@
         Ordering: alphabetic
     -->
     <version.findbugs-maven-plugin>3.0.0</version.findbugs-maven-plugin>
-    <version.maven-ejb-plugin>2.3</version.maven-ejb-plugin>
     <version.maven-project-info-reports-plugin>2.7</version.maven-project-info-reports-plugin>
     <version.maven-surefire-report-plugin>2.6</version.maven-surefire-report-plugin>
     <version.dashboard-maven-plugin>1.0.0-beta-1</version.dashboard-maven-plugin>
@@ -122,12 +121,6 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>findbugs-maven-plugin</artifactId>
           <version>${version.findbugs-maven-plugin}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-ejb-plugin</artifactId>
-          <version>${version.maven-ejb-plugin}</version>
         </plugin>
 
       </plugins>
