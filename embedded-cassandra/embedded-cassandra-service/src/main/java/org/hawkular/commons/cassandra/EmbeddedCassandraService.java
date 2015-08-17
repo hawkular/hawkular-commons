@@ -62,7 +62,7 @@ public class EmbeddedCassandraService {
                     ConfigEditor editor = new ConfigEditor();
                     editor.initEmbeddedConfiguration();
 
-                    cassandraDaemon = new CassandraDaemon();
+                    cassandraDaemon = new CassandraDaemon(true);
                     cassandraDaemon.activate();
                 } catch (Exception e) {
                     logger.error("Error initializing embedded Cassandra server", e);
