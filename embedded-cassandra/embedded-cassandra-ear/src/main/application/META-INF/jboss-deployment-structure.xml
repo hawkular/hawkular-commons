@@ -17,23 +17,10 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-
-  <parent>
-    <groupId>org.hawkular.commons</groupId>
-    <artifactId>hawkular-commons-parent</artifactId>
-    <version>0.2.2.Final-SNAPSHOT</version>
-  </parent>
-
-  <artifactId>hawkular-commons-embedded-cassandra</artifactId>
-  <packaging>pom</packaging>
-
-  <name>Embedded Cassandra for Hawkular</name>
-
-  <modules>
-    <module>embedded-cassandra-service</module>
-    <module>embedded-cassandra-ear</module>
-  </modules>
-
-</project>
+<jboss-deployment-structure>
+  <deployment>
+    <exclude-subsystems>
+      <subsystem name="logging"/>
+    </exclude-subsystems>
+  </deployment>
+</jboss-deployment-structure>
