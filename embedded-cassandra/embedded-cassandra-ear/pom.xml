@@ -50,7 +50,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-ear-plugin</artifactId>
         <configuration>
-          <version>6</version>
+          <version>7</version>
           <defaultLibBundleDir>lib</defaultLibBundleDir>
           <modules>
             <ejbModule>

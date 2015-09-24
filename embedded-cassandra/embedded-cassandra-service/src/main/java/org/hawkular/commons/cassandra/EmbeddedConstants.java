@@ -17,14 +17,17 @@
 package org.hawkular.commons.cassandra;
 
 public class EmbeddedConstants {
-    protected static final String CASSANDRA_CONFIG = "cassandra.config";
-    protected static final String CASSANDRA_LISTEN_ADDRESS_DEFAULT = "127.0.0.1";
-    protected static final Integer CASSANDRA_NATIVE_PORT_DEFAULT = 9042;
-    protected static final String CASSANDRA_YAML = "cassandra.yaml";
-    protected static final String CASSANDRA_CLUSTER_NAME = "cassandra.yaml";
-    protected static final String JBOSS_DATA_DIR = "jboss.server.data.dir";
-    protected static final String HAWKULAR_DATA = "hawkular-data";
-    protected static final String EMBEDDED_CASSANDRA_OPTION = "embedded_cassandra";
-    protected static final String HAWKULAR_BACKEND_PROPERTY = "hawkular.backend";
-    protected static final String HAWKULAR_BACKEND_ENV_NAME = "HAWKULAR_BACKEND";
+    public static final String CASSANDRA_CONFIG = "cassandra.config";
+    public static final String CASSANDRA_LISTEN_ADDRESS_DEFAULT = "127.0.0.1";
+    public static final Integer CASSANDRA_NATIVE_PORT_DEFAULT = 9042;
+    public static final String CASSANDRA_YAML = "cassandra.yaml";
+    public static final String JBOSS_DATA_DIR = "jboss.server.data.dir";
+    public static final String HAWKULAR_DATA = "hawkular-data";
+    public static final String EMBEDDED_CASSANDRA_OPTION = "embedded_cassandra";
+    public static final String HAWKULAR_BACKEND_PROPERTY = "hawkular.backend";
+    public static final String HAWKULAR_BACKEND_ENV_NAME = "HAWKULAR_BACKEND";
+
+    private EmbeddedConstants() {
+        // Constants class
+    }
 }
