@@ -75,6 +75,7 @@
   </developers>
 
   <modules>
+    <module>cassandra-driver-wf-module</module>
     <module>embedded-cassandra</module>
     <module>templates</module>
     <module>email</module>
