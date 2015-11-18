@@ -27,6 +27,9 @@ import javax.inject.Qualifier;
  * An qualifier to annotate the producers of additional information to be placed into the REST status output. The value
  * is expected to be a {@code Map<String, String>}.
  *
+ * <p>In addition, if you want to keep the order in which the entries are added to the resulting status JSON object,
+ * make sure to use a map instance with stable iteration order.
+ *
  * @author Lukas Krejci
  * @since 0.2.4.Final
  */

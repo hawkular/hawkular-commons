@@ -17,7 +17,7 @@
 package org.hawkular.commons.rest.status;
 
 import java.io.InputStream;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -40,7 +40,7 @@ class ManifestUtil {
             BUILT_FROM_GIT};
 
     public static Map<String, String> getFrom(ServletContext servletContext) {
-        Map<String, String> ret = new HashMap<>();
+        Map<String, String> ret = new LinkedHashMap<>();
         try (InputStream inputStream = servletContext.getResourceAsStream("/META-INF/MANIFEST.MF")) {
             Manifest manifest = new Manifest(inputStream);
             Attributes attr = manifest.getMainAttributes();

@@ -63,7 +63,6 @@
     <dependency>
       <groupId>com.wordnik</groupId>
       <artifactId>swagger-annotations</artifactId>
-      <version>1.5.3-M1</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

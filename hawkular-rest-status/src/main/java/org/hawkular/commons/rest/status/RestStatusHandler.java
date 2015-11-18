@@ -19,6 +19,7 @@ package org.hawkular.commons.rest.status;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -51,7 +52,7 @@ public class RestStatusHandler {
     @Inject @RestStatusInfo
     private Instance<Map<String, String>> details;
 
-    private Map<String, String> status;
+    private volatile Map<String, String> status;
 
     @GET
     @Path("/")
@@ -67,12 +68,28 @@ public class RestStatusHandler {
         return Response.ok(status).build();
     }
 
+    /**
+     * This supposes that for the lifetime of the application, the data we extract from the servlet context don't
+     * change (and indeed they shouldn't because we use the servlet context to get at the web application's manifest
+     * file.
+     *
+     * <p>This returns a copy of the status map so that it can be modified without influence on and from other threads
+     * handling the status request.
+     *
+     * @param servletContext the servlet context to initialize the status map from. Used only the first time this method
+     *                       is called.
+     * @return a new map instance holding the status entries obtained from the manifest.
+     */
     private Map<String, String> getStatus(ServletContext servletContext) {
         if (status == null) {
-            status = new HashMap<>(ManifestUtil.getFrom(servletContext));
+            synchronized (this) {
+                if (status == null) {
+                    status = new HashMap<>(ManifestUtil.getFrom(servletContext));
+                }
+            }
         }
 
-        return status;
+        return new LinkedHashMap<>(status);
     }
 
 }
