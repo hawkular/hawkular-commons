@@ -79,6 +79,7 @@
     <module>embedded-cassandra</module>
     <module>templates</module>
     <module>email</module>
+    <module>hawkular-rest-status</module>
   </modules>
 
   <scm>
