@@ -39,7 +39,14 @@ class ManifestUtil {
     private static final String[] VERSION_ATTRIBUTES = new String[]{IMPLEMENTATION_VERSION,
             BUILT_FROM_GIT};
 
-    public static Map<String, String> getFrom(ServletContext servletContext) {
+    /**
+     * Returns a {@link Map} with keys being the elements from {@link #VERSION_ATTRIBUTES} and values being
+     * the respective values from the manifest as loaded using the given {@code servletContext}.
+     *
+     * @param servletContext the servlet context to load the manifest values from
+     * @return a {@link Map} of attributes
+     */
+    public static Map<String, String> getVersionAttributes(ServletContext servletContext) {
         Map<String, String> ret = new LinkedHashMap<>();
         try (InputStream inputStream = servletContext.getResourceAsStream("/META-INF/MANIFEST.MF")) {
             Manifest manifest = new Manifest(inputStream);
