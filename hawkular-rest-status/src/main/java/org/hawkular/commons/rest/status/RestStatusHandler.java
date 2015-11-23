@@ -18,7 +18,7 @@ package org.hawkular.commons.rest.status;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -52,16 +52,22 @@ public class RestStatusHandler {
     @Inject @RestStatusInfo
     private Instance<Map<String, String>> details;
 
-    private volatile Map<String, String> status;
+    private final Object baseStatusLock = new Object();
+
+    private volatile Map<String, String> baseStatus;
 
     @GET
     @Path("/")
     @Produces(APPLICATION_JSON)
     public Response status(@Context ServletContext servletContext) {
-        Map<String, String> status = getStatus(servletContext);
-        if (!details.isUnsatisfied()) {
-            //include stuff from all the status info producers found
-            for (Map<String, String> details: this.details) {
+        final Map<String, String> status;
+        if (details.isUnsatisfied()) {
+            /* No need to create a new Map in case there are no status info producers */
+            status = getBaseStatus(servletContext);
+        } else {
+            status = new LinkedHashMap<>(getBaseStatus(servletContext));
+            /* include stuff from all the status info producers found */
+            for (Map<String, String> details : this.details) {
                 status.putAll(details);
             }
         }
@@ -69,27 +75,25 @@ public class RestStatusHandler {
     }
 
     /**
-     * This supposes that for the lifetime of the application, the data we extract from the servlet context don't
+     * This supposes that for the lifetime of the application, the data we extract from the servlet context do not
      * change (and indeed they shouldn't because we use the servlet context to get at the web application's manifest
      * file.
+     * <p>
+     * This returns an immutable map - therefore, to enhance the result, a copy is needed.
      *
-     * <p>This returns a copy of the status map so that it can be modified without influence on and from other threads
-     * handling the status request.
-     *
-     * @param servletContext the servlet context to initialize the status map from. Used only the first time this method
-     *                       is called.
-     * @return a new map instance holding the status entries obtained from the manifest.
+     * @param servletContext the servlet context to initialize the baseStatus map from. Used only the first time this
+     *            method is called.
+     * @return an immutable map holding the status entries obtained from the manifest.
      */
-    private Map<String, String> getStatus(ServletContext servletContext) {
-        if (status == null) {
-            synchronized (this) {
-                if (status == null) {
-                    status = new HashMap<>(ManifestUtil.getFrom(servletContext));
+    private Map<String, String> getBaseStatus(ServletContext servletContext) {
+        if (baseStatus == null) {
+            synchronized (baseStatusLock) {
+                if (baseStatus == null) {
+                    baseStatus = Collections.unmodifiableMap(ManifestUtil.getVersionAttributes(servletContext));
                 }
             }
         }
-
-        return new LinkedHashMap<>(status);
+        return baseStatus;
     }
 
 }
