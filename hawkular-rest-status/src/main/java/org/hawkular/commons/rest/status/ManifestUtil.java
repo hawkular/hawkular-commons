@@ -16,7 +16,9 @@
  */
 package org.hawkular.commons.rest.status;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.jar.Attributes;
@@ -25,42 +27,55 @@ import java.util.jar.Manifest;
 import javax.servlet.ServletContext;
 
 /**
- * Manifest extraction.
- * Credits to Hawkular Metrics team.
+ * Manifest extraction. Credits to Hawkular Metrics team.
  *
  * @author Jay Shaughnessy
  * @author Lucas Ponce
- * @since 0.2.4.Final
  */
 class ManifestUtil {
-    private static final String IMPLEMENTATION_VERSION = "Implementation-Version";
-    private static final String BUILT_FROM_GIT = "Built-From-Git-SHA1";
+    static final String IMPLEMENTATION_VERSION = "Implementation-Version";
+    static final String BUILT_FROM_GIT = "Built-From-Git-SHA1";
 
-    private static final String[] VERSION_ATTRIBUTES = new String[]{IMPLEMENTATION_VERSION,
-            BUILT_FROM_GIT};
+    private static final String[] VERSION_ATTRIBUTES = new String[] { IMPLEMENTATION_VERSION,
+            BUILT_FROM_GIT };
+    static final String UNKNOWN_VALUE = "Unknown";
 
     /**
-     * Returns a {@link Map} with keys being the elements from {@link #VERSION_ATTRIBUTES} and values being
-     * the respective values from the manifest as loaded using the given {@code servletContext}.
+     * Returns a {@link Map} with keys being the elements from {@link #VERSION_ATTRIBUTES} and values being the
+     * respective values from the manifest as loaded using the given {@code servletContext}. Some or all values may be
+     * missing from the result map.
      *
      * @param servletContext the servlet context to load the manifest values from
      * @return a {@link Map} of attributes
+     * @throws IOException on problems with reading {@code /META-INF/MANIFEST.MF} file from the {@code servletContext}
      */
-    public static Map<String, String> getVersionAttributes(ServletContext servletContext) {
+    public static Map<String, String> getVersionAttributes(ServletContext servletContext) throws IOException {
+        URL url = servletContext.getResource("/META-INF/MANIFEST.MF");
+        if (url != null) {
+            return getVersionAttributes(url);
+        } else {
+            return new LinkedHashMap<>();
+        }
+    }
+
+    /**
+     * For the sake of unit testing
+     *
+     * @param url the URL to load the MANIFEST.MF file from
+     * @return a {@link Map} of attributes
+     * @throws IOException on problems with reading {@code /META-INF/MANIFEST.MF} file from the given {@code url}
+     */
+    static Map<String, String> getVersionAttributes(URL url) throws IOException {
         Map<String, String> ret = new LinkedHashMap<>();
-        try (InputStream inputStream = servletContext.getResourceAsStream("/META-INF/MANIFEST.MF")) {
+        try (InputStream inputStream = url.openStream()) {
             Manifest manifest = new Manifest(inputStream);
-            Attributes attr = manifest.getMainAttributes();
-            for (String attribute : VERSION_ATTRIBUTES) {
-                ret.put(attribute, attr.getValue(attribute));
-            }
-        } catch (Exception e) {
-            for (String attribute : VERSION_ATTRIBUTES) {
-                if (ret.get(attribute) == null) {
-                    ret.put(attribute, "Unknown");
-                }
+            Attributes attributes = manifest.getMainAttributes();
+            for (String key : VERSION_ATTRIBUTES) {
+                final String value = attributes.getValue(key);
+                ret.put(key, value == null ? UNKNOWN_VALUE : value);
             }
         }
         return ret;
     }
+
 }

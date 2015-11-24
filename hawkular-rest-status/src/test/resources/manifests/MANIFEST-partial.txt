@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Implementation-Title: Hawkular Nest Integration Test WAR
+Built-From-Git-Branch: 151117-prop-replacer
+Archiver-Version: Plexus Archiver
+Built-By: ppalaga
+Built-From-Git-SHA1: eb699f45f5461bb4cf52aca651679edb01802c04
+Implementation-Vendor-Id: org.hawkular.nest
+Created-By: Apache Maven 3.3.3
+Build-Jdk: 1.8.0_60
+Built-On: 2015-11-24T10:54:23+01
+Implementation-Vendor: Red Hat, Inc.
+
