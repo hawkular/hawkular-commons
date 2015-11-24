@@ -18,6 +18,7 @@ package org.hawkular.commons.rest.status;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,6 +32,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+
+import org.hawkular.commons.rest.status.log.MsgLogger;
+import org.hawkular.commons.rest.status.log.RestStatusLoggers;
 
 import com.wordnik.swagger.annotations.Api;
 
@@ -49,6 +53,8 @@ import com.wordnik.swagger.annotations.Api;
 @Api(value = "/status", description = "Status of the component service.")
 @ApplicationScoped
 public class RestStatusHandler {
+    private static final MsgLogger log = RestStatusLoggers.getLogger(RestStatusHandler.class);
+
     @Inject @RestStatusInfo
     private Instance<Map<String, String>> details;
 
@@ -89,7 +95,13 @@ public class RestStatusHandler {
         if (baseStatus == null) {
             synchronized (baseStatusLock) {
                 if (baseStatus == null) {
-                    baseStatus = Collections.unmodifiableMap(ManifestUtil.getVersionAttributes(servletContext));
+                    try {
+                        baseStatus = Collections.unmodifiableMap(ManifestUtil.getVersionAttributes(servletContext));
+                    } catch (IOException e) {
+                        log.errorFailedToReadManifest(servletContext.getContextPath(), e);
+                        /* We do not want to try to read the manifest again */
+                        baseStatus = Collections.emptyMap();
+                    }
                 }
             }
         }
