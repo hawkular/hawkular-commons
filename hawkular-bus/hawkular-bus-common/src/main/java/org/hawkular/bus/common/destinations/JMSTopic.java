@@ -14,36 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.bus.common;
+package org.hawkular.bus.common.destinations;
 
-import java.io.InputStream;
-import java.util.Map;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import javax.jms.Destination;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import javax.enterprise.util.Nonbinding;
+import javax.inject.Qualifier;
 
 /**
- * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
+ * @author jsanda
  */
-public interface BasicMessage {
-
-    void setHeaders(Map<String, String> headers);
-
-    Map<String, String> getHeaders();
-
-    void setCorrelationId(MessageId correlationId);
-
-    MessageId getCorrelationId();
-
-    void setMessageId(MessageId messageId);
-
-    MessageId getMessageId();
-
-    InputStream getBinaryData();
-
-    void setBinaryData(InputStream binaryData);
-
-    Destination getReplyTo();
-
-    void setReplyTo(Destination replyTo);
-
+@Qualifier
+@Retention(RUNTIME)
+@Target({ METHOD, FIELD, PARAMETER, TYPE })
+@Documented
+public @interface JMSTopic {
+    @Nonbinding
+    String value();
 }
