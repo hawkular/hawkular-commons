@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2015 Red Hat, Inc. and/or its affiliates
+    and other contributors as indicated by the @author tags.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.hawkular.commons</groupId>
+    <artifactId>hawkular-commons-parent</artifactId>
+    <version>0.2.5.Final-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>hawkular-bus-parent</artifactId>
+  <packaging>pom</packaging>
+  <name>Hawkular Bus: Root Parent</name>
+  <inceptionYear>2015</inceptionYear>
+
+  <scm>
+    <connection>scm:git:git@github.com:hawkular/hawkular-bus.git</connection>
+    <developerConnection>scm:git:git@github.com:hawkular/hawkular-bus.git</developerConnection>
+    <url>https://github.com/hawkular/hawkular-bus</url>
+    <tag>head</tag>
+  </scm>
+
+  <modules>
+    <module>hawkular-bus-common</module>
+    <module>hawkular-bus-mdb</module>
+    <module>hawkular-bus-rest-client</module>
+    <!-- <module>hawkular-bus-test-common</module> -->
+    <!-- <module>hawkular-bus-samples</module> -->
+    <module>hawkular-bus-feature-pack</module>
+    <module>hawkular-bus-itests</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- CONVENTIONS: -->
+      <!-- - Dependencies must be SORTED ALPHABETICALLY on groupId -->
+      <!-- - Do not declare <scope> (exception: import) or <optional>: a child module will declare scope/optional itself. -->
+      <!-- - Always extract the version as a property. -->
+      <!-- - A element's inner order is <groupId>, <artifactId>, [<type>,] [<classifier>,] <version> -->
+
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${version.com.google.guava}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>gnu.getopt</groupId>
+        <artifactId>java-getopt</artifactId>
+        <version>${version.gnu.getopt}</version>
+      </dependency>
+
+      <!-- ActiveMQ BOM -->
+
+      <dependency>
+        <groupId>org.wildfly</groupId>
+        <artifactId>wildfly-jms-client-bom</artifactId>
+        <version>${version.org.wildfly}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-rar</artifactId>
+        <version>${version.org.apache.activemq}</version>
+        <type>rar</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.wildfly.bom</groupId>
+        <artifactId>wildfly-javaee7</artifactId>
+        <version>${version.org.wildfly}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.wildfly.core</groupId>
+        <artifactId>wildfly-controller</artifactId>
+        <version>${version.org.wildfly.core}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.wildfly</groupId>
+        <artifactId>wildfly-dist</artifactId>
+        <version>${version.org.wildfly}</version>
+        <type>zip</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.wildfly.core</groupId>
+        <artifactId>wildfly-server</artifactId>
+        <version>${version.org.wildfly.core}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.wildfly.core</groupId>
+        <artifactId>wildfly-subsystem-test-framework</artifactId>
+        <version>${version.org.wildfly.core}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+</project>

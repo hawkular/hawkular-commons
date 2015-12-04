@@ -74,6 +74,7 @@
     <module>templates</module>
     <module>email</module>
     <module>hawkular-rest-status</module>
+    <module>hawkular-bus</module>
   </modules>
 
   <scm>
@@ -95,5 +96,5 @@
     <!-- Because Hawkular Commons hosts relatively independent subcomponents,
          the dependencies should be managed on the subcomponent level rather than here -->
   </dependencyManagement>
-  
+
 </project>
