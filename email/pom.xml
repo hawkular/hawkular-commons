@@ -31,6 +31,18 @@
 
   <name>Email services for Hawkular components</name>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.wildfly.bom</groupId>
+        <artifactId>wildfly-javaee7</artifactId>
+        <version>${version.org.wildfly}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.hawkular.commons</groupId>

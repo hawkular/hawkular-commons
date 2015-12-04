@@ -28,6 +28,7 @@
 
   <artifactId>cassandra-driver-wf-module</artifactId>
   <packaging>pom</packaging>
+
   <name>Hawkular: Cassandra Driver module for Wildfly</name>
 
   <dependencies>

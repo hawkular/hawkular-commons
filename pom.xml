@@ -35,16 +35,10 @@
   <description>Hawkular Commons is a collection of common code and frameworks used by the Hawkular project and sub-projects.</description>
   <url>http://www.hawkular.org/</url>
   <inceptionYear>2014</inceptionYear>
-
-  <properties>
-    <version.org.freemarker>2.3.23</version.org.freemarker>
-  </properties>
-
   <organization>
     <name>Red Hat, Inc.</name>
     <url>http://redhat.com/</url>
   </organization>
-
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
@@ -80,6 +74,7 @@
     <module>templates</module>
     <module>email</module>
     <module>hawkular-rest-status</module>
+    <module>hawkular-bus</module>
   </modules>
 
   <scm>
@@ -88,27 +83,18 @@
     <url>https://github.com/hawkular/hawkular-commons</url>
     <tag>HEAD</tag>
   </scm>
-
   <ciManagement>
     <system>Travis-ci</system>
     <url>https://travis-ci.org/hawkular/hawkular-commons</url>
   </ciManagement>
 
+  <properties>
+    <version.org.freemarker>2.3.23</version.org.freemarker>
+  </properties>
+
   <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.wildfly.bom</groupId>
-        <artifactId>wildfly-javaee7</artifactId>
-        <version>${version.org.wildfly}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.freemarker</groupId>
-        <artifactId>freemarker</artifactId>
-        <version>${version.org.freemarker}</version>
-      </dependency>
-    </dependencies>
+    <!-- Because Hawkular Commons hosts relatively independent subcomponents,
+         the dependencies should be managed on the subcomponent level rather than here -->
   </dependencyManagement>
 
 </project>

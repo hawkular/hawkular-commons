@@ -1,0 +1,81 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.bus.common.AbstractMessage"
+  },
+  "javaType": "org.hawkular.bus.sample.msg.Person",
+  "additionalProperties": false,
+  "description": "A person.",
+  "properties": {
+    "firstName": {
+      "type": "string"
+    },
+    "lastName": {
+      "type": "string"
+    },
+    "title": {
+      "enum": ["Mr.", "Mrs.", "Miss", "Dr."]
+    },
+    "age": {
+      "description": "Age in years.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 99
+    },
+    "favoriteColors": {
+      "description": "A set of colors that this person likes.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "books": {
+      "description": "A list of books owned by this person.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "hobbies": {
+      "description": "A map of hobbies, whose value is a number from 1 to 10 based on how much the person likes it.",
+      "type": "object",
+      "javaType": "java.util.Map<String, Number>"
+    },
+    "address": {
+      "description": "The home address of this person.",
+      "type": "object",
+      "javaType": "org.hawkular.bus.sample.msg.Address",
+      "additionalProperties": false,
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        }
+      }
+    },
+    "phoneNumbers": {
+      "description": "Phone numbers associated with this person.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "javaType": "org.hawkular.bus.sample.msg.PhoneNumber",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "description": "Indicates the kind of number, such as home, cell, or work.",
+            "type": "string"
+          },
+          "digits": {
+            "type": "string"
+          }
+        }
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": ["firstName", "lastName"]
+}

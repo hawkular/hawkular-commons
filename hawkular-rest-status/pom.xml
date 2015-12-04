@@ -18,12 +18,13 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <artifactId>hawkular-commons-parent</artifactId>
     <groupId>org.hawkular.commons</groupId>
     <version>0.2.5.Final-SNAPSHOT</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
 
   <artifactId>hawkular-rest-status</artifactId>
 
@@ -32,6 +33,18 @@
     A reusable implementation of a /status endpoint that extracts basic info from the MANIFEST.MF and can be provided
     with further component-specific information.
   </description>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.wildfly.bom</groupId>
+        <artifactId>wildfly-javaee7</artifactId>
+        <version>${version.org.wildfly}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
