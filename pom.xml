@@ -95,20 +95,8 @@
   </ciManagement>
 
   <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.wildfly.bom</groupId>
-        <artifactId>wildfly-javaee7</artifactId>
-        <version>${version.org.wildfly}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.freemarker</groupId>
-        <artifactId>freemarker</artifactId>
-        <version>${version.org.freemarker}</version>
-      </dependency>
-    </dependencies>
+    <!-- Because Hawkular Commons hosts relatively independent subcomponents,
+         the dependencies should be managed on the subcomponent level rather than here -->
   </dependencyManagement>
 
 </project>
