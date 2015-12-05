@@ -70,6 +70,7 @@
 
   <modules>
     <module>cassandra-driver-wf-module</module>
+    <module>cassandra-driver-feature-pack</module>
     <module>embedded-cassandra</module>
     <module>templates</module>
     <module>email</module>
