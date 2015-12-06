@@ -79,19 +79,6 @@
       </dependency>
 
       <dependency>
-        <groupId>org.wildfly</groupId>
-        <artifactId>wildfly-dist</artifactId>
-        <version>${version.org.wildfly}</version>
-        <type>zip</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.wildfly</groupId>
-        <artifactId>wildfly-server</artifactId>
-        <version>${version.org.wildfly}</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.wildfly.core</groupId>
         <artifactId>wildfly-subsystem-test-framework</artifactId>
         <version>${version.org.wildfly.core}</version>
