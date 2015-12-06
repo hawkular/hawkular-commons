@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hawkular.bus.broker.extension.BrokerService;
 import org.hawkular.nest.extension.log.MsgLogger;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
@@ -70,7 +69,6 @@ class NestSubsystemAdd extends AbstractAddStepHandler {
     @Override
     protected void populateModel(OperationContext context, ModelNode operation, Resource resource)
             throws OperationFailedException {
-
         // deploy anything we find in the deployments folder
         try {
             if (requiresRuntime(context)) { // only add the steps if we are going to actually deploy now
@@ -198,7 +196,7 @@ class NestSubsystemAdd extends AbstractAddStepHandler {
                 .getServiceTarget()
                 .addService(name, service)
                 .addDependency(ServerEnvironmentService.SERVICE_NAME, ServerEnvironment.class, service.envServiceValue)
-                .addDependency(BrokerService.SERVICE_NAME, BrokerService.class, service.brokerService)
+                //.addDependency(BrokerService.SERVICE_NAME, BrokerService.class, service.brokerService)
                 .addListener(verificationHandler)
                 .setInitialMode(Mode.ACTIVE)
                 .install();

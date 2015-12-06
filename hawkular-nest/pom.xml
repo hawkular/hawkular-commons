@@ -36,7 +36,8 @@
 
   <modules>
     <module>hawkular-nest-wf-extension</module>
-    <module>hawkular-nest-distro</module>
+    <module>hawkular-nest-feature-pack</module>
+    <module>hawkular-nest-itest-parent</module>
   </modules>
 
   <properties>
@@ -47,12 +48,20 @@
     <!-- - A version property must be specified in the format "version.{groupId}" -->
     <!-- - If groupId is not unique, append the property name with ".{artifactId}" -->
     <!-- - Version properties must be sorted alphabetically -->
-    <version.org.hawkular.bus>0.7.3.Final-SRC-revision-7d835f56fcc30e52f267bb46ae92025b95f715e5</version.org.hawkular.bus>
-    <version.org.hawkular.commons>0.2.4.Final-SRC-revision-fe3cf17f7907ed9a4d7a24944cbac0962fbc8395</version.org.hawkular.commons>
+    <!-- <version.org.hawkular.bus>0.7.3.Final-SRC-revision-311fc710ed09d4c1d15d30afba2706ac521753de</version.org.hawkular.bus> -->
+    <version.org.hawkular.commons>0.2.4.Final-SRC-revision-6e32b3e489ac33b7dd4eb6e5c56b0ba61e878b72</version.org.hawkular.commons>
+    <version.com.squareup.okhttp>2.6.0</version.com.squareup.okhttp>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>com.squareup.okhttp</groupId>
+        <artifactId>okhttp</artifactId>
+        <version>${version.com.squareup.okhttp}</version>
+      </dependency>
+
       <dependency>
         <groupId>org.hawkular.commons</groupId>
         <artifactId>cassandra-driver-wf-module</artifactId>

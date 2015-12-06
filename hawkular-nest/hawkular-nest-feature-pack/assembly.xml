@@ -17,40 +17,19 @@
     limitations under the License.
 
 -->
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
 
-<assembly>
-  <id>distribution</id>
+  <id>${project.artifactId}</id>
   <formats>
     <format>zip</format>
   </formats>
-
   <includeBaseDirectory>false</includeBaseDirectory>
-  <baseDirectory>${project.build.finalName}</baseDirectory>
-
   <fileSets>
-    <!-- non-binary files -->
     <fileSet>
-      <directory>${assembly.dir}</directory>
-      <outputDirectory></outputDirectory>
-      <excludes>
-        <exclude>**/*.sh</exclude>
-      </excludes>
-      <filtered>false</filtered>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-
-    <!-- all scripts and other files that go in the /bin directory - will have u+x file perm set-->
-    <fileSet>
-      <directory>${assembly.dir}</directory>
-      <outputDirectory></outputDirectory>
-      <includes>
-        <include>**/*.sh</include>
-      </includes>
-      <filtered>false</filtered>
-      <fileMode>0744</fileMode>
-      <directoryMode>0755</directoryMode>
+      <directory>target/${project.artifactId}-${project.version}</directory>
+      <outputDirectory/>
     </fileSet>
   </fileSets>
-
 </assembly>
+

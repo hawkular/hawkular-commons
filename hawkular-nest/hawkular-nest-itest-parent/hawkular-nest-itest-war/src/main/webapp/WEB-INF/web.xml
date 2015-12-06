@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Copyright 2015 Red Hat, Inc. and/or its affiliates
@@ -17,14 +17,18 @@
     limitations under the License.
 
 -->
-<!DOCTYPE suppressions PUBLIC
-    "-//Puppy Crawl//DTD Suppressions 1.1//EN"
-    "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
 
-<suppressions>
-  <!-- we want to remain as faithful to the Wildfly style as possible -->
-  <suppress checks="[a-zA-Z0-9]" files="standalone\.xml"/>
+  <display-name>Hawkular Nest Test WAR</display-name>
 
-  <!-- these are snippets of XML possibly not fully formed - we can't check them since they aren't valid XML -->
-  <suppress checks="[a-zA-Z0-9]" files="(subsystem.*\.xml|socketbinding.*\.xml)"/>
-</suppressions>
+  <context-param>
+    <param-name>resteasy.media.type.mappings</param-name>
+    <param-value>html : text/html, json : application/json, xml : application/xml, csv : text/csv, txt: text/plain,
+      yaml: application/yaml, jsonw: application/vnd.rhq.wrapped+json
+    </param-value>
+  </context-param>
+
+</web-app>

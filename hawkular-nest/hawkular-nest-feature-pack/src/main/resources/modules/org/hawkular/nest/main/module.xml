@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" ?>
 <!--
 
     Copyright 2015 Red Hat, Inc. and/or its affiliates
@@ -17,18 +17,8 @@
     limitations under the License.
 
 -->
-
-<module xmlns="urn:jboss:module:1.0" name="${moduleName}">
-
-  <resources>
-    <resource-root path="." />
-    <resource-root path="${project.build.finalName}.jar" />
-    <resource-root path="hawkular-bus-common-${version.org.hawkular.bus}.jar" />
-    <resource-root path="hawkular-bus-mdb-${version.org.hawkular.bus}.jar" />
-  </resources>
-
+<module xmlns="urn:jboss:module:1.1" name="org.hawkular.nest">
   <dependencies>
-    <module name="org.hawkular.bus.broker" export="true" />
 
     <!-- modules required by any subsystem -->
     <module name="javax.api" />
@@ -41,9 +31,7 @@
     <module name="org.jboss.vfs" />
 
     <!-- other dependencies we need -->
-    <module name="com.fasterxml.jackson.core.jackson-core" export="true" />
-    <module name="com.fasterxml.jackson.core.jackson-databind" export="true" />
-    <module name="com.fasterxml.jackson.core.jackson-annotations" export="true" />
+    <module name="com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider" export="true" />
     <module name="com.google.guava" export="true" />
     <module name="gnu.getopt" />
     <module name="javax.jms.api"  export="true" />
@@ -53,9 +41,14 @@
     <module name="org.apache.commons.pool" />
     <module name="org.apache.log4j" />
     <module name="org.jboss.logmanager" services="import" />
-    <module name="org.jboss.common-core" />
+    <module name="org.jboss.common-beans" />
     <module name="org.jboss.as.network" />
     <module name="org.jboss.as.jmx" />
     <module name="org.slf4j" />
   </dependencies>
+
+  <resources>
+    <resource-root path="." />
+    <artifact name="${org.hawkular.nest:hawkular-nest-wf-extension}"/>
+  </resources>
 </module>
