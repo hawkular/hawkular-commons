@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2015 Red Hat, Inc. and/or its affiliates
+    and other contributors as indicated by the @author tags.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.hawkular</groupId>
+    <artifactId>hawkular-parent</artifactId>
+    <version>26</version>
+  </parent>
+
+  <groupId>org.hawkular.nest</groupId>
+  <artifactId>hawkular-nest-parent</artifactId>
+  <version>0.7.3.Final-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>Hawkular: Nest Root Parent</name>
+  <inceptionYear>2015</inceptionYear>
+
+  <modules>
+    <module>hawkular-nest-wf-extension</module>
+    <module>hawkular-nest-distro</module>
+  </modules>
+
+  <properties>
+
+    <!-- DEPENDENCY VERSIONS -->
+
+    <!-- CONVENTIONS: -->
+    <!-- - A version property must be specified in the format "version.{groupId}" -->
+    <!-- - If groupId is not unique, append the property name with ".{artifactId}" -->
+    <!-- - Version properties must be sorted alphabetically -->
+    <version.org.hawkular.bus>0.7.3.Final-SRC-revision-7d835f56fcc30e52f267bb46ae92025b95f715e5</version.org.hawkular.bus>
+    <version.org.hawkular.commons>0.2.4.Final-SRC-revision-fe3cf17f7907ed9a4d7a24944cbac0962fbc8395</version.org.hawkular.commons>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.hawkular.commons</groupId>
+        <artifactId>cassandra-driver-wf-module</artifactId>
+        <version>${version.org.hawkular.commons}</version>
+        <classifier>module</classifier>
+        <type>zip</type>
+      </dependency>
+
+      <!-- Hawkular Bus Dependencies -->
+      <dependency>
+        <groupId>org.hawkular.bus</groupId>
+        <artifactId>hawkular-bus-broker-wf-extension</artifactId>
+        <version>${version.org.hawkular.bus}</version>
+        <classifier>module</classifier>
+        <type>zip</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.hawkular.bus</groupId>
+        <artifactId>hawkular-bus-broker-wf-extension</artifactId>
+        <version>${version.org.hawkular.bus}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.hawkular.bus</groupId>
+        <artifactId>hawkular-bus-common</artifactId>
+        <version>${version.org.hawkular.bus}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.hawkular.bus</groupId>
+        <artifactId>hawkular-bus-mdb</artifactId>
+        <version>${version.org.hawkular.bus}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.hawkular.bus</groupId>
+        <artifactId>hawkular-bus-ra-wf-module</artifactId>
+        <version>${version.org.hawkular.bus}</version>
+        <classifier>module</classifier>
+        <type>zip</type>
+      </dependency>
+
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${version.com.google.guava}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-parent</artifactId>
+        <version>${version.org.apache.activemq}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.wildfly.core</groupId>
+        <artifactId>wildfly-controller</artifactId>
+        <version>${version.org.wildfly.core}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.wildfly.core</groupId>
+        <artifactId>wildfly-server</artifactId>
+        <version>${version.org.wildfly.core}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.wildfly</groupId>
+        <artifactId>wildfly-dist</artifactId>
+        <version>${version.org.wildfly}</version>
+        <type>zip</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.wildfly</groupId>
+        <artifactId>wildfly-server</artifactId>
+        <version>${version.org.wildfly}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.wildfly.core</groupId>
+        <artifactId>wildfly-subsystem-test-framework</artifactId>
+        <version>${version.org.wildfly.core}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.wildfly.bom</groupId>
+        <artifactId>wildfly-javaee7</artifactId>
+        <version>${version.org.wildfly}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <profiles>
+    <!-- unzips the assembly so devs can run it right out of target/ -->
+    <profile>
+      <id>dev</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+              <formats>
+                <format>dir</format>
+                <format>zip</format>
+              </formats>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
