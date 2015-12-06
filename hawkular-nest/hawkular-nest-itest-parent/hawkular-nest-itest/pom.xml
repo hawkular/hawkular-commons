@@ -19,9 +19,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.hawkular.nest</groupId>
+    <groupId>org.hawkular.commons</groupId>
     <artifactId>hawkular-nest-itest-parent</artifactId>
-    <version>0.7.3.Final-SNAPSHOT</version>
+    <version>0.2.5.Final-SNAPSHOT</version>
   </parent>
   <artifactId>hawkular-nest-itest</artifactId>
   <name>Hawkular Nest Intagration Tests</name>
@@ -40,7 +40,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.hawkular.nest</groupId>
+      <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-nest-feature-pack</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
@@ -48,7 +48,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.hawkular.nest</groupId>
+      <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-nest-feature-pack</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
@@ -61,7 +61,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.hawkular.nest</groupId>
+      <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-nest-itest-war</artifactId>
       <version>${project.version}</version>
       <type>war</type>
@@ -118,7 +118,7 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.hawkular.nest</groupId>
+                  <groupId>org.hawkular.commons</groupId>
                   <artifactId>hawkular-nest-itest-war</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>

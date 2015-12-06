@@ -21,9 +21,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.hawkular.nest</groupId>
+    <groupId>org.hawkular.commons</groupId>
     <artifactId>hawkular-nest-parent</artifactId>
-    <version>0.7.3.Final-SNAPSHOT</version>
+    <version>0.2.5.Final-SNAPSHOT</version>
   </parent>
 
   <artifactId>hawkular-nest-feature-pack</artifactId>
@@ -31,6 +31,12 @@
   <name>Hawkular: Nest Feature Pack</name>
 
   <dependencies>
+
+    <dependency>
+      <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-nest-wf-extension</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>org.wildfly</groupId>
@@ -44,28 +50,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-
-    <dependency>
-      <groupId>org.hawkular.nest</groupId>
-      <artifactId>hawkular-nest-wf-extension</artifactId>
-      <version>0.7.3.Final-SNAPSHOT</version>
-    </dependency>
-
-
-<!--
-    <dependency>
-      <groupId>org.hawkular.bus</groupId>
-      <artifactId>hawkular-bus-broker-wf-extension</artifactId>
-      <classifier>module</classifier>
-      <type>zip</type>
-    </dependency> -->
-<!--
-    <dependency>
-      <groupId>org.hawkular.bus</groupId>
-      <artifactId>hawkular-bus-ra-wf-module</artifactId>
-      <classifier>module</classifier>
-      <type>zip</type>
-    </dependency> -->
 
   </dependencies>
 

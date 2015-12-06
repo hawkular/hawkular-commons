@@ -21,14 +21,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.hawkular</groupId>
-    <artifactId>hawkular-parent</artifactId>
-    <version>26</version>
+    <groupId>org.hawkular.commons</groupId>
+    <artifactId>hawkular-commons-parent</artifactId>
+    <version>0.2.5.Final-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.hawkular.nest</groupId>
+  <groupId>org.hawkular.commons</groupId>
   <artifactId>hawkular-nest-parent</artifactId>
-  <version>0.7.3.Final-SNAPSHOT</version>
+  <version>0.2.5.Final-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Hawkular: Nest Root Parent</name>
@@ -48,8 +48,6 @@
     <!-- - A version property must be specified in the format "version.{groupId}" -->
     <!-- - If groupId is not unique, append the property name with ".{artifactId}" -->
     <!-- - Version properties must be sorted alphabetically -->
-    <!-- <version.org.hawkular.bus>0.7.3.Final-SRC-revision-311fc710ed09d4c1d15d30afba2706ac521753de</version.org.hawkular.bus> -->
-    <version.org.hawkular.commons>0.2.4.Final-SRC-revision-6e32b3e489ac33b7dd4eb6e5c56b0ba61e878b72</version.org.hawkular.commons>
     <version.com.squareup.okhttp>2.6.0</version.com.squareup.okhttp>
   </properties>
 
@@ -63,60 +61,9 @@
       </dependency>
 
       <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>cassandra-driver-wf-module</artifactId>
-        <version>${version.org.hawkular.commons}</version>
-        <classifier>module</classifier>
-        <type>zip</type>
-      </dependency>
-
-      <!-- Hawkular Bus Dependencies -->
-      <dependency>
-        <groupId>org.hawkular.bus</groupId>
-        <artifactId>hawkular-bus-broker-wf-extension</artifactId>
-        <version>${version.org.hawkular.bus}</version>
-        <classifier>module</classifier>
-        <type>zip</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.hawkular.bus</groupId>
-        <artifactId>hawkular-bus-broker-wf-extension</artifactId>
-        <version>${version.org.hawkular.bus}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.hawkular.bus</groupId>
-        <artifactId>hawkular-bus-common</artifactId>
-        <version>${version.org.hawkular.bus}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.hawkular.bus</groupId>
-        <artifactId>hawkular-bus-mdb</artifactId>
-        <version>${version.org.hawkular.bus}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.hawkular.bus</groupId>
-        <artifactId>hawkular-bus-ra-wf-module</artifactId>
-        <version>${version.org.hawkular.bus}</version>
-        <classifier>module</classifier>
-        <type>zip</type>
-      </dependency>
-
-      <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${version.com.google.guava}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-parent</artifactId>
-        <version>${version.org.apache.activemq}</version>
-        <type>pom</type>
-        <scope>import</scope>
       </dependency>
 
       <dependency>

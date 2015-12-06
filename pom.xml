@@ -75,6 +75,7 @@
     <module>email</module>
     <module>hawkular-rest-status</module>
     <module>hawkular-bus</module>
+    <module>hawkular-nest</module>
   </modules>
 
   <scm>

@@ -17,8 +17,8 @@
 
 -->
 <server-provisioning xmlns="urn:wildfly:server-provisioning:1.1" extract-schemas="true"
-  copy-module-artifacts="false">
+  copy-module-artifacts="true">
   <feature-packs>
-    <feature-pack groupId="org.hawkular.nest" artifactId="hawkular-nest-feature-pack" version="${project.version}" />
+    <feature-pack groupId="org.hawkular.commons" artifactId="hawkular-nest-feature-pack" version="${project.version}" />
   </feature-packs>
 </server-provisioning>

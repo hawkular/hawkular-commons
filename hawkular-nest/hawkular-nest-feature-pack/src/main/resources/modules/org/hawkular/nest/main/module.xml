@@ -49,6 +49,6 @@
 
   <resources>
     <resource-root path="." />
-    <artifact name="${org.hawkular.nest:hawkular-nest-wf-extension}"/>
+    <artifact name="${org.hawkular.commons:hawkular-nest-wf-extension}"/>
   </resources>
 </module>
