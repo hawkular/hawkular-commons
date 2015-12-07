@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" ?>
 <!--
 
     Copyright 2015 Red Hat, Inc. and/or its affiliates
@@ -17,13 +17,15 @@
     limitations under the License.
 
 -->
-<arquillian xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns="http://jboss.org/schema/arquillian"
-            xsi:schemaLocation="http://jboss.org/schema/arquillian
-            http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
-  <container qualifier="default" default="true">
-    <configuration>
-      <property name="jbossHome">${jbossHome}</property>
-    </configuration>
-  </container>
-</arquillian>
+<module xmlns="urn:jboss:module:1.1" name="org.hawkular.commons.cassandra-driver">
+  <dependencies>
+    <module name="com.google.guava" />
+    <module name="org.slf4j" />
+    <module name="io.netty"/>
+    <module name="sun.jdk" />
+  </dependencies>
+  <resources>
+    <artifact name="${com.datastax.cassandra:cassandra-driver-core}"/>
+    <artifact name="${com.codahale.metrics:metrics-core}"/>
+  </resources>
+</module>

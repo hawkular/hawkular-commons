@@ -116,7 +116,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <systemPropertyVariables>
-            <jbossHome>${project.build.directory}/${project.artifactId}-${project.version}</jbossHome>
+            <jboss.home>${project.build.directory}/${project.artifactId}-${project.version}</jboss.home>
             <hawkular.nest.itest.war.path>${hawkular.nest.itest.war.path}</hawkular.nest.itest.war.path>
           </systemPropertyVariables>
         </configuration>

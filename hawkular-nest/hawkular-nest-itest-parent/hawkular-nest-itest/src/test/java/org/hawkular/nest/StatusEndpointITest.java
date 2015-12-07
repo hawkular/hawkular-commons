@@ -49,11 +49,13 @@ public class StatusEndpointITest {
 
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
-        File[] libs = Maven.resolver().loadPomFromFile("pom.xml").importRuntimeAndTestDependencies().resolve()
-                .withTransitivity().asFile();
-        WebArchive archive = ShrinkWrap.create(WebArchive.class).addAsLibraries(libs);
+        File[] libs = Maven.resolver().loadPomFromFile("pom.xml")
+                .resolve("com.squareup.okhttp:okhttp")
+                .withoutTransitivity().asFile();
+        WebArchive archive = ShrinkWrap.create(WebArchive.class, StatusEndpointITest.class.getSimpleName() + ".war")
+                .addAsLibraries(libs);
         // ZipExporter exporter = new ZipExporterImpl(archive);
-        // exporter.exportTo(new File("target", "test-archive.war"));
+        // exporter.exportTo(new File("target", StatusEndpointITest.class.getSimpleName() + ".war"));
         return archive;
     }
 

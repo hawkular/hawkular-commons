@@ -24,6 +24,10 @@
     <?EXTENSIONS?>
   </extensions>
 
+  <system-properties>
+    <property name="hawkular.backend" value="${hawkular.backend:embedded_cassandra}" />
+  </system-properties>
+
   <management>
     <security-realms>
       <security-realm name="ManagementRealm">

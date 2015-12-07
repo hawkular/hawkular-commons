@@ -28,8 +28,7 @@
       output-file="standalone/configuration/standalone.xml" />
   </config>
 
-<!--   <copy-artifacts>
-    <copy-artifact artifact="org.jboss.resteasy:resteasy-spring" to-location="modules/org/hawkular/nest/main/deployments/" />
+  <copy-artifacts>
+    <copy-artifact artifact="org.hawkular.commons:hawkular-commons-embedded-cassandra-ear" to-location="modules/org/hawkular/nest/main/deployments/hawkular-commons-embedded-cassandra-ear.ear" />
   </copy-artifacts>
- -->
 </build>
