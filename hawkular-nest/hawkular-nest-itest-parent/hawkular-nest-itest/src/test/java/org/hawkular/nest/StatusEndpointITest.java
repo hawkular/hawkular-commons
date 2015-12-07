@@ -24,8 +24,14 @@ import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -35,10 +41,21 @@ import com.squareup.okhttp.Response;
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  *
  */
+@RunWith(Arquillian.class)
 public class StatusEndpointITest {
 
     private static final String statusUrl = "http://127.0.0.1:8080/hawkular/nest/itest/status";
     private static final String itestWarPath = System.getProperty("hawkular.nest.itest.war.path");
+
+    @Deployment(testable = false)
+    public static WebArchive createDeployment() {
+        File[] libs = Maven.resolver().loadPomFromFile("pom.xml").importRuntimeAndTestDependencies().resolve()
+                .withTransitivity().asFile();
+        WebArchive archive = ShrinkWrap.create(WebArchive.class).addAsLibraries(libs);
+        // ZipExporter exporter = new ZipExporterImpl(archive);
+        // exporter.exportTo(new File("target", "test-archive.war"));
+        return archive;
+    }
 
     @Test
     public void testStatusEndpoint() throws IOException, InterruptedException {
@@ -57,7 +74,7 @@ public class StatusEndpointITest {
             Manifest manifest = readManifest(itestWarPath);
             Attributes attributes = manifest.getMainAttributes();
 
-            String expected = String.format("{\"Implementation-Version\":\"%s\"," //
+            String expected = String.format("{\"Implementation-Version\":\"%s\","//
                     + "\"Built-From-Git-SHA1\":\"%s\","//
                     + "\"testKey1\":\"testValue1\"}", //
                     attributes.getValue("Implementation-Version"),
