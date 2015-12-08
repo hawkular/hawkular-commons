@@ -35,7 +35,7 @@
   <modules>
     <module>hawkular-nest-wf-extension</module>
     <module>hawkular-nest-feature-pack</module>
-    <module>hawkular-nest-itest-parent</module>
+    <module>hawkular-nest-itest</module>
   </modules>
 
   <properties>

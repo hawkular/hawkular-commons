@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.nest.itest;
+package org.hawkular.commons.rest.status.itest;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;

@@ -14,20 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.nest;
+package org.hawkular.commons.rest.status.itest;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
+import org.hawkular.commons.cassandra.driver.itest.CassandraDriverITest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.impl.base.exporter.zip.ZipExporterImpl;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,17 +44,30 @@ import com.squareup.okhttp.Response;
 public class StatusEndpointITest {
 
     private static final String statusUrl = "http://127.0.0.1:8080/hawkular/nest/itest/status";
-    private static final String itestWarPath = System.getProperty("hawkular.nest.itest.war.path");
 
-    @Deployment(testable = false)
+    @Deployment
     public static WebArchive createDeployment() {
         File[] libs = Maven.resolver().loadPomFromFile("pom.xml")
-                .resolve("com.squareup.okhttp:okhttp")
-                .withoutTransitivity().asFile();
+                .resolve("org.hawkular.commons:hawkular-rest-status", "com.squareup.okhttp:okhttp")
+                .withTransitivity().asFile();
         WebArchive archive = ShrinkWrap.create(WebArchive.class, StatusEndpointITest.class.getSimpleName() + ".war")
+                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+                .addAsWebInfResource(
+                        CassandraDriverITest.class.getResource("/rest-status/jboss-deployment-structure.xml"),
+                        "jboss-deployment-structure.xml")
+                .addAsWebInfResource(
+                        CassandraDriverITest.class.getResource("/rest-status/jboss-web.xml"),
+                        "jboss-web.xml")
+                .addAsWebInfResource(
+                        CassandraDriverITest.class.getResource("/rest-status/web.xml"),
+                        "web.xml")
+                .addAsManifestResource(
+                        CassandraDriverITest.class.getResource("/rest-status/MANIFEST.MF"),
+                        "MANIFEST.MF")
+                .addPackage(StatusEndpointITest.class.getPackage())
                 .addAsLibraries(libs);
-        // ZipExporter exporter = new ZipExporterImpl(archive);
-        // exporter.exportTo(new File("target", StatusEndpointITest.class.getSimpleName() + ".war"));
+        ZipExporter exporter = new ZipExporterImpl(archive);
+        exporter.exportTo(new File("target", StatusEndpointITest.class.getSimpleName() + ".war"));
         return archive;
     }
 
@@ -73,31 +85,15 @@ public class StatusEndpointITest {
         if (response.isSuccessful()) {
             String foundBody = response.body().string();
 
-            Manifest manifest = readManifest(itestWarPath);
-            Attributes attributes = manifest.getMainAttributes();
-
-            String expected = String.format("{\"Implementation-Version\":\"%s\","//
-                    + "\"Built-From-Git-SHA1\":\"%s\","//
-                    + "\"testKey1\":\"testValue1\"}", //
-                    attributes.getValue("Implementation-Version"),
-                    attributes.getValue("Built-From-Git-SHA1"));
+            /* see src/test/resources/rest-status/MANIFEST.MF */
+            String expected = "{\"Implementation-Version\":\"1.2.3.4\","//
+                    + "\"Built-From-Git-SHA1\":\"cofeebabe\","//
+                    + "\"testKey1\":\"testValue1\"}";
             Assert.assertEquals(expected, foundBody);
         } else {
             Assert.fail("Could not get [" + statusUrl + "]: " + response.code() + " " + response.message());
         }
 
-    }
-
-    private static Manifest readManifest(String warPath) throws IOException {
-        try (ZipInputStream zip = new ZipInputStream(new FileInputStream(new File(warPath)))) {
-            ZipEntry entry;
-            while ((entry = zip.getNextEntry()) != null) {
-                if ("META-INF/MANIFEST.MF".equals(entry.getName())) {
-                    return new Manifest(zip);
-                }
-            }
-        }
-        throw new IllegalStateException("No META-INF/MANIFEST.MF in [" + warPath + "]");
     }
 
 }

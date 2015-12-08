@@ -20,7 +20,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.hawkular.commons</groupId>
-    <artifactId>hawkular-nest-itest-parent</artifactId>
+    <artifactId>hawkular-nest-parent</artifactId>
     <version>0.2.5.Final-SNAPSHOT</version>
   </parent>
   <artifactId>hawkular-nest-itest</artifactId>
@@ -28,7 +28,6 @@
 
   <properties>
     <hawkular.nest.deployments.dir>${project.build.directory}/${project.artifactId}-${project.version}/modules/org/hawkular/nest/main/deployments</hawkular.nest.deployments.dir>
-    <hawkular.nest.itest.war.path>${hawkular.nest.deployments.dir}/hawkular-nest-itest-war-${project.version}.war</hawkular.nest.itest.war.path>
   </properties>
 
   <dependencyManagement>
@@ -40,16 +39,18 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
+
+      <dependency>
+        <groupId>org.hawkular.commons</groupId>
+        <artifactId>hawkular-rest-status</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
-
-    <dependency>
-      <groupId>com.squareup.okhttp</groupId>
-      <artifactId>okhttp</artifactId>
-      <scope>test</scope>
-    </dependency>
 
     <dependency>
       <groupId>org.hawkular.commons</groupId>
@@ -74,11 +75,58 @@
 
     <dependency>
       <groupId>org.hawkular.commons</groupId>
-      <artifactId>hawkular-nest-itest-war</artifactId>
+      <artifactId>hawkular-rest-status</artifactId>
       <version>${project.version}</version>
-      <type>war</type>
     </dependency>
 
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jaxrs</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.enterprise</groupId>
+      <artifactId>cdi-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-rest-status</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jaxrs</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.enterprise</groupId>
+      <artifactId>cdi-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.squareup.okhttp</groupId>
+      <artifactId>okhttp</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>
@@ -116,7 +164,6 @@
         <configuration>
           <systemPropertyVariables>
             <jboss.home>${project.build.directory}/${project.artifactId}-${project.version}</jboss.home>
-            <hawkular.nest.itest.war.path>${hawkular.nest.itest.war.path}</hawkular.nest.itest.war.path>
           </systemPropertyVariables>
         </configuration>
       </plugin>
@@ -133,31 +180,6 @@
             <phase>compile</phase>
             <configuration>
               <config-file>server-provisioning.xml</config-file>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-deployments</id>
-            <phase>test-compile</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.hawkular.commons</groupId>
-                  <artifactId>hawkular-nest-itest-war</artifactId>
-                  <version>${project.version}</version>
-                  <type>war</type>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${hawkular.nest.deployments.dir}</outputDirectory>
             </configuration>
           </execution>
         </executions>

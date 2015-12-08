@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.nest;
+package org.hawkular.commons.cassandra.driver.itest;
 
 import java.io.IOException;
 import java.util.List;
@@ -47,7 +47,7 @@ public class CassandraDriverITest {
         WebArchive archive = ShrinkWrap.create(WebArchive.class, CassandraDriverITest.class.getSimpleName() + ".war")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
                 .addAsWebInfResource(
-                        CassandraDriverITest.class.getResource("/cassandra-driver-jboss-deployment-structure.xml"),
+                        CassandraDriverITest.class.getResource("/cassandra-driver/jboss-deployment-structure.xml"),
                         "jboss-deployment-structure.xml");
         // ZipExporter exporter = new ZipExporterImpl(archive);
         // exporter.exportTo(new File("target", CassandraDriverITest.class.getSimpleName() + ".war"));
