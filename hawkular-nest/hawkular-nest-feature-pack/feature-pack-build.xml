@@ -20,7 +20,7 @@
 <build xmlns="urn:wildfly:feature-pack-build:1.1">
   <dependencies>
     <artifact name="org.wildfly:wildfly-feature-pack" />
-    <!-- <artifact name="org.hawkular.commons:cassandra-driver-feature-pack" /> -->
+    <artifact name="org.hawkular.commons:hawkular-bus-feature-pack" />
   </dependencies>
 
   <config>
