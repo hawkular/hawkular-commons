@@ -46,12 +46,6 @@
   <dependencies>
 
     <dependency>
-      <groupId>com.squareup.okhttp</groupId>
-      <artifactId>okhttp</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-nest-feature-pack</artifactId>
       <version>${project.version}</version>
@@ -79,6 +73,11 @@
       <type>war</type>
     </dependency>
 
+    <dependency>
+      <groupId>com.squareup.okhttp</groupId>
+      <artifactId>okhttp</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>
@@ -93,10 +92,10 @@
     </dependency>
 
     <dependency>
-      <groupId>org.wildfly</groupId>
-      <artifactId>wildfly-arquillian-container-managed</artifactId>
-      <version>8.2.1.Final</version>
-      <scope>test</scope>
+        <groupId>org.arquillian.container</groupId>
+        <artifactId>arquillian-container-chameleon</artifactId>
+        <version>1.0.0.Alpha6</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -117,6 +116,7 @@
         <configuration>
           <systemPropertyVariables>
             <jboss.home>${project.build.directory}/${project.artifactId}-${project.version}</jboss.home>
+            <version.org.wildfly>${version.org.wildfly}</version.org.wildfly>
             <hawkular.nest.itest.war.path>${hawkular.nest.itest.war.path}</hawkular.nest.itest.war.path>
           </systemPropertyVariables>
         </configuration>
