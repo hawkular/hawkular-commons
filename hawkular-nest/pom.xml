@@ -26,9 +26,7 @@
     <version>0.2.5.Final-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.hawkular.commons</groupId>
   <artifactId>hawkular-nest-parent</artifactId>
-  <version>0.2.5.Final-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Hawkular: Nest Root Parent</name>
@@ -64,6 +62,12 @@
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${version.com.google.guava}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.wildfly</groupId>
+        <artifactId>wildfly-arquillian-container-managed</artifactId>
+        <version>${version.org.wildfly.wildfly-arquillian-container-managed}</version>
       </dependency>
 
       <dependency>
