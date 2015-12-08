@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.hawkular</groupId>
     <artifactId>hawkular-parent</artifactId>
-    <version>26</version>
+    <version>27</version>
   </parent>
 
   <groupId>org.hawkular.commons</groupId>
@@ -69,12 +69,12 @@
   </developers>
 
   <modules>
-    <module>cassandra-driver-wf-module</module>
     <module>embedded-cassandra</module>
     <module>templates</module>
     <module>email</module>
     <module>hawkular-rest-status</module>
     <module>hawkular-bus</module>
+    <module>hawkular-nest</module>
   </modules>
 
   <scm>
