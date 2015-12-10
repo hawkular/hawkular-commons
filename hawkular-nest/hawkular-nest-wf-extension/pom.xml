@@ -33,11 +33,6 @@
 
   <dependencies>
     <!-- WildFly will provide these - the module.xml will pull these in as dependencies -->
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <scope>provided</scope>
-    </dependency>
 
     <dependency>
       <groupId>org.jboss.common</groupId>
@@ -67,7 +62,6 @@
     <dependency>
       <groupId>org.wildfly.core</groupId>
       <artifactId>wildfly-subsystem-test-framework</artifactId>
-      <version>${version.org.wildfly.core}</version>
     </dependency>
 
     <!-- for logging annotations - it is not needed at runtime -->
