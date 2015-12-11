@@ -164,6 +164,7 @@
         <configuration>
           <systemPropertyVariables>
             <jboss.home>${project.build.directory}/${project.artifactId}-${project.version}</jboss.home>
+            <shrinkwrap.maven.settings>${project.build.directory}/shrinkwrap-maven-settings.xml</shrinkwrap.maven.settings>
           </systemPropertyVariables>
         </configuration>
       </plugin>
@@ -183,6 +184,55 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.gmavenplus</groupId>
+        <artifactId>gmavenplus-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <properties>
+            <property>
+              <name>someProp</name>
+              <value>${someProp}</value>
+            </property>
+          </properties>
+          <scripts>
+            <script><![CDATA[
+              import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer
+              import org.apache.maven.settings.SettingsUtils
+              import org.apache.maven.settings.Settings
+
+              Settings settings = SettingsUtils.copySettings(session.settings)
+              settings.setServers(null)
+              String outputPath = "${project.build.directory}/shrinkwrap-maven-settings.xml"
+              Writer out = null
+              try {
+                out = new OutputStreamWriter(new FileOutputStream(new File(outputPath)), "utf-8")
+                new SettingsXpp3Writer().write(out, settings)
+              } finally {
+                if (out != null) {
+                  out.close()
+                }
+              }
+            ]]></script>
+          </scripts>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>${version.org.codehaus.groovy}</version>
+            <scope>runtime</scope>
+          </dependency>
+        </dependencies>
       </plugin>
 
     </plugins>
