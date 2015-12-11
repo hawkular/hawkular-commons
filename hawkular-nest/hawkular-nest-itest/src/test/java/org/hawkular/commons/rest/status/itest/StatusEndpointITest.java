@@ -44,10 +44,12 @@ import com.squareup.okhttp.Response;
 public class StatusEndpointITest {
 
     private static final String statusUrl = "http://127.0.0.1:8080/hawkular/nest/itest/status";
+    private static final String shrinkwrapMavenSettings = System.getProperty("shrinkwrap.maven.settings");
 
     @Deployment
     public static WebArchive createDeployment() {
-        File[] libs = Maven.resolver().loadPomFromFile("pom.xml")
+        // System.out.println("shrinkwrapMavenSettings = "+ shrinkwrapMavenSettings);
+        File[] libs = Maven.configureResolver().fromFile(shrinkwrapMavenSettings).loadPomFromFile("pom.xml")
                 .resolve("org.hawkular.commons:hawkular-rest-status", "com.squareup.okhttp:okhttp")
                 .withTransitivity().asFile();
         WebArchive archive = ShrinkWrap.create(WebArchive.class, StatusEndpointITest.class.getSimpleName() + ".war")
