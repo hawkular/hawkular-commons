@@ -21,7 +21,7 @@
   <parent>
     <artifactId>hawkular-commons-parent</artifactId>
     <groupId>org.hawkular.commons</groupId>
-    <version>0.2.5.Final</version>
+    <version>0.2.6.Final-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
