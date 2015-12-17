@@ -373,7 +373,7 @@ public class MessageProcessor {
 
         setHeaders(basicMessage, headers, msg);
 
-        log.infof("Created text message [%s] with text [%s]", msg, msg.getText());
+        log.debugf("Created text message [%s] with text [%s]", msg, msg.getText());
 
         return msg;
     }
@@ -391,7 +391,7 @@ public class MessageProcessor {
      */
     protected void setHeaders(BasicMessage basicMessage, Map<String, String> headers, Message destination)
             throws JMSException {
-        log.infof("Setting [%s] = [%s] on a message of type [%s]", MessageProcessor.HEADER_BASIC_MESSAGE_CLASS,
+        log.debugf("Setting [%s] = [%s] on a message of type [%s]", MessageProcessor.HEADER_BASIC_MESSAGE_CLASS,
                 basicMessage.getClass().getName(), destination.getClass().getName());
         destination.setStringProperty(MessageProcessor.HEADER_BASIC_MESSAGE_CLASS, basicMessage.getClass().getName());
 
@@ -458,7 +458,7 @@ public class MessageProcessor {
 
         setHeaders(basicMessage, headers, msg);
 
-        log.infof("Created binary message [%s]", msg);
+        log.debugf("Created binary message [%s]", msg);
 
         return msg;
     }
