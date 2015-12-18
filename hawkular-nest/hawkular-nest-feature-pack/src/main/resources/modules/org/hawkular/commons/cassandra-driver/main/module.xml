@@ -23,6 +23,7 @@
     <module name="org.slf4j" />
     <module name="io.netty"/>
     <module name="sun.jdk" />
+    <module name="javax.api" />
   </dependencies>
   <resources>
     <artifact name="${com.datastax.cassandra:cassandra-driver-core}"/>
