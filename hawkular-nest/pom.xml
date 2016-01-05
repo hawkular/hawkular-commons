@@ -99,23 +99,4 @@
     </dependencies>
   </dependencyManagement>
 
-  <profiles>
-    <!-- unzips the assembly so devs can run it right out of target/ -->
-    <profile>
-      <id>dev</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <configuration>
-              <formats>
-                <format>dir</format>
-                <format>zip</format>
-              </formats>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
