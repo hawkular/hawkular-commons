@@ -16,79 +16,42 @@
  */
 package org.hawkular.bus.common.consumer;
 
+import javax.inject.Inject;
 import javax.jms.Message;
+import javax.jms.MessageListener;
 
 import org.hawkular.bus.common.BasicMessage;
-import org.hawkular.bus.common.BasicMessageWithExtraData;
+import org.hawkular.bus.common.MessageSerializer;
 import org.jboss.logging.Logger;
 
 /**
  * A message listener that expects to receive a JSON-encoded BasicMessage or one of its subclasses. Implementors need
- * not worry about the JSON decoding as it is handled for you
- *
- * Subclasses must override one and only one of the {@link #onBasicMessage(BasicMessageWithExtraData)} or
- * {@link #onBasicMessage(BasicMessage)} methods.
- *
- * This processes fire-and-forget requests - that is, the request message is processed with no response being sent back
- * to the sender.
- *
+ * not worry about the JSON decoding as it is handled for you. This class can also be used as a base class for MDBs.
+
  * @author John Mazzitelli
  */
 
-public abstract class BasicMessageListener<T extends BasicMessage> extends AbstractBasicMessageListener<T> {
+public abstract class BasicMessageListener<T extends BasicMessage> implements MessageListener {
+
     private static final Logger log = Logger.getLogger(BasicMessageListener.class);
 
-    public BasicMessageListener() {
-        super();
-    }
-
-    protected BasicMessageListener(Class<T> jsonDecoderRing) {
-        super(jsonDecoderRing);
-    }
-
-    protected BasicMessageListener(ClassLoader basicMessageClassLoader) {
-        super(basicMessageClassLoader);
-    }
+    @Inject
+    private MessageSerializer messageSerializer;
 
     @Override
     public void onMessage(Message message) {
 
         log.debugf("Received raw message [%s]", message);
 
-        BasicMessageWithExtraData<T> msgWithExtraData = parseMessage(message);
-        if (msgWithExtraData == null) {
-            return; // either we are not to process this message or some error occurred, so we skip it
-        }
-
-        onBasicMessage(msgWithExtraData);
-        return;
-    };
-
-    /**
-     * Subclasses implement this method to process the received message.
-     *
-     * If subclasses would rather just receive the {@link BasicMessage}, it can do so by
-     * overriding {@link #onBasicMessage(BasicMessage)} and leaving this method as-is (that is,
-     * do NOT override this method).
-     *
-     * @param msgWithExtraData the basic message received with any extra data that came with it
-     */
-    protected void onBasicMessage(BasicMessageWithExtraData<T> msgWithExtraData) {
-        onBasicMessage(msgWithExtraData.getBasicMessage()); // delegate
+        T basicMessage = messageSerializer.toBasicMessage(message);
+        onBasicMessage(basicMessage);
     }
 
     /**
-     * Subclasses can implement this method rather than {@link #onBasicMessage(BasicMessageWithExtraData)}
-     * if they only expect to receive a {@link BasicMessage} with no additional data.
+     * This callback method is invoked after the raw JMS message is mapped to the message of type {@link T}.
      *
-     * If this method is overridden by subclasses, then the {@link #onBasicMessage(BasicMessageWithExtraData)}
-     * should not be.
+     * @param basicMessage The received message.
      *
-     * This base implementation is a no-op.
-     *
-     * @param basicMessage the basic message received
      */
-    protected void onBasicMessage(T basicMessage) {
-        // no op
-    }
+    public abstract void onBasicMessage(T basicMessage);
 }

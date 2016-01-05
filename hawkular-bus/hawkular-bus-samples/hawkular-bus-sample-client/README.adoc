@@ -1,6 +1,0 @@
-A sample client for the Hawkular Bus that listens to queue 'myqueue' on an internal broker.
-
-Run this via:
-   mvn -Prun-sample-client install
-
-and see the log output.
