@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates
+ * Copyright 2015-2016 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,10 +16,10 @@
  */
 package org.hawkular.bus.common.consumer;
 
-import java.io.IOException;
-
 import javax.jms.Destination;
+import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 import org.hawkular.bus.common.AbstractMessage;
@@ -90,6 +90,7 @@ public abstract class RPCBasicMessageListener<T extends BasicMessage, U extends 
 
         // send the response back to the sender of the request
         ConsumerConnectionContext consumerConnectionContext = null;
+        MessageProducer sessionProducer = null;
         try {
             Destination replyTo = message.getJMSReplyTo();
 
@@ -117,7 +118,8 @@ public abstract class RPCBasicMessageListener<T extends BasicMessage, U extends 
                 if (session == null) {
                     msglog.errorNoSessionInListener();
                 } else {
-                    producerContext.setMessageProducer(session.createProducer(replyTo));
+                    sessionProducer = session.createProducer(replyTo);
+                    producerContext.setMessageProducer(sessionProducer);
                     sender.send(producerContext, responseBasicMessage);
                 }
 
@@ -128,10 +130,10 @@ public abstract class RPCBasicMessageListener<T extends BasicMessage, U extends 
             msglog.errorFailedToSendResponse(e);
             return;
         } finally {
-            if (consumerConnectionContext != null) {
+            if (sessionProducer != null) {
                 try {
-                    consumerConnectionContext.close();
-                } catch (IOException e) {
+                    sessionProducer.close();
+                } catch (JMSException e) {
                     msglog.errorFailedToCloseResourcesToRPCClient(e);
                 }
             }
