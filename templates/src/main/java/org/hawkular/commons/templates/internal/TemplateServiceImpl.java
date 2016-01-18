@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 Red Hat, Inc. and/or its affiliates
+ * Copyright 2014-2016 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,6 +44,8 @@ import freemarker.template.TemplateException;
 @PermitAll
 @Singleton
 public class TemplateServiceImpl implements TemplateService {
+    MsgLogger logger = MsgLogger.LOGGER;
+
     @Inject @OverrideDirectory
     String overrideDirectory;
 
@@ -52,11 +54,11 @@ public class TemplateServiceImpl implements TemplateService {
 
     private Configuration configuration = new Configuration(Configuration.VERSION_2_3_23);
 
-    public TemplateServiceImpl() throws IOException {
+    public TemplateServiceImpl() {
         this(null, null);
     }
 
-    public TemplateServiceImpl(String overrideDirectory, String configurationDirectory) throws IOException {
+    public TemplateServiceImpl(String overrideDirectory, String configurationDirectory) {
         if (null != overrideDirectory) {
             this.overrideDirectory = overrideDirectory;
         }
@@ -76,14 +78,23 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @PostConstruct
-    void configure() throws IOException {
+    void configure() {
         Set<TemplateLoader> loaders = new LinkedHashSet<>();
+
         if (null != overrideDirectory) {
-            loaders.add(new FileTemplateLoader(new File(this.overrideDirectory)));
+            try {
+                loaders.add(new FileTemplateLoader(new File(this.overrideDirectory)));
+            } catch (IOException e) {
+                logger.failedToLoadTemplatesFromOverrideDirectory(overrideDirectory, e);
+            }
         }
 
         if (null != configurationDirectory) {
-            loaders.add(new FileTemplateLoader(new File(this.configurationDirectory)));
+            try {
+                loaders.add(new FileTemplateLoader(new File(this.configurationDirectory)));
+            } catch (IOException e) {
+                logger.failedToLoadTemplatesFromConfigDirectory(configurationDirectory, e);
+            }
         }
 
         MultiTemplateLoader mtl = new MultiTemplateLoader(loaders.toArray(new TemplateLoader[loaders.size()]));
