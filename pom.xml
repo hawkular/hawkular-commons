@@ -91,7 +91,7 @@
   <properties>
     <version.org.freemarker>2.3.23</version.org.freemarker>
     <version.org.wildfly.wildfly-arquillian-container-managed>8.2.1.Final</version.org.wildfly.wildfly-arquillian-container-managed>
-    <version.org.jboss.arquillian>1.1.10.Final</version.org.jboss.arquillian>
+    <version.org.jboss.arquillian>1.1.11.Final</version.org.jboss.arquillian>
   </properties>
 
   <dependencyManagement>
