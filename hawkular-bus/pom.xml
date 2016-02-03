@@ -71,13 +71,6 @@
       </dependency>
 
       <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-rar</artifactId>
-        <version>${version.org.apache.activemq}</version>
-        <type>rar</type>
-      </dependency>
-
-      <dependency>
         <groupId>org.wildfly.bom</groupId>
         <artifactId>wildfly-javaee7</artifactId>
         <version>${version.org.wildfly}</version>
