@@ -60,12 +60,6 @@
         <version>${version.com.google.guava}</version>
       </dependency>
 
-      <dependency>
-        <groupId>gnu.getopt</groupId>
-        <artifactId>java-getopt</artifactId>
-        <version>${version.gnu.getopt}</version>
-      </dependency>
-
       <!-- ActiveMQ BOM -->
 
       <dependency>
@@ -74,13 +68,6 @@
         <version>${version.org.wildfly}</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-rar</artifactId>
-        <version>${version.org.apache.activemq}</version>
-        <type>rar</type>
       </dependency>
 
       <dependency>
