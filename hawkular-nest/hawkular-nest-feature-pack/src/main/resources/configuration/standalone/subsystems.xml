@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!--
 
-    Copyright 2015 Red Hat, Inc. and/or its affiliates
+    Copyright 2015-2016 Red Hat, Inc. and/or its affiliates
     and other contributors as indicated by the @author tags.
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,9 @@
     <subsystem>logging.xml</subsystem>
     <subsystem>batch-jberet.xml</subsystem>
     <subsystem>bean-validation.xml</subsystem>
-    <subsystem>datasources.xml</subsystem>
+
+    <subsystem>hawkular-nest-datasources.xml</subsystem>
+
     <subsystem>deployment-scanner.xml</subsystem>
     <subsystem>ee.xml</subsystem>
     <subsystem>ejb3.xml</subsystem>
