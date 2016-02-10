@@ -37,7 +37,6 @@
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-commons-embedded-cassandra-service</artifactId>
       <type>ejb</type>
-      <version>${project.version}</version>
     </dependency>
   </dependencies>
 

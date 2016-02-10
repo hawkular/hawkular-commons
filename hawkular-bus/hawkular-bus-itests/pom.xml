@@ -52,14 +52,12 @@
     <dependency>
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-bus-common</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-bus-feature-pack</artifactId>
-      <version>${project.version}</version>
       <type>pom</type>
       <scope>provided</scope>
     </dependency>
@@ -67,7 +65,6 @@
     <dependency>
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-bus-feature-pack</artifactId>
-      <version>${project.version}</version>
       <type>zip</type>
       <exclusions>
         <exclusion>
@@ -159,7 +156,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <systemPropertyVariables>
-            <jbossHome>${project.build.directory}/${project.artifactId}-${project.version}</jbossHome>
+            <jbossHome>${project.build.directory}/${project.build.finalName}</jbossHome>
           </systemPropertyVariables>
         </configuration>
       </plugin>

@@ -94,9 +94,88 @@
     <version.org.jboss.arquillian>1.1.11.Final</version.org.jboss.arquillian>
   </properties>
 
+  <!-- We manage the artifacts from Commons here so that hawkular-commons-parent can be imported as a BoM by downstream Hawkular components -->
   <dependencyManagement>
-    <!-- Because Hawkular Commons hosts relatively independent subcomponents,
-         the dependencies should be managed on the subcomponent level rather than here -->
+    <dependencies>
+
+      <dependency>
+        <groupId>org.hawkular.commons</groupId>
+        <artifactId>hawkular-bus-common</artifactId>
+        <version>0.3.6.Final-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hawkular.commons</groupId>
+        <artifactId>hawkular-bus-feature-pack</artifactId>
+        <version>0.3.6.Final-SNAPSHOT</version>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.hawkular.commons</groupId>
+        <artifactId>hawkular-bus-feature-pack</artifactId>
+        <version>0.3.6.Final-SNAPSHOT</version>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>org.hawkular.commons</groupId>
+        <artifactId>hawkular-bus-mdb</artifactId>
+        <version>0.3.6.Final-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hawkular.commons</groupId>
+        <artifactId>hawkular-bus-rest-client</artifactId>
+        <version>0.3.6.Final-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.hawkular.commons</groupId>
+        <artifactId>hawkular-commons-email</artifactId>
+        <version>0.3.6.Final-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.hawkular.commons</groupId>
+        <artifactId>hawkular-commons-embedded-cassandra-ear</artifactId>
+        <version>0.3.6.Final-SNAPSHOT</version>
+        <type>ear</type>
+      </dependency>
+      <dependency>
+        <groupId>org.hawkular.commons</groupId>
+        <artifactId>hawkular-commons-embedded-cassandra-service</artifactId>
+        <version>0.3.6.Final-SNAPSHOT</version>
+        <type>ejb</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.hawkular.commons</groupId>
+        <artifactId>hawkular-commons-templates</artifactId>
+        <version>0.3.6.Final-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.hawkular.commons</groupId>
+        <artifactId>hawkular-nest-feature-pack</artifactId>
+        <version>0.3.6.Final-SNAPSHOT</version>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.hawkular.commons</groupId>
+        <artifactId>hawkular-nest-feature-pack</artifactId>
+        <version>0.3.6.Final-SNAPSHOT</version>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>org.hawkular.commons</groupId>
+        <artifactId>hawkular-nest-wf-extension</artifactId>
+        <version>0.3.6.Final-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.hawkular.commons</groupId>
+        <artifactId>hawkular-rest-status</artifactId>
+        <version>0.3.6.Final-SNAPSHOT</version>
+      </dependency>
+
+    </dependencies>
   </dependencyManagement>
 
 </project>

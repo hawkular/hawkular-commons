@@ -27,7 +27,7 @@
   <name>Hawkular Nest Intagration Tests</name>
 
   <properties>
-    <hawkular.nest.deployments.dir>${project.build.directory}/${project.artifactId}-${project.version}/modules/org/hawkular/nest/main/deployments</hawkular.nest.deployments.dir>
+    <hawkular.nest.deployments.dir>${project.build.directory}/${project.build.finalName}/modules/org/hawkular/nest/main/deployments</hawkular.nest.deployments.dir>
   </properties>
 
   <dependencyManagement>
@@ -40,13 +40,6 @@
         <type>pom</type>
       </dependency>
 
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-rest-status</artifactId>
-        <version>${project.version}</version>
-        <scope>test</scope>
-      </dependency>
-
     </dependencies>
   </dependencyManagement>
 
@@ -55,7 +48,6 @@
     <dependency>
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-nest-feature-pack</artifactId>
-      <version>${project.version}</version>
       <type>pom</type>
       <scope>provided</scope>
     </dependency>
@@ -63,7 +55,6 @@
     <dependency>
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-nest-feature-pack</artifactId>
-      <version>${project.version}</version>
       <type>zip</type>
       <exclusions>
         <exclusion>
@@ -72,31 +63,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-
-    <dependency>
-      <groupId>org.hawkular.commons</groupId>
-      <artifactId>hawkular-rest-status</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxrs</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.enterprise</groupId>
-      <artifactId>cdi-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
 
     <dependency>
       <groupId>org.hawkular.commons</groupId>
@@ -163,7 +129,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <systemPropertyVariables>
-            <jboss.home>${project.build.directory}/${project.artifactId}-${project.version}</jboss.home>
+            <jboss.home>${project.build.directory}/${project.build.finalName}</jboss.home>
             <shrinkwrap.maven.settings>${project.build.directory}/shrinkwrap-maven-settings.xml</shrinkwrap.maven.settings>
           </systemPropertyVariables>
         </configuration>
