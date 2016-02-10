@@ -60,16 +60,6 @@
         <version>${version.com.google.guava}</version>
       </dependency>
 
-      <!-- ActiveMQ BOM -->
-
-      <dependency>
-        <groupId>org.wildfly</groupId>
-        <artifactId>wildfly-jms-client-bom</artifactId>
-        <version>${version.org.wildfly}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-
       <dependency>
         <groupId>org.wildfly.bom</groupId>
         <artifactId>wildfly-javaee7</artifactId>
@@ -79,28 +69,11 @@
       </dependency>
 
       <dependency>
-        <groupId>org.wildfly.core</groupId>
-        <artifactId>wildfly-controller</artifactId>
-        <version>${version.org.wildfly.core}</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.wildfly</groupId>
-        <artifactId>wildfly-dist</artifactId>
+        <artifactId>wildfly-jms-client-bom</artifactId>
         <version>${version.org.wildfly}</version>
-        <type>zip</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.wildfly.core</groupId>
-        <artifactId>wildfly-server</artifactId>
-        <version>${version.org.wildfly.core}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.wildfly.core</groupId>
-        <artifactId>wildfly-subsystem-test-framework</artifactId>
-        <version>${version.org.wildfly.core}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
 
     </dependencies>

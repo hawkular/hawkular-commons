@@ -78,12 +78,6 @@
 
       <dependency>
         <groupId>org.wildfly.core</groupId>
-        <artifactId>wildfly-server</artifactId>
-        <version>${version.org.wildfly.core}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.wildfly.core</groupId>
         <artifactId>wildfly-subsystem-test-framework</artifactId>
         <version>${version.org.wildfly.core}</version>
       </dependency>

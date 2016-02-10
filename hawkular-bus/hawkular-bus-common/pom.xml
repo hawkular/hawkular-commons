@@ -37,6 +37,18 @@
   </properties>
 
   <dependencies>
+    <!-- To avoid javadoc errors (and thus causing mvn release plugin to fail) we need this provided dependency.
+      Google Guava uses com.google.common.util.concurrent.ExecutionList which is annotated with @GuardedBy.
+      Without this dep to give us that annotation class, we get this error:
+      Cannot find annotation method 'value()' in type 'GuardedBy':
+      class file for javax.annotation.concurrent.GuardedBy not found
+    -->
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+      <version>${version.com.google.code.findbugs}</version>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -57,23 +69,22 @@
     </dependency>
 
     <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>artemis-jms-client</artifactId>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.spec.javax.jms</groupId>
-      <artifactId>jboss-jms-api_2.0_spec</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging</artifactId>
+      <scope>provided</scope>
     </dependency>
-
-    <!-- for logging annotations - it is not needed at runtime -->
     <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging-annotations</artifactId>
@@ -85,58 +96,12 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- To avoid javadoc errors (and thus causing mvn release plugin to fail) we need this provided dependency.
-      Google Guava uses com.google.common.util.concurrent.ExecutionList which is annotated with @GuardedBy.
-      Without this dep to give us that annotation class, we get this error:
-      Cannot find annotation method 'value()' in type 'GuardedBy':
-      class file for javax.annotation.concurrent.GuardedBy not found
-    -->
     <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>jsr305</artifactId>
-      <version>1.3.8</version>
+      <groupId>org.jboss.spec.javax.jms</groupId>
+      <artifactId>jboss-jms-api_2.0_spec</artifactId>
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
-  <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-        <excludes>
-          <!-- these don't need to be in the jar, just in our module .zip -->
-          <exclude>module/**</exclude>
-        </excludes>
-      </resource>
-    </resources>
-
-    <plugins>
-      <!-- TODO Remove assembly plugin once WildFly feature packs are in place -->
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <finalName>hawkular-bus-common-${project.version}</finalName>
-          <descriptors>
-            <descriptor>src/main/scripts/module-assembly.xml</descriptor>
-          </descriptors>
-        </configuration>
-        <executions>
-          <execution>
-            <id>module-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

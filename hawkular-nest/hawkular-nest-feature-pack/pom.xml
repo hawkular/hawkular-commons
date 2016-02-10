@@ -57,21 +57,13 @@
 
     <dependency>
       <groupId>org.hawkular.commons</groupId>
-      <artifactId>hawkular-nest-wf-extension</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-commons-embedded-cassandra-ear</artifactId>
-      <version>${project.version}</version>
       <type>ear</type>
     </dependency>
 
     <dependency>
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-bus-feature-pack</artifactId>
-      <version>${project.version}</version>
       <type>zip</type>
       <exclusions>
         <exclusion>
@@ -79,6 +71,11 @@
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-nest-wf-extension</artifactId>
     </dependency>
 
     <dependency>

@@ -52,14 +52,12 @@
     <dependency>
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-bus-common</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-bus-feature-pack</artifactId>
-      <version>${project.version}</version>
       <type>pom</type>
       <scope>provided</scope>
     </dependency>
@@ -67,7 +65,6 @@
     <dependency>
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-bus-feature-pack</artifactId>
-      <version>${project.version}</version>
       <type>zip</type>
       <exclusions>
         <exclusion>
@@ -80,14 +77,7 @@
     <dependency>
       <groupId>javax.enterprise</groupId>
       <artifactId>cdi-api</artifactId>
-      <version>1.2</version>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jboss.spec.javax.jms</groupId>
-      <artifactId>jboss-jms-api_2.0_spec</artifactId>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -103,10 +93,16 @@
     </dependency>
 
     <dependency>
+      <groupId>org.jboss.spec.javax.jms</groupId>
+      <artifactId>jboss-jms-api_2.0_spec</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.wildfly</groupId>
       <artifactId>wildfly-arquillian-container-managed</artifactId>
-      <version>8.2.1.Final</version>
       <scope>test</scope>
+      <version>${version.org.wildfly.wildfly-arquillian-container-managed}</version>
     </dependency>
 
   </dependencies>
@@ -142,7 +138,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/standalone/configuration</outputDirectory>
+              <outputDirectory>${project.build.directory}/${project.build.finalName}/standalone/configuration</outputDirectory>
               <resources>
                 <resource>
                   <directory>src/test/resources</directory>
@@ -159,7 +155,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <systemPropertyVariables>
-            <jbossHome>${project.build.directory}/${project.artifactId}-${project.version}</jbossHome>
+            <jbossHome>${project.build.directory}/${project.build.finalName}</jbossHome>
           </systemPropertyVariables>
         </configuration>
       </plugin>
