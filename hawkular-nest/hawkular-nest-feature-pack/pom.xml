@@ -57,11 +57,6 @@
 
     <dependency>
       <groupId>org.hawkular.commons</groupId>
-      <artifactId>hawkular-nest-wf-extension</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-commons-embedded-cassandra-ear</artifactId>
       <type>ear</type>
     </dependency>
@@ -76,6 +71,11 @@
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-nest-wf-extension</artifactId>
     </dependency>
 
     <dependency>
