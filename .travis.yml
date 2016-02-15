@@ -22,6 +22,8 @@ addons:
     branch_pattern: coverity_scan
 install:
 - mvn -version -B
+# unshallow is needed by license-maven-plugin
+- git fetch origin --unshallow
 script:
 - mvn -s .travis.maven.settings.xml verify -Pitest -Dwildfly.logging.console.level=DEBUG -B | grep -vF "[INFO] Downloading:" | grep -vF "[INFO] Downloaded:"; test ${PIPESTATUS[0]} -eq 0
 after_success:
