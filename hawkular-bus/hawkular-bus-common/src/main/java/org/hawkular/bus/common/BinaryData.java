@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates
+ * Copyright 2015-2016 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,13 +16,14 @@
  */
 package org.hawkular.bus.common;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.SequenceInputStream;
 
 /**
- * This is a "stream" that includes some in-memory data as well as another stream.  The in-memory data (if not null
- * or empty) will be read first. Once the in-memory data has been exhausted, any additional reads will read data
- * from the input stream.
+ * This is a stream that is backed either by the provided InputStream or by a SequenceInputStream, should the
+ * inMemoryData be provided.
  *
  * This is used in the use-case that an input stream contained a JSON command (e.g. AbstractMessage) followed by
  * additional binary data. The JSON parser may have read extra data over and beyond the actual JSON message data.
@@ -35,17 +36,16 @@ import java.io.InputStream;
  * amount of data found in a stream.
  */
 public class BinaryData extends InputStream {
-
-    private byte[] inMemoryData;
-    private final InputStream streamData;
-    private int inMemoryDataPointer;
-
+    private InputStream backingStream;
     private Runnable onCloseAction;
 
     public BinaryData(byte[] inMemoryData, InputStream streamData) {
-        this.inMemoryData = (inMemoryData != null) ? inMemoryData : new byte[0];
-        this.streamData = streamData;
-        this.inMemoryDataPointer = 0;
+        if (null == inMemoryData || inMemoryData.length == 0) {
+            backingStream = streamData;
+        } else {
+            ByteArrayInputStream firstStream = new ByteArrayInputStream(inMemoryData);
+            backingStream = new SequenceInputStream(firstStream, streamData);
+        }
         this.onCloseAction = null;
     }
 
@@ -59,68 +59,54 @@ public class BinaryData extends InputStream {
         onCloseAction = action;
     }
 
-    public int read() throws IOException {
-        if (unreadInMemoryDataExists()) {
-            return (inMemoryData[inMemoryDataPointer++] & 0xff);
-        } else {
-            return streamData.read();
-        }
-    }
-
-    public int read(byte[] b) throws IOException {
-        if (unreadInMemoryDataExists()) {
-            return super.read(b); // the superclass implementation is all we need
-        } else {
-            return this.streamData.read(b); // delegate directly to the stream
-        }
-    }
-
-    public int read(byte[] b, int off, int len) throws IOException {
-        if (unreadInMemoryDataExists()) {
-            return super.read(b, off, len); // the superclass implementation is all we need
-        } else {
-            return this.streamData.read(b, off, len); // delegate directly to the stream
-        }
-    }
-
-    public long skip(long n) throws IOException {
-        if (unreadInMemoryDataExists()) {
-            return super.skip(n); // the superclass implementation is all we need
-        } else {
-            return this.streamData.skip(n); // delegate directly to the stream
-        }
-    }
-
-    public int available() throws IOException {
-        return (inMemoryData.length - inMemoryDataPointer) + streamData.available();
-    }
-
     public void close() throws IOException {
-        // force nothing more to be read from the in-memory data, let the garbage collected free up its memory,
-        // but avoid NPEs by setting inMemoryData to a small zero-byte array.
-        inMemoryData = new byte[0];
-        inMemoryDataPointer = 0;
-        streamData.close();
-
-        // if we were asked to do something after close is done, do it now
-        if (onCloseAction != null) {
-            onCloseAction.run();
+        try {
+            backingStream.close();
+        } finally {
+            // if we were asked to do something after close is done, do it now
+            if (onCloseAction != null) {
+                onCloseAction.run();
+            }
         }
     }
 
+    @Override
     public void mark(int readlimit) {
-        super.mark(readlimit); // superclass doesn't support this, and neither to we
+        backingStream.mark(readlimit);
     }
 
+    @Override
     public void reset() throws IOException {
-        super.reset(); // superclass doesn't support this, and neither do we
+        backingStream.reset();
     }
 
+    @Override
     public boolean markSupported() {
-        return super.markSupported(); // superclass doesn't support this, and neither to we
+        return backingStream.markSupported();
     }
 
-    private boolean unreadInMemoryDataExists() {
-        return (inMemoryDataPointer < inMemoryData.length);
+    @Override
+    public int read() throws IOException {
+        return backingStream.read();
+    }
+
+    @Override
+    public int read(byte[] b) throws IOException {
+        return backingStream.read(b);
+    }
+
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        return backingStream.read(b, off, len);
+    }
+
+    @Override
+    public long skip(long n) throws IOException {
+        return backingStream.skip(n);
+    }
+
+    @Override
+    public int available() throws IOException {
+        return backingStream.available();
     }
 }
