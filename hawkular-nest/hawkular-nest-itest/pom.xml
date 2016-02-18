@@ -130,7 +130,8 @@
         <configuration>
           <systemPropertyVariables>
             <jboss.home>${project.build.directory}/${project.build.finalName}</jboss.home>
-            <shrinkwrap.maven.settings>${project.build.directory}/shrinkwrap-maven-settings.xml</shrinkwrap.maven.settings>
+            <!-- <shrinkwrap.maven.settings>${project.build.directory}/shrinkwrap-maven-settings.xml</shrinkwrap.maven.settings> -->
+            <shrinkwrap.maven.settings>${basedir}/../../.travis.maven.settings.xml</shrinkwrap.maven.settings>
           </systemPropertyVariables>
         </configuration>
       </plugin>
