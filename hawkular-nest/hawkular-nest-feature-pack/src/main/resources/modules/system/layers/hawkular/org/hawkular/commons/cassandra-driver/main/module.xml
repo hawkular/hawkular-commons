@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!--
 
-    Copyright 2015 Red Hat, Inc. and/or its affiliates
+    Copyright 2015-2016 Red Hat, Inc. and/or its affiliates
     and other contributors as indicated by the @author tags.
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,16 +17,16 @@
     limitations under the License.
 
 -->
-<module xmlns="urn:jboss:module:1.1" name="org.hawkular.bus">
+<module xmlns="urn:jboss:module:1.1" name="org.hawkular.commons.cassandra-driver">
   <dependencies>
-    <module name="org.jboss.logging" />
-    <module name="javaee.api" export="true"  />
-    <module name="org.hawkular.commons.guava"/>
-    <module name="com.fasterxml.jackson.core.jackson-annotations" export="true"/>
-    <module name="com.fasterxml.jackson.core.jackson-core" export="true"/>
-    <module name="com.fasterxml.jackson.core.jackson-databind" export="true"/>
+    <module name="org.hawkular.commons.guava" />
+    <module name="org.slf4j" />
+    <module name="io.netty"/>
+    <module name="sun.jdk" />
+    <module name="javax.api" />
   </dependencies>
   <resources>
-    <artifact name="${org.hawkular.commons:hawkular-bus-common}" />
+    <artifact name="${com.datastax.cassandra:cassandra-driver-core}"/>
+    <artifact name="${com.codahale.metrics:metrics-core}"/>
   </resources>
 </module>

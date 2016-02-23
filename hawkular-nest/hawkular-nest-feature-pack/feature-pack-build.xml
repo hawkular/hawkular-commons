@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2015 Red Hat, Inc. and/or its affiliates
+    Copyright 2015-2016 Red Hat, Inc. and/or its affiliates
     and other contributors as indicated by the @author tags.
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +29,6 @@
   </config>
 
   <copy-artifacts>
-    <copy-artifact artifact="org.hawkular.commons:hawkular-commons-embedded-cassandra-ear" to-location="modules/org/hawkular/nest/main/deployments/hawkular-commons-embedded-cassandra-ear.ear" />
+    <copy-artifact artifact="org.hawkular.commons:hawkular-commons-embedded-cassandra-ear" to-location="modules/system/layers/hawkular/org/hawkular/nest/main/deployments/hawkular-commons-embedded-cassandra-ear.ear" />
   </copy-artifacts>
 </build>
