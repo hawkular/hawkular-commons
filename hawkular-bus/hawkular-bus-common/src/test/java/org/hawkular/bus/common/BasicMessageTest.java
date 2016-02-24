@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates
+ * Copyright 2015-2016 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -162,7 +162,7 @@ public class BasicMessageTest {
     // This is just to test that our JsonParser does NOT close the stream.
     // If close is called, that is bad and should fail the test
     class UncloseableByteArrayInputStream extends ByteArrayInputStream {
-        public UncloseableByteArrayInputStream(byte[] buf) {
+        UncloseableByteArrayInputStream(byte[] buf) {
             super(buf);
         }
 
