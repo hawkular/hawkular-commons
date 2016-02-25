@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates
+ * Copyright 2015-2016 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -69,7 +69,7 @@ public class BusTest {
 
         private class MessageListener extends BasicMessageListener<BasicMessage> {
 
-            public MessageListener() {
+            MessageListener() {
                 super(BusTest.class.getClassLoader());
             }
 
@@ -87,7 +87,7 @@ public class BusTest {
         private final MessageListener messageListener = new MessageListener();
         private BlockingQueue<BasicMessageWithExtraData<BasicMessage>> receivedMessages = new ArrayBlockingQueue<>(1);
 
-        public MessageReceiver(ConnectionFactory connectionFactory, Endpoint endpoint)
+        MessageReceiver(ConnectionFactory connectionFactory, Endpoint endpoint)
                 throws JMSException, IOException {
             String messageSelector = String.format("%s = '%s'", TEST_HEADER, TEST_VALUE);
             this.connectionContextFactory = new ConnectionContextFactory(true, connectionFactory);

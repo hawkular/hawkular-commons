@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates
+ * Copyright 2015-2016 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -142,10 +142,10 @@ class SomeMessage extends AbstractMessage {
     // this will be included in the JSON due to its getter/setter
     private String someAttrib;
 
-    public SomeMessage() {
+    SomeMessage() {
     }
 
-    public SomeMessage(String one) {
+    SomeMessage(String one) {
         this.one = one;
     }
 
@@ -192,10 +192,10 @@ class AnotherMessage extends SomeMessage {
     // if our superclass supports getter/setter JSON, this will be included in the JSON
     private String anotherAttrib;
 
-    public AnotherMessage() {
+    AnotherMessage() {
     }
 
-    public AnotherMessage(String one, String two) {
+    AnotherMessage(String one, String two) {
         super(one);
         this.two = two;
     }
