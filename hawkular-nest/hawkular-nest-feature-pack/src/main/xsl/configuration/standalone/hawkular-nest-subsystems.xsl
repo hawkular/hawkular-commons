@@ -17,13 +17,25 @@
     limitations under the License.
 
 -->
-<build xmlns="urn:wildfly:feature-pack-build:1.1">
-  <dependencies>
-    <artifact name="org.wildfly:wildfly-feature-pack" />
-  </dependencies>
 
-  <config>
-    <standalone template="configuration/standalone/template.xml" subsystems="configuration/standalone/subsystems.xml"
-      output-file="standalone/configuration/standalone.xml" />
-  </config>
-</build>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="2.0">
+
+  <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" xalan:indent-amount="4" standalone="no" />
+  <xsl:strip-space elements="*" />
+
+  <!-- Add the Nest subsystem -->
+  <xsl:template match="/*[name(.)='config']/*[name(.)='subsystems']">
+    <xsl:copy>
+      <xsl:apply-templates select="node()|@*"/>
+      <xsl:element name="subsystem">nest.xml</xsl:element>
+    </xsl:copy>
+  </xsl:template>
+
+  <!-- copy everything else as-is -->
+  <xsl:template match="node()|@*">
+    <xsl:copy>
+      <xsl:apply-templates select="node()|@*" />
+    </xsl:copy>
+  </xsl:template>
+
+</xsl:stylesheet>
