@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 Red Hat, Inc. and/or its affiliates
+ * Copyright 2014-2016 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -80,7 +81,7 @@ public class ConfigEditor {
 
         if (!yamlFile.exists()) {
             // load the default configuration file
-            try (InputStream yamlInputStream =  getClass().getResourceAsStream("/" + CASSANDRA_YAML)) {
+            try (InputStream yamlInputStream = getClass().getResourceAsStream("/" + CASSANDRA_YAML)) {
                 DumperOptions options = new DumperOptions();
                 options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
                 yaml = new Yaml(options);
@@ -89,9 +90,17 @@ public class ConfigEditor {
             }
 
             // set embedded configuration
-            this.setDataFileDirectories(asList(new File(basedir, "data").getAbsolutePath()));
-            this.setCommitLogDirectory(new File(basedir, "commitlog").getAbsolutePath());
-            this.setSavedCachesDirectory(new File(basedir, "saved_caches").getAbsolutePath());
+            final File dataFileDir0 = new File(basedir, "data");
+            this.setDataFileDirectories(asList(dataFileDir0.getAbsolutePath()));
+
+            final File commitLogDir = new File(basedir, "commitlog");
+            this.setCommitLogDirectory(commitLogDir.getAbsolutePath());
+
+            final File savedCachesDir = new File(basedir, "saved_caches");
+            this.setSavedCachesDirectory(savedCachesDir.getAbsolutePath());
+
+            final File hintsDir = new File(basedir, "hints");
+            this.setHintsDirectory(hintsDir.getAbsolutePath());
 
             this.setClusterName(HAWKULAR_DATA);
             this.setSeeds(CASSANDRA_LISTEN_ADDRESS_DEFAULT);
@@ -107,29 +116,9 @@ public class ConfigEditor {
             this.setNumTokens(1);
             this.setRpcServerType("hsha");
 
-            // create folders
-            if (!basedir.exists()) {
-                basedir.mkdir();
-            }
-
-            if (!confDir.exists()) {
-                confDir.mkdir();
-            }
-
-            File tempFile = new File(this.getDataFileDirectories().get(0));
-            if (!tempFile.exists()) {
-                tempFile.mkdirs();
-            }
-
-            tempFile = new File(this.getCommitLogDirectory());
-            if (!tempFile.exists()) {
-                tempFile.mkdirs();
-            }
-
-            tempFile = new File(this.getSavedCachesDirectory());
-            if (!tempFile.exists()) {
-                tempFile.mkdirs();
-            }
+            Stream.of(basedir, confDir, dataFileDir0, commitLogDir, savedCachesDir, hintsDir)//
+                    .filter(dir -> !dir.exists())//
+                    .forEach(File::mkdirs);
 
             this.save();
         }
@@ -200,6 +189,14 @@ public class ConfigEditor {
 
     public void setDataFileDirectories(List<String> dirs) {
         config.put("data_file_directories", dirs);
+    }
+
+    public String getHintsDirectory() {
+        return (String) config.get("hints_directory");
+    }
+
+    public void setHintsDirectory(String dir) {
+        config.put("hints_directory", dir);
     }
 
     public String getSavedCachesDirectory() {
