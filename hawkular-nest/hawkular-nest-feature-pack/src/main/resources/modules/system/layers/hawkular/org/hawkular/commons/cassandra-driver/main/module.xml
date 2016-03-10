@@ -27,6 +27,6 @@
   </dependencies>
   <resources>
     <artifact name="${com.datastax.cassandra:cassandra-driver-core}"/>
-    <artifact name="${com.codahale.metrics:metrics-core}"/>
+    <artifact name="${io.dropwizard.metrics:metrics-core}"/>
   </resources>
 </module>
