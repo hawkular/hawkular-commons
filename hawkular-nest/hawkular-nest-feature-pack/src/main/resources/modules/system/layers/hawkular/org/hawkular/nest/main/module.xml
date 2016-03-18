@@ -32,7 +32,6 @@
 
     <!-- other dependencies we need -->
     <module name="com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider" export="true" />
-    <module name="org.hawkular.commons.guava" export="true" />
     <module name="gnu.getopt" />
     <module name="javax.jms.api"  export="true" />
     <module name="javax.management.j2ee.api" />

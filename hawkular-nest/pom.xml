@@ -59,12 +59,6 @@
       </dependency>
 
       <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>${version.com.google.guava}</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.wildfly</groupId>
         <artifactId>wildfly-arquillian-container-managed</artifactId>
         <version>${version.org.wildfly.wildfly-arquillian-container-managed}</version>
