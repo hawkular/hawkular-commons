@@ -1,5 +1,5 @@
 #
-# Copyright 2014-2015 Red Hat, Inc. and/or its affiliates
+# Copyright 2014-2016 Red Hat, Inc. and/or its affiliates
 # and other contributors as indicated by the @author tags.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +32,7 @@ commit_failure_policy: stop
 commitlog_segment_size_in_mb: 32
 commitlog_sync: periodic
 commitlog_sync_period_in_ms: 10000
-compaction_throughput_mb_per_sec: 16
+compaction_throughput_mb_per_sec: 0
 concurrent_counter_writes: 32
 concurrent_reads: 32
 concurrent_writes: 32
@@ -60,7 +60,7 @@ max_hint_window_in_ms: 10800000
 max_hints_delivery_threads: 2
 memtable_allocation_type: heap_buffers
 native_transport_port: 9042
-num_tokens: 256
+num_tokens: 1
 partitioner: org.apache.cassandra.dht.Murmur3Partitioner
 permissions_validity_in_ms: 2000
 range_request_timeout_in_ms: 10000
@@ -72,7 +72,7 @@ row_cache_size_in_mb: 0
 rpc_address: 127.0.0.1
 rpc_keepalive: true
 rpc_port: 9160
-rpc_server_type: sync
+rpc_server_type: hsha
 # these 2 are important for hsha - with the max threads unset, there is a likelihood of OOMs because the
 # thrift server tries to start an ungodly number of threads (MAX_INT / number of cores)
 rpc_min_threads: 16

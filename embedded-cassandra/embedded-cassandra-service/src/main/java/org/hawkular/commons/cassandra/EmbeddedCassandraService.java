@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 Red Hat, Inc. and/or its affiliates
+ * Copyright 2014-2016 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,9 +16,16 @@
  */
 package org.hawkular.commons.cassandra;
 
+import static org.hawkular.commons.cassandra.EmbeddedConstants.CASSANDRA_CONFIG;
+import static org.hawkular.commons.cassandra.EmbeddedConstants.CASSANDRA_YAML;
 import static org.hawkular.commons.cassandra.EmbeddedConstants.EMBEDDED_CASSANDRA_OPTION;
 import static org.hawkular.commons.cassandra.EmbeddedConstants.HAWKULAR_BACKEND_ENV_NAME;
 import static org.hawkular.commons.cassandra.EmbeddedConstants.HAWKULAR_BACKEND_PROPERTY;
+import static org.hawkular.commons.cassandra.EmbeddedConstants.HAWKULAR_DATA;
+import static org.hawkular.commons.cassandra.EmbeddedConstants.JBOSS_DATA_DIR;
+
+import java.io.File;
+import java.net.URL;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -53,22 +60,39 @@ public class EmbeddedCassandraService {
             String backend = System.getProperty(HAWKULAR_BACKEND_PROPERTY);
 
             String tmp = System.getenv(HAWKULAR_BACKEND_ENV_NAME);
-            if (tmp!=null) {
+            if (tmp != null) {
                 backend = tmp;
                 logger.debug("== Using backend setting from environment: " + tmp);
             }
             if (cassandraDaemon == null && EMBEDDED_CASSANDRA_OPTION.equals(backend)) {
                 try {
-                    ConfigEditor editor = new ConfigEditor();
-                    editor.initEmbeddedConfiguration();
+
+                    File baseDir = new File(System.getProperty(JBOSS_DATA_DIR, "./"), HAWKULAR_DATA);
+                    File confDir = new File(baseDir, "conf");
+                    File yamlFile = new File(confDir, CASSANDRA_YAML);
+                    if (yamlFile.exists()) {
+                        System.setProperty(CASSANDRA_CONFIG, yamlFile.toURI().toURL().toString());
+                    } else {
+                        /* Create the file using defaults from CASSANDRA_YAML in the current jar */
+                        URL defaultCassandraYamlUrl = getClass().getResource("/" + CASSANDRA_YAML);
+                        CassandraYaml.builder()
+                                .load(defaultCassandraYamlUrl)//
+                                .baseDir(baseDir)//
+                                .clusterName(HAWKULAR_DATA)//
+                                .defaultKeyCacheSize()//
+                                .defaultNativeTransportMaxThreads()//
+                                .store(yamlFile)//
+                                .mkdirs()//
+                                .setCassandraConfigProp()
+                                .setTriggersDirProp();
+                    }
 
                     cassandraDaemon = new CassandraDaemon(true);
                     cassandraDaemon.activate();
                 } catch (Exception e) {
                     logger.error("Error initializing embedded Cassandra server", e);
                 }
-            }
-            else {
+            } else {
                 logger.info("== Embedded Cassandra not started as selected backend was " + backend + " ==");
             }
         }
