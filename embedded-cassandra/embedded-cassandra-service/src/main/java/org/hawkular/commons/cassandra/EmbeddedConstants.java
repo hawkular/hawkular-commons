@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 Red Hat, Inc. and/or its affiliates
+ * Copyright 2014-2016 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,7 @@ package org.hawkular.commons.cassandra;
 
 public class EmbeddedConstants {
     public static final String CASSANDRA_CONFIG = "cassandra.config";
-    public static final String CASSANDRA_LISTEN_ADDRESS_DEFAULT = "127.0.0.1";
-    public static final Integer CASSANDRA_NATIVE_PORT_DEFAULT = 9042;
+    public static final String CASSANDRA_TRIGGERS_DIR = "cassandra.triggers_dir";
     public static final String CASSANDRA_YAML = "cassandra.yaml";
     public static final String JBOSS_DATA_DIR = "jboss.server.data.dir";
     public static final String HAWKULAR_DATA = "hawkular-data";
