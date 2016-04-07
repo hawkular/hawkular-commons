@@ -23,18 +23,23 @@
   <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" xalan:indent-amount="4" standalone="no" />
   <xsl:strip-space elements="*" />
 
-  <!-- Add the Nest subsystem -->
-  <xsl:template match="/*[name(.)='config']/*[name(.)='subsystems']">
+  <xsl:template
+      match="//*[local-name()='config']/*[local-name()='subsystem']/*[local-name()='root-logger']/*[local-name()='level']">
     <xsl:copy>
-      <xsl:apply-templates select="node()|@*"/>
-      <xsl:element name="subsystem">nest.xml</xsl:element>
+      <xsl:apply-templates select="@*|node()"/>
+      <xsl:attribute name="name">
+        <xsl:text disable-output-escaping="yes">${hawkular.log.root:INFO}</xsl:text>
+      </xsl:attribute>
     </xsl:copy>
   </xsl:template>
 
-  <!-- Use our own logging -->
-  <xsl:template match="/*[name(.)='config']/*[name(.)='subsystems']/*[name(.)='subsystem' and text()='logging.xml']">
+  <xsl:template
+      match="//*[local-name()='config']/*[local-name()='subsystem']/*[local-name()='console-handler']/*[local-name()='level']">
     <xsl:copy>
-      <xsl:text>hawkular-nest-logging.xml</xsl:text>
+      <xsl:apply-templates select="@*|node()"/>
+      <xsl:attribute name="name">
+        <xsl:text disable-output-escaping="yes">${hawkular.log.console:INFO}</xsl:text>
+      </xsl:attribute>
     </xsl:copy>
   </xsl:template>
 

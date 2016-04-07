@@ -130,6 +130,7 @@
         <configuration>
           <systemPropertyVariables>
             <jboss.home>${project.build.directory}/${project.build.finalName}</jboss.home>
+            <jboss.options>-Xmx512m -XX:MaxPermSize=256m -Dhawkular.log.console=WARN</jboss.options>
             <shrinkwrap.maven.settings>${project.build.directory}/shrinkwrap-maven-settings.xml</shrinkwrap.maven.settings>
           </systemPropertyVariables>
         </configuration>
