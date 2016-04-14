@@ -79,8 +79,6 @@ public class EmbeddedCassandraService {
                                 .load(defaultCassandraYamlUrl)//
                                 .baseDir(baseDir)//
                                 .clusterName(HAWKULAR_DATA)//
-                                .defaultKeyCacheSize()//
-                                .defaultNativeTransportMaxThreads()//
                                 .store(yamlFile)//
                                 .mkdirs()//
                                 .setCassandraConfigProp()
