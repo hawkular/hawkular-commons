@@ -40,6 +40,12 @@
         <type>pom</type>
       </dependency>
 
+      <dependency>
+        <groupId>org.wildfly.arquillian</groupId>
+        <artifactId>wildfly-arquillian-container-managed</artifactId>
+        <version>${version.org.wildfly.arquillian}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -101,7 +107,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.wildfly</groupId>
+      <groupId>org.wildfly.arquillian</groupId>
       <artifactId>wildfly-arquillian-container-managed</artifactId>
       <scope>test</scope>
     </dependency>

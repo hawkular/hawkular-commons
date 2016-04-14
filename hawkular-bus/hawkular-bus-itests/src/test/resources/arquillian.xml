@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2015 Red Hat, Inc. and/or its affiliates
+    Copyright 2015-2016 Red Hat, Inc. and/or its affiliates
     and other contributors as indicated by the @author tags.
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,8 +26,6 @@
 
   <container qualifier="default" default="true">
     <configuration>
-      <property name="chameleonTarget">wildfly:10.0.0.CR4:managed</property>
-      <property name="jbossHome">${jbossHome}</property>
       <property name="serverConfig">standalone-test.xml</property>
 <!--       <property name="javaVmArguments">-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y</property> -->
     </configuration>
