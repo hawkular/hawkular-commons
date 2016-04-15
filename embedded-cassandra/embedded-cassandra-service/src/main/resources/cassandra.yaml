@@ -33,11 +33,12 @@ commitlog_segment_size_in_mb: 32
 commitlog_sync: periodic
 commitlog_sync_period_in_ms: 10000
 compaction_throughput_mb_per_sec: 0
-concurrent_counter_writes: 32
-concurrent_reads: 32
-concurrent_writes: 32
+concurrent_compactors: 1
+concurrent_counter_writes: 2
+concurrent_reads: 2
+concurrent_writes: 2
 counter_cache_save_period: 7200
-counter_cache_size_in_mb: null
+counter_cache_size_in_mb: 0
 counter_write_request_timeout_in_ms: 5000
 cross_node_timeout: false
 disk_failure_policy: stop
@@ -45,21 +46,25 @@ dynamic_snitch_badness_threshold: 0.1
 dynamic_snitch_reset_interval_in_ms: 600000
 dynamic_snitch_update_interval_in_ms: 100
 endpoint_snitch: SimpleSnitch
-hinted_handoff_enabled: true
+file_cache_size_in_mb: 64
+hinted_handoff_enabled: false
 hinted_handoff_throttle_in_kb: 1024
 incremental_backups: false
-index_summary_capacity_in_mb: null
+index_summary_capacity_in_mb: 13
 index_summary_resize_interval_in_minutes: 60
 initial_token: -9223372036854775808
 inter_dc_tcp_nodelay: false
 internode_compression: all
 key_cache_save_period: 14400
-key_cache_size_in_mb: null
+key_cache_size_in_mb: 0
 listen_address: 127.0.0.1
 max_hint_window_in_ms: 10800000
 max_hints_delivery_threads: 2
+memtable_heap_space_in_mb: 64
+memtable_offheap_space_in_mb: 64
 memtable_allocation_type: heap_buffers
 native_transport_port: 9042
+native_transport_max_threads: 32
 num_tokens: 1
 partitioner: org.apache.cassandra.dht.Murmur3Partitioner
 permissions_validity_in_ms: 2000
@@ -75,8 +80,8 @@ rpc_port: 9160
 rpc_server_type: hsha
 # these 2 are important for hsha - with the max threads unset, there is a likelihood of OOMs because the
 # thrift server tries to start an ungodly number of threads (MAX_INT / number of cores)
-rpc_min_threads: 16
-rpc_max_threads: 1024
+rpc_min_threads: 8
+rpc_max_threads: 512
 seed_provider:
 - class_name: org.apache.cassandra.locator.SimpleSeedProvider
   parameters:

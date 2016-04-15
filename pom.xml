@@ -95,7 +95,7 @@
     <!-- Keep in sync with modules/system/layers/base/org/freemarker/main in the Keycloak or Hawkular Accounts feature pack -->
     <version.org.freemarker>2.3.23</version.org.freemarker>
     <version.org.jboss.arquillian>1.1.11.Final</version.org.jboss.arquillian>
-    <version.org.wildfly.wildfly-arquillian-container-managed>8.2.1.Final</version.org.wildfly.wildfly-arquillian-container-managed>
+    <version.org.wildfly.arquillian>2.0.0.Alpha1</version.org.wildfly.arquillian>
   </properties>
 
   <!-- We manage the artifacts from Commons here so that hawkular-commons-parent can be imported as a BoM by downstream Hawkular components -->
