@@ -33,7 +33,7 @@
 
   <modules>
     <module>embedded-cassandra-service</module>
-    <module>embedded-cassandra-ear</module>
+    <module>embedded-cassandra-war</module>
   </modules>
 
 </project>

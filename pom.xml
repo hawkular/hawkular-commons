@@ -145,15 +145,14 @@
 
       <dependency>
         <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-commons-embedded-cassandra-ear</artifactId>
+        <artifactId>hawkular-commons-embedded-cassandra-war</artifactId>
         <version>0.6.1.Final-SNAPSHOT</version>
-        <type>ear</type>
+        <type>war</type>
       </dependency>
       <dependency>
         <groupId>org.hawkular.commons</groupId>
         <artifactId>hawkular-commons-embedded-cassandra-service</artifactId>
         <version>0.6.1.Final-SNAPSHOT</version>
-        <type>ejb</type>
       </dependency>
 
       <dependency>

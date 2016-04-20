@@ -27,10 +27,10 @@ import static org.hawkular.commons.cassandra.EmbeddedConstants.JBOSS_DATA_DIR;
 import java.io.File;
 import java.net.URL;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Destroyed;
+import javax.enterprise.context.Initialized;
+import javax.enterprise.event.Observes;
 
 import org.apache.cassandra.service.CassandraDaemon;
 import org.slf4j.Logger;
@@ -41,22 +41,20 @@ import org.slf4j.LoggerFactory;
  *
  * @author Stefan Negrea
  */
-@Startup
-@Singleton
+@ApplicationScoped
 public class EmbeddedCassandraService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmbeddedCassandraService.class);
 
-
     private CassandraDaemon cassandraDaemon;
+    private final Object lock = new Object();
 
     public EmbeddedCassandraService() {
         logger.info("======== Hawkular - Embedded Cassandra ========");
     }
 
-    @PostConstruct
-    public void start() {
-        synchronized (this) {
+    public void start(@Observes @Initialized(ApplicationScoped.class) Object ignore) {
+        synchronized (lock) {
             String backend = System.getProperty(HAWKULAR_BACKEND_PROPERTY);
 
             String tmp = System.getenv(HAWKULAR_BACKEND_ENV_NAME);
@@ -96,9 +94,8 @@ public class EmbeddedCassandraService {
         }
     }
 
-    @PreDestroy
-    void stop() {
-        synchronized (this) {
+    public void stop(@Observes @Destroyed(ApplicationScoped.class) Object ignore) {
+        synchronized (lock) {
             if (cassandraDaemon != null) {
                 cassandraDaemon.deactivate();
             }
