@@ -73,6 +73,7 @@
     <module>templates</module>
     <module>email</module>
     <module>hawkular-rest-status</module>
+    <module>hawkular-inventory-paths</module>
     <module>hawkular-bus</module>
     <module>hawkular-nest</module>
   </modules>
@@ -153,6 +154,12 @@
         <artifactId>hawkular-commons-embedded-cassandra-service</artifactId>
         <version>0.5.1.Final-SNAPSHOT</version>
         <type>ejb</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.hawkular.commons</groupId>
+        <artifactId>hawkular-inventory-paths</artifactId>
+        <version>0.5.1.Final-SNAPSHOT</version>
       </dependency>
 
       <dependency>
