@@ -33,6 +33,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Represents a path in an inventory. The path is either {@link CanonicalPath} or {@link RelativePath}.
  *
@@ -81,6 +84,7 @@ import java.util.function.Function;
  * @author Lukas Krejci
  * @since 0.2.0
  */
+@ApiModel
 public abstract class Path {
 
     public static final char TYPE_DELIM = ';';
@@ -88,8 +92,13 @@ public abstract class Path {
 
     //all path instances created from this one in the up(), down() and *iterator() methods will share this list
     //and will only differ in their "myIdx" field.
+    @ApiModelProperty(hidden = true)
     protected final List<Segment> path;
+
+    @ApiModelProperty(hidden = true)
     protected final int startIdx;
+
+    @ApiModelProperty(hidden = true)
     protected final int endIdx;
 
     Path() {
@@ -234,6 +243,7 @@ public abstract class Path {
     /**
      * @return true if this is an instance of {@link CanonicalPath}, false otherwise
      */
+    @ApiModelProperty(hidden = true)
     public boolean isCanonical() {
         return this instanceof CanonicalPath;
     }
@@ -241,6 +251,7 @@ public abstract class Path {
     /**
      * @return true if this is an instance of {@link RelativePath}, false otherwise
      */
+    @ApiModelProperty(hidden = true)
     public boolean isRelative() {
         return this instanceof RelativePath;
     }
@@ -251,6 +262,7 @@ public abstract class Path {
      *
      * @return true if this path is well-formed, false otherwise.
      */
+    @ApiModelProperty(hidden = true)
     public boolean isDefined() {
         return startIdx >= 0 && endIdx > startIdx && endIdx <= path.size();
     }
@@ -299,6 +311,7 @@ public abstract class Path {
     /**
      * @return the number of ancestors. This may be less than zero for undefined paths (see {@link #isDefined()}).
      */
+    @ApiModelProperty(hidden = true)
     public int getDepth() {
         return endIdx - startIdx - 1;
     }
@@ -306,6 +319,7 @@ public abstract class Path {
     /**
      * @return the top segment in this path or null if this path is not {@link #isDefined() defined}.
      */
+    @ApiModelProperty(hidden = true)
     public Segment getTop() {
         return isDefined() ? path.get(startIdx) : null;
     }
@@ -314,6 +328,7 @@ public abstract class Path {
      * @return the last path segment on the path or null if this path is not {@link #isDefined() defined}. E.g. if this
      * path represents {@code "a/b/c"} then the segment returned from this method is {@code "c"}
      */
+    @ApiModelProperty(hidden = true)
     public Segment getSegment() {
         return isDefined() ? path.get(endIdx - 1) : null;
     }
@@ -325,6 +340,7 @@ public abstract class Path {
      *
      * @return the unmodifiable path segments or empty list if this path is {@link #isDefined() undefined}.
      */
+    @ApiModelProperty(hidden = true)
     public List<Segment> getPath() {
         return isDefined() ? path.subList(startIdx, endIdx) : Collections.emptyList();
     }
