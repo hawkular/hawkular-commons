@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.hawkular.commons</groupId>
     <artifactId>hawkular-bus-parent</artifactId>
-    <version>0.6.1.Final</version>
+    <version>0.6.2.Final-SNAPSHOT</version>
   </parent>
 
   <artifactId>hawkular-bus-common</artifactId>
