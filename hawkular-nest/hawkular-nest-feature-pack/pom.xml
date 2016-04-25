@@ -57,8 +57,8 @@
 
     <dependency>
       <groupId>org.hawkular.commons</groupId>
-      <artifactId>hawkular-commons-embedded-cassandra-ear</artifactId>
-      <type>ear</type>
+      <artifactId>hawkular-commons-embedded-cassandra-war</artifactId>
+      <type>war</type>
     </dependency>
 
     <dependency>

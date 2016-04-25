@@ -29,6 +29,6 @@
   </config>
 
   <copy-artifacts>
-    <copy-artifact artifact="org.hawkular.commons:hawkular-commons-embedded-cassandra-ear" to-location="modules/system/layers/hawkular/org/hawkular/nest/main/deployments/hawkular-commons-embedded-cassandra-ear.ear" />
+    <copy-artifact artifact="org.hawkular.commons:hawkular-commons-embedded-cassandra-war" to-location="modules/system/layers/hawkular/org/hawkular/nest/main/deployments/hawkular-commons-embedded-cassandra-war.war" />
   </copy-artifacts>
 </build>

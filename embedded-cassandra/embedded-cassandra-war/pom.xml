@@ -26,40 +26,61 @@
     <version>0.6.1.Final-SNAPSHOT</version>
   </parent>
 
-  <artifactId>hawkular-commons-embedded-cassandra-ear</artifactId>
-  <packaging>ear</packaging>
+  <artifactId>hawkular-commons-embedded-cassandra-war</artifactId>
+  <packaging>war</packaging>
 
-  <name>Embedded Cassandra EAR for Hawkular</name>
-  <description>Embedded Cassandra Server EAR for Hawkular</description>
+  <name>Hawkular Commons Embedded Cassandra WAR</name>
 
   <dependencies>
     <dependency>
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-commons-embedded-cassandra-service</artifactId>
-      <type>ejb</type>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-cli</groupId>
+          <artifactId>commons-cli</artifactId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-codec</artifactId>
+          <groupId>commons-codec</groupId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jboss.logging</groupId>
+          <artifactId>jboss-logging</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.eclipse.jdt.core.compiler</groupId>
+          <artifactId>ecj</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpcore</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
   <build>
-    <finalName>hawkular-commons-embedded-cassandra</finalName>
-
     <plugins>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-ear-plugin</artifactId>
+        <artifactId>maven-war-plugin</artifactId>
         <configuration>
-          <version>7</version>
-          <defaultLibBundleDir>lib</defaultLibBundleDir>
-          <modules>
-            <ejbModule>
-              <groupId>org.hawkular.commons</groupId>
-              <artifactId>hawkular-commons-embedded-cassandra-service</artifactId>
-            </ejbModule>
-          </modules>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
       </plugin>
-
     </plugins>
   </build>
 
