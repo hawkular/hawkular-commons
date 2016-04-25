@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * A path represents the canonical traversal to an element through the inventory graph. The canonical traversal
  * always starts at a tenant and follows only the "contains" relationships down to the entity in question. For
@@ -37,6 +40,15 @@ import java.util.Set;
  * @author Lukas Krejci
  * @since 0.2.0
  */
+@ApiModel(value = "CanonicalPath",
+        description = "A canonical path is slash-separated list of path segments that uniquely identity an entity" +
+        " in the Hawkular Inventory graph. The path follows the \"contains\" relationships in inventory (which form" +
+        " a tree structure). Each segment specifies the type of the element on that position in the tree, followed by" +
+        " semicolon and the ID of the element. An example of a canonical path would be" +
+        " \"/t;tenant/f;my-feed/r;my-resource\". The type is one of 't' (tenant), 'e' (environment)," +
+        " 'rt' (resource type), 'mt' (metric type), 'ot' (operation type), 'mp' (metadata pack), 'r' (resource)," +
+        " 'm' (metric), 'd' (data) or 'rl' (relationship). Please consult Hawkular Inventory documentation for a more" +
+        " thorough discussion of the different types of entities and their places in the model.", parent = Path.class)
 public final class CanonicalPath extends Path implements Iterable<CanonicalPath>, Serializable {
 
     private static final long serialVersionUID = -333891787878559703L;
@@ -199,6 +211,7 @@ public final class CanonicalPath extends Path implements Iterable<CanonicalPath>
     /**
      * @return The path to the root resource as known to this path instance.
      */
+    @ApiModelProperty(hidden = true)
     public CanonicalPath getRoot() {
         return new CanonicalPath(1, path);
     }
@@ -209,6 +222,7 @@ public final class CanonicalPath extends Path implements Iterable<CanonicalPath>
      *
      * @return the bottom-most path in the shared chain
      */
+    @ApiModelProperty(hidden = true)
     public CanonicalPath getLeaf() {
         return new CanonicalPath(path.size(), path);
     }
