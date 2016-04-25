@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import io.swagger.annotations.ApiModel;
+
 /**
  * A relative path is used in the API to refer to other entities during association. Its precise meaning is
  * context-sensitive but the basic idea is that given a position in the graph, you want to refer to other entities that
@@ -42,6 +44,7 @@ import java.util.function.Function;
  * @author Lukas Krejci
  * @since 0.2.0
  */
+@ApiModel
 public final class RelativePath extends Path implements Serializable {
 
     static final Map<String, Class<?>> SHORT_NAME_TYPES = new HashMap<>();
