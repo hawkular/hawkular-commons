@@ -88,12 +88,13 @@
       <artifactId>wildfly-feature-pack</artifactId>
       <version>${version.org.wildfly}</version>
       <type>zip</type>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.wildfly</groupId>
+      <artifactId>wildfly-messaging-activemq</artifactId>
+      <version>${version.org.wildfly}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -126,14 +127,20 @@
                   <artifactId>hawkular-bus-feature-pack</artifactId>
                   <type>zip</type>
                   <includes>configuration/standalone/template.xml,configuration/standalone/subsystems.xml</includes>
-                  <outputDirectory>${project.build.directory}/feature-pack-resources-tmp</outputDirectory>
+                  <outputDirectory>${project.build.directory}/upstream-subsystem-templates</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.wildfly.core</groupId>
                   <artifactId>wildfly-logging</artifactId>
                   <version>${version.org.wildfly.core}</version>
                   <includes>subsystem-templates/logging.xml</includes>
-                  <outputDirectory>${project.build.directory}/feature-pack-resources-tmp</outputDirectory>
+                  <outputDirectory>${project.build.directory}/upstream-subsystem-templates</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.wildfly</groupId>
+                  <artifactId>wildfly-messaging-activemq</artifactId>
+                  <includes>subsystem-templates/*.xml</includes>
+                  <outputDirectory>${project.build.directory}/upstream-subsystem-templates</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -155,7 +162,7 @@
             <configuration>
               <transformationSets>
                 <transformationSet>
-                  <dir>${project.build.directory}/feature-pack-resources-tmp</dir>
+                  <dir>${project.build.directory}/upstream-subsystem-templates</dir>
                   <stylesheet>${basedir}/src/main/xsl/configuration/standalone/hawkular-nest-subsystems.xsl</stylesheet>
                   <includes>
                     <include>configuration/standalone/subsystems.xml</include>
@@ -168,8 +175,9 @@
                     </fileMapper>
                   </fileMappers>
                 </transformationSet>
+
                 <transformationSet>
-                  <dir>${project.build.directory}/feature-pack-resources-tmp</dir>
+                  <dir>${project.build.directory}/upstream-subsystem-templates</dir>
                   <stylesheet>${basedir}/src/main/xsl/configuration/standalone/hawkular-nest-template.xsl</stylesheet>
                   <includes>
                     <include>configuration/standalone/template.xml</include>
@@ -182,8 +190,9 @@
                     </fileMapper>
                   </fileMappers>
                 </transformationSet>
+
                 <transformationSet>
-                  <dir>${project.build.directory}/feature-pack-resources-tmp</dir>
+                  <dir>${project.build.directory}/upstream-subsystem-templates</dir>
                   <stylesheet>${basedir}/src/main/xsl/subsystem-templates/hawkular-nest-logging.xsl</stylesheet>
                   <includes>
                     <include>subsystem-templates/logging.xml</include>
@@ -196,6 +205,22 @@
                     </fileMapper>
                   </fileMappers>
                 </transformationSet>
+
+                <transformationSet>
+                  <dir>${project.build.directory}/upstream-subsystem-templates</dir>
+                  <stylesheet>${basedir}/src/main/xsl/subsystem-templates/hawkular-nest-messaging-activemq.xsl</stylesheet>
+                  <includes>
+                    <include>subsystem-templates/messaging-activemq.xml</include>
+                  </includes>
+                  <outputDir>${project.build.directory}/feature-pack-resources</outputDir>
+                  <fileMappers>
+                    <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
+                      <pattern>^subsystem-templates/(.*)\.xml$</pattern>
+                      <replacement>subsystem-templates/hawkular-nest-$1.xml</replacement>
+                    </fileMapper>
+                  </fileMappers>
+                </transformationSet>
+
               </transformationSets>
             </configuration>
           </execution>

@@ -18,7 +18,7 @@
 
 -->
 
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="2.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="2.0" exclude-result-prefixes="xalan">
 
   <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" xalan:indent-amount="4" standalone="no" />
   <xsl:strip-space elements="*" />
@@ -27,9 +27,7 @@
       match="//*[local-name()='config']/*[local-name()='subsystem']/*[local-name()='root-logger']/*[local-name()='level']">
     <xsl:copy>
       <xsl:apply-templates select="@*|node()"/>
-      <xsl:attribute name="name">
-        <xsl:text disable-output-escaping="yes">${hawkular.log.root:INFO}</xsl:text>
-      </xsl:attribute>
+      <xsl:attribute name="name">${hawkular.log.root:INFO}</xsl:attribute>
     </xsl:copy>
   </xsl:template>
 
@@ -37,9 +35,15 @@
       match="//*[local-name()='config']/*[local-name()='subsystem']/*[local-name()='console-handler']/*[local-name()='level']">
     <xsl:copy>
       <xsl:apply-templates select="@*|node()"/>
-      <xsl:attribute name="name">
-        <xsl:text disable-output-escaping="yes">${hawkular.log.console:INFO}</xsl:text>
-      </xsl:attribute>
+      <xsl:attribute name="name">${hawkular.log.console:INFO}</xsl:attribute>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template
+      match="//*[local-name()='logger' and @category='org.jboss.as.config']/*[local-name()='level']">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()"/>
+      <xsl:attribute name="name">${hawkular.log.jboss.as.config:INFO}</xsl:attribute>
     </xsl:copy>
   </xsl:template>
 
