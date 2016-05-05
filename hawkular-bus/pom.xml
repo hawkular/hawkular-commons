@@ -43,7 +43,6 @@
     <module>hawkular-bus-mdb</module>
     <module>hawkular-bus-rest-client</module>
     <module>hawkular-bus-feature-pack</module>
-    <module>hawkular-bus-itests</module>
   </modules>
 
   <dependencyManagement>

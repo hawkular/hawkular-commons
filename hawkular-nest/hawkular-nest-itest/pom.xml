@@ -77,6 +77,12 @@
 
     <dependency>
       <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-bus-common</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-inventory-paths</artifactId>
     </dependency>
 

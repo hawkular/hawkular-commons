@@ -16,8 +16,6 @@
  */
 package org.hawkular.bus.itest;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -47,24 +45,23 @@ import org.hawkular.bus.common.consumer.BasicMessageListener;
 import org.hawkular.bus.common.consumer.ConsumerConnectionContext;
 import org.hawkular.bus.common.producer.ProducerConnectionContext;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.impl.base.exporter.zip.ZipExporterImpl;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * @author jsanda
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  *
  */
-@RunWith(Arquillian.class)
-public class BusTest {
+public class BusTest extends Arquillian {
+    public static final String GROUP = "bus";
     private static class MessageReceiver implements Closeable {
 
         private class MessageListener extends BasicMessageListener<BasicMessage> {
@@ -141,7 +138,7 @@ public class BusTest {
     public static WebArchive createDeployment() {
         WebArchive archive = ShrinkWrap.create(WebArchive.class)
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-                .addAsWebInfResource(BusTest.class.getResource("/jboss-deployment-structure.xml"),
+                .addAsWebInfResource(BusTest.class.getResource("/bus/jboss-deployment-structure.xml"),
                         "jboss-deployment-structure.xml")
                 .addPackage(BusTest.class.getPackage());
         ZipExporter exporter = new ZipExporterImpl(archive);
@@ -153,9 +150,9 @@ public class BusTest {
     @Resource(name = "java:/ConnectionFactory")
     private ConnectionFactory connectionFactory;
 
-    @Test
+    @Test(groups = { GROUP })
     public void textMessage() throws JMSException, IOException, InterruptedException {
-        assertNotNull(connectionFactory);
+        Assert.assertNotNull(connectionFactory);
 
         Endpoint endpoint = new Endpoint(Type.QUEUE, TEST_QUEUE);
 
@@ -173,16 +170,16 @@ public class BusTest {
 
             BasicMessageWithExtraData<BasicMessage> envelopeReceived =
                     receiver.receivedMessages.poll(15, TimeUnit.SECONDS);
-            Assert.assertNotNull("No message received", envelopeReceived);
-            Assert.assertEquals(envelopeSent.getBasicMessage().toJSON(), envelopeReceived.getBasicMessage().toJSON());
-            Assert.assertNull("envelopeReceived should have no binary attachment", envelopeReceived.getBinaryData());
+            Assert.assertNotNull(envelopeReceived, "No message received");
+            Assert.assertEquals(envelopeReceived.getBasicMessage().toJSON(), envelopeSent.getBasicMessage().toJSON());
+            Assert.assertNull(envelopeReceived.getBinaryData(), "envelopeReceived should have no binary attachment");
         }
 
     }
 
-    @Test
+    @Test(groups = { GROUP })
     public void textMessageWithBinary() throws JMSException, IOException, InterruptedException {
-        assertNotNull(connectionFactory);
+        Assert.assertNotNull(connectionFactory);
 
         Endpoint endpoint = new Endpoint(Type.QUEUE, TEST_QUEUE);
 
@@ -203,13 +200,13 @@ public class BusTest {
 
             BasicMessageWithExtraData<BasicMessage> envelopeReceived =
                     receiver.receivedMessages.poll(15, TimeUnit.SECONDS);
-            Assert.assertNotNull("No message received", envelopeReceived);
-            Assert.assertEquals(envelopeSent.getBasicMessage().toJSON(), envelopeReceived.getBasicMessage().toJSON());
+            Assert.assertNotNull(envelopeReceived, "No message received");
+            Assert.assertEquals(envelopeReceived.getBasicMessage().toJSON(), envelopeSent.getBasicMessage().toJSON());
 
             ByteArrayOutputStream bytesReceived = new ByteArrayOutputStream(bytesSent.length);
             copy(envelopeReceived.getBinaryData(), bytesReceived);
 
-            Assert.assertArrayEquals(bytesSent, bytesReceived.toByteArray());
+            Assert.assertEquals(bytesReceived.toByteArray(), bytesSent);
         }
     }
 }
