@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2015-2016 Red Hat, Inc. and/or its affiliates
+    Copyright 2014-2016 Red Hat, Inc. and/or its affiliates
     and other contributors as indicated by the @author tags.
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,37 +26,23 @@
     <version>0.6.2.Final-SNAPSHOT</version>
   </parent>
 
-  <artifactId>hawkular-nest-parent</artifactId>
+  <artifactId>hawkular-command-gateway</artifactId>
   <packaging>pom</packaging>
 
-  <name>Hawkular: Nest Root Parent</name>
-  <inceptionYear>2015</inceptionYear>
+  <name>Hawkular Command Gateway Parent</name>
 
   <modules>
-    <module>hawkular-nest-wf-extension</module>
-    <module>hawkular-nest-feature-pack</module>
-    <module>hawkular-nest-itest</module>
+    <module>hawkular-command-gateway-api</module>
+    <module>hawkular-command-gateway-war</module>
   </modules>
 
   <dependencyManagement>
     <dependencies>
 
       <dependency>
-        <groupId>org.wildfly</groupId>
-        <artifactId>wildfly-arquillian-container-managed</artifactId>
-        <version>${version.org.wildfly.wildfly-arquillian-container-managed}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.wildfly.core</groupId>
-        <artifactId>wildfly-controller</artifactId>
-        <version>${version.org.wildfly.core}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.wildfly.core</groupId>
-        <artifactId>wildfly-subsystem-test-framework</artifactId>
-        <version>${version.org.wildfly.core}</version>
+        <groupId>javax</groupId>
+        <artifactId>javaee-api</artifactId>
+        <version>7.0</version>
       </dependency>
 
       <dependency>
@@ -69,5 +55,4 @@
 
     </dependencies>
   </dependencyManagement>
-
 </project>

@@ -27,7 +27,22 @@
   <name>Hawkular Nest Intagration Tests</name>
 
   <properties>
-    <hawkular.nest.deployments.dir>${project.build.directory}/${project.build.finalName}/modules/org/hawkular/nest/main/deployments</hawkular.nest.deployments.dir>
+    <surefire.testng.verbose>3</surefire.testng.verbose>
+    <failsafe.itest.includes>**/*ITest.class</failsafe.itest.includes>
+
+    <hawkular.bind.address>127.0.0.1</hawkular.bind.address>
+    <hawkular.port.offset>0</hawkular.port.offset>
+    <!-- $hawkular.management.port must be equal to $hawkular.port.offset + 9990 -->
+    <hawkular.management.port>9990</hawkular.management.port>
+    <hawkular.log.root>INFO</hawkular.log.root>
+    <hawkular.log.console>TRACE</hawkular.log.console>
+    <hawkular.log.bus>TRACE</hawkular.log.bus>
+    <hawkular.log.cmdgw>TRACE</hawkular.log.cmdgw>
+    <hawkular.log.nest>INFO</hawkular.log.nest>
+    <hawkular.log.datastax.driver>INFO</hawkular.log.datastax.driver>
+    <hawkular.log.liquibase>WARN</hawkular.log.liquibase>
+    <hawkular.log.cassandra>INFO</hawkular.log.cassandra>
+
   </properties>
 
   <dependencyManagement>
@@ -58,6 +73,12 @@
     </dependency>
 
     <dependency>
+      <groupId>com.squareup.okhttp</groupId>
+      <artifactId>okhttp-ws</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>javax.enterprise</groupId>
       <artifactId>cdi-api</artifactId>
       <scope>provided</scope>
@@ -79,6 +100,11 @@
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-bus-common</artifactId>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-command-gateway-api</artifactId>
     </dependency>
 
     <dependency>
@@ -140,17 +166,60 @@
 
   <build>
     <plugins>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <!-- because integration tests are run by maven-failsafe-plugin -->
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>${failsafe.itest.includes}</include>
+          </includes>
           <systemPropertyVariables>
             <jboss.home>${project.build.directory}/${project.build.finalName}</jboss.home>
             <jboss.options>-Xmx512m -XX:MaxPermSize=256m -Dhawkular.log.console=WARN</jboss.options>
             <shrinkwrap.maven.settings>${project.build.directory}/shrinkwrap-maven-settings.xml</shrinkwrap.maven.settings>
+            <hawkular.bind.address>${hawkular.bind.address}</hawkular.bind.address>
+            <hawkular.port.offset>${hawkular.port.offset}</hawkular.port.offset>
+            <!-- output over-the-wire traffic -->
+            <org.apache.commons.logging.Log>org.apache.commons.logging.impl.SimpleLog</org.apache.commons.logging.Log>
+            <org.apache.commons.logging.simplelog.log.org.apache.http>${http.log}</org.apache.commons.logging.simplelog.log.org.apache.http>
+            <org.apache.commons.logging.simplelog.log.org.apache.http.wire>${http.log.wire}</org.apache.commons.logging.simplelog.log.org.apache.http.wire>
+            <java.util.logging.config.file>${project.build.testOutputDirectory}/logging.properties</java.util.logging.config.file>
           </systemPropertyVariables>
+          <properties>
+            <property>
+              <name>surefire.testng.verbose</name>
+              <value>${surefire.testng.verbose}</value>
+            </property>
+          </properties>
         </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>
@@ -217,6 +286,29 @@
             <scope>runtime</scope>
           </dependency>
         </dependencies>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <overwrite>true</overwrite>
+              <outputDirectory>${project.build.directory}/${project.build.finalName}/standalone/configuration/</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/src/test/resources/standalone-configuration/</directory>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>

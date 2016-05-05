@@ -1,0 +1,52 @@
+{
+  "definitions": {
+    "responseStatus": {
+      "type": "string",
+      "javaType": "org.hawkular.cmdgw.api.ResponseStatus",
+      "description": "A status of a response",
+      "enum": ["OK", "ERROR"]
+    },
+    "responseServerRefreshIndicator": {
+      "type": "string",
+      "javaType": "org.hawkular.cmdgw.api.ServerRefreshIndicator",
+      "description": "If the server needs to be refreshed in order to fully apply recent changes, this tells you what needs to be done. This is helpful when an operation or attribute change requires a reload or restart of the server.",
+      "enum": ["RELOAD-REQUIRED", "RESTART-REQUIRED"]
+    }
+  },
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.AuthMessage"
+  },
+  "javaType": "org.hawkular.cmdgw.api.ResourcePathResponse",
+  "javaInterfaces" : ["org.hawkular.cmdgw.api.UiSessionDestination"],
+  "description": "Results of a Resource related operation. The awkward name of the schema file A2ResourcePathResponse.schema.json is there so that this schema file precedes all other schema files alphabetically. This is required by jsonschema2pojo-maven-plugin that is not resolving the inter-schema dependencies, it just takes files in alphabetical order.",
+  "additionalProperties": false,
+  "properties": {
+    "resourcePath": {
+      "description" : "The inventory path to the resource that was targeted by the request.",
+      "type": "string"
+    },
+    "senderRequestId": {
+      "description" : "An ID chosen originally by the sending UI client that should make it possible to associate this response with the triggering request. This ID is supposed to be unique just within the sending WebSocket session",
+      "type": "string"
+    },
+    "destinationSessionId": {
+      "description" : "The ID of a WebSocket Session that is the destination of this message.",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/definitions/responseStatus",
+      "description": "Indicates if the deployment succeeded or failed."
+    },
+    "message": {
+      "type": "string",
+      "description": "A message that further describes the results of the operation."
+    },
+    "serverRefreshIndicator": {
+      "$ref": "#/definitions/responseServerRefreshIndicator",
+      "description": "If the server needs to be refreshed in order to fully apply recent changes, this tells you what needs to be done. This is helpful when an operation or attribute change requires a reload or restart of the server."
+    }
+  },
+  "required": ["resourcePath", "destinationSessionId"]
+}

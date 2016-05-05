@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.ResourcePathRequest"
+  },
+  "javaType": "org.hawkular.cmdgw.api.RemoveDatasourceRequest",
+  "description": "Unregisters a Datasource or a XA Datasource that corresponds to the resource given by the resourcePath field.",
+  "additionalProperties": false
+}

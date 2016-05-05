@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.ResourcePathResponse"
+  },
+  "javaType": "org.hawkular.cmdgw.api.RemoveJdbcDriverResponse",
+  "description": "Results of an RemoveJdbcDriverRequest.",
+  "additionalProperties": false
+}

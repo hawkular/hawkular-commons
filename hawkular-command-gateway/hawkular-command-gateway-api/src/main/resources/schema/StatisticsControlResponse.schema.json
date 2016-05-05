@@ -1,0 +1,37 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.ResourcePathResponse"
+  },
+  "javaType": "org.hawkular.cmdgw.api.StatisticsControlResponse",
+  "javaInterfaces" : ["org.hawkular.cmdgw.api.EventDestination"],
+  "description": "Results of changing the statistic enablement flags in WildFly subsystems.",
+  "additionalProperties": false,
+  "properties": {
+    "web": {
+      "$ref": "StatisticsControlRequest.schema.json/#/definitions/statisticsSetting",
+      "description": "Current state of statistics control for the web (aka undertow) subsystem"
+    },
+    "transactions": {
+      "$ref": "StatisticsControlRequest.schema.json/#/definitions/statisticsSetting",
+      "description": "Current state of statistics control for the transactions subsystem"
+    },
+    "datasources": {
+      "$ref": "StatisticsControlRequest.schema.json/#/definitions/statisticsSetting",
+      "description": "Current state of statistics control for all datasources"
+    },
+    "infinispan": {
+      "$ref": "StatisticsControlRequest.schema.json/#/definitions/statisticsSetting",
+      "description": "Current state of statistics control for all infinispan caches"
+    },
+    "ejb3": {
+      "$ref": "StatisticsControlRequest.schema.json/#/definitions/statisticsSetting",
+      "description": "Current state of statistics control for the EJB3 subsystem"
+    },
+    "messaging": {
+      "$ref": "StatisticsControlRequest.schema.json/#/definitions/statisticsSetting",
+      "description": "Current state of statistics control for the JMS messaging subsystem"
+    }
+  }
+}

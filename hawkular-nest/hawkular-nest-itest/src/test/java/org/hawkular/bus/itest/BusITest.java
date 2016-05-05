@@ -60,14 +60,14 @@ import org.testng.annotations.Test;
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  *
  */
-public class BusTest extends Arquillian {
+public class BusITest extends Arquillian {
     public static final String GROUP = "bus";
     private static class MessageReceiver implements Closeable {
 
         private class MessageListener extends BasicMessageListener<BasicMessage> {
 
             MessageListener() {
-                super(BusTest.class.getClassLoader());
+                super(BusITest.class.getClassLoader());
             }
 
             @Override
@@ -118,7 +118,7 @@ public class BusTest extends Arquillian {
 
     }
 
-    private static final Logger log = Logger.getLogger(BusTest.class);
+    private static final Logger log = Logger.getLogger(BusITest.class);
 
     private static final String TEST_HEADER = "testHeader";
     private static final String TEST_QUEUE = "TestQueue";
@@ -138,9 +138,9 @@ public class BusTest extends Arquillian {
     public static WebArchive createDeployment() {
         WebArchive archive = ShrinkWrap.create(WebArchive.class)
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-                .addAsWebInfResource(BusTest.class.getResource("/bus/jboss-deployment-structure.xml"),
+                .addAsWebInfResource(BusITest.class.getResource("/bus/jboss-deployment-structure.xml"),
                         "jboss-deployment-structure.xml")
-                .addPackage(BusTest.class.getPackage());
+                .addPackage(BusITest.class.getPackage());
         ZipExporter exporter = new ZipExporterImpl(archive);
         exporter.exportTo(new File("target", "test-archive.war"));
 

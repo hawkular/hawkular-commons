@@ -47,6 +47,15 @@
     </xsl:copy>
   </xsl:template>
 
+  <xsl:template match="//*[local-name()='config']/*[local-name()='supplement' and @name='default']/*[local-name()='replacement' and @placeholder='LOGGERS']">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()"/>
+      <logger category="org.hawkular.cmdgw">
+        <level name="${{hawkular.log.cmdgw:INFO}}" />
+      </logger>
+    </xsl:copy>
+  </xsl:template>
+
   <!-- copy everything else as-is -->
   <xsl:template match="node()|@*">
     <xsl:copy>

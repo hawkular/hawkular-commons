@@ -1,0 +1,59 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.ResourcePathRequest"
+  },
+  "javaType": "org.hawkular.cmdgw.api.AddDatasourceRequest",
+  "description": "Adds a Datasource or a XA Datasource to an Application Server instance given by the inventory path stored in resourcePath field.",
+  "additionalProperties": false,
+  "properties": {
+    "xaDatasource": {
+      "description" : "true if an XA datasource should be added, false otherwise",
+      "javaType": "boolean",
+      "type": "boolean"
+    },
+    "datasourceName": {
+      "description" : "The name for this datasource.",
+      "type": "string"
+    },
+    "jndiName": {
+      "description" : "the JNDI name for the datasource",
+      "type": "string"
+    },
+    "driverName": {
+      "description" : "Name of the JDBC driver as available under /subsystem=datasources/jdbc-driver=* in WildFly configuration.",
+      "type": "string"
+    },
+    "driverClass": {
+      "description" : "The fully qualified name of the JDBC driver class. For non-XA Datasources either needs to be explicitly set here or in the JDBC driver referenced in driverName.",
+      "type": "string"
+    },
+    "connectionUrl": {
+      "description" : "The JDBC driver connection URL. Required for non-XA datasources.",
+      "type": "string"
+    },
+    "xaDataSourceClass": {
+      "description" : "The fully qualified name of the javax.sql.XADataSource implementation. For XA Datasources either needs to be explicitly set here or in the JDBC driver referenced in driverName.",
+      "type": "string"
+    },
+    "datasourceProperties": {
+      "description" : "Either a list of xa-datasource-properties in case this is a XA datasource or otherwise a list of connection-properties for a non-XA datasource.",
+      "javaType" : "java.util.Map<String,String>",
+      "type": "object"
+    },
+    "userName": {
+      "description" : "The user name used when creating a new connection.",
+      "type": "string"
+    },
+    "password": {
+      "description" : "The password used when creating a new connection.",
+      "type": "string"
+    },
+    "securityDomain": {
+      "description" : "The security domain which defines the javax.security.auth.Subject that are used to distinguish connections in the pool.",
+      "type": "string"
+    }
+  },
+  "required": ["xaDatasource", "datasourceName", "jndiName", "driverName"]
+}

@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.AuthMessage"
+  },
+  "javaType": "org.hawkular.cmdgw.api.ResourcePathRequest",
+  "javaInterfaces" : ["org.hawkular.cmdgw.api.ResourcePathDestination", "org.hawkular.cmdgw.api.UiSessionOrigin"],
+  "description": "A request targeting a resource given by the resourcePath field. The awkward name of the schema file A1ResourcePathRequest.schema.json is there so that this schema file precedes all other schema files alphabetically. This is required by jsonschema2pojo-maven-plugin that is not resolving the inter-schema dependencies, it just takes files in alphabetical order.",
+  "additionalProperties": false,
+  "properties": {
+    "resourcePath": {
+      "description" : "The inventory path to the resource that is targeted by this request.",
+      "type": "string"
+    },
+    "senderRequestId": {
+      "description" : "An ID chosen by the sending UI client that should make it possible to associate future responses with this request. This ID is supposed to be unique just within the current WebSocket session.",
+      "type": "string"
+    },
+    "senderSessionId": {
+      "description" : "UI clients do not need to set this, the server will overwrite this field based on the ID of the present WebSocket session ID.",
+      "type": "string"
+    }
+  },
+  "required": ["resourcePath"]
+}
