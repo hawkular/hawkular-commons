@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates
+ * Copyright 2015-2016 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,14 +20,13 @@ import java.io.IOException;
 import java.util.List;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ProtocolVersion;
@@ -38,9 +37,9 @@ import com.datastax.driver.core.Session;
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  *
  */
-@RunWith(Arquillian.class)
-public class CassandraDriverITest {
+public class CassandraDriverITest extends Arquillian {
     private static final Logger log = Logger.getLogger(CassandraDriverITest.class);
+    public static final String GROUP = "cassandra";
 
     @Deployment
     public static WebArchive createDeployment() {
@@ -59,11 +58,11 @@ public class CassandraDriverITest {
     private static int attempts = 15;
     private static final int interval = 4000;
 
-    @Test
+    @Test(groups = { GROUP })
     public void testCassandraSession() throws IOException, InterruptedException {
 
         try (Session session = getSession()) {
-            Assert.assertNotNull("Injected Cassandra session is null", session);
+            Assert.assertNotNull(session, "Injected Cassandra session is null");
             session.execute("CREATE KEYSPACE test_keyspace"
                     + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1}");
             session.execute("CREATE TABLE test_keyspace.test_table (id varchar PRIMARY KEY)");
@@ -71,8 +70,8 @@ public class CassandraDriverITest {
             session.execute("INSERT INTO test_keyspace.test_table (id) VALUES ('deadbeef')");
 
             List<Row> rows = session.execute("SELECT id FROM test_keyspace.test_table").all();
-            Assert.assertEquals(1, rows.size());
-            Assert.assertEquals("deadbeef", rows.get(0).getString(0));
+            Assert.assertEquals(rows.size(), 1);
+            Assert.assertEquals(rows.get(0).getString(0), "deadbeef");
 
             session.execute("DROP TABLE test_keyspace.test_table");
             session.execute("DROP KEYSPACE test_keyspace");
