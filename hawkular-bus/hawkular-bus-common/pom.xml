@@ -28,7 +28,7 @@
 
   <artifactId>hawkular-bus-common</artifactId>
   <packaging>jar</packaging>
-  <name>Hawkular Bus: Bus Framework Common Library</name>
+  <name>Hawkular Bus Framework Common Library</name>
   <description>Hawkular Bus Framework Common Library for use with both consumer and producer code.</description>
 
   <properties>

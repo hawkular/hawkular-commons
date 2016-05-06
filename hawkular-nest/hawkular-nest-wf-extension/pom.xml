@@ -29,7 +29,7 @@
   <artifactId>hawkular-nest-wf-extension</artifactId>
   <packaging>jar</packaging>
 
-  <name>Hawkular: Nest WildFly Extension</name>
+  <name>Hawkular Nest WildFly Extension</name>
 
   <dependencies>
 

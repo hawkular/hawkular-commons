@@ -28,7 +28,7 @@
 
   <artifactId>hawkular-bus-parent</artifactId>
   <packaging>pom</packaging>
-  <name>Hawkular Bus: Root Parent</name>
+  <name>Hawkular Bus Parent</name>
   <inceptionYear>2015</inceptionYear>
 
   <scm>

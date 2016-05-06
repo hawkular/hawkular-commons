@@ -28,7 +28,7 @@
 
   <artifactId>hawkular-nest-feature-pack</artifactId>
   <packaging>pom</packaging>
-  <name>Hawkular: Nest Feature Pack</name>
+  <name>Hawkular Nest Feature Pack</name>
 
   <dependencies>
 
