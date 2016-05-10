@@ -21,28 +21,27 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="2.0" exclude-result-prefixes="xalan">
 
   <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" xalan:indent-amount="4" standalone="no" />
-  <xsl:strip-space elements="*" />
 
   <!-- Add the Nest subsystem -->
-  <xsl:template match="/*[name(.)='config']/*[name(.)='subsystems']">
+  <xsl:template match="/*[local-name()='config']/*[local-name()='subsystems']">
     <xsl:copy>
-      <xsl:apply-templates select="node()|@*"/>
+      <xsl:apply-templates select="node()|comment()|@*"/>
       <subsystem>hawkular-nest-messaging-activemq.xml</subsystem>
       <subsystem>nest.xml</subsystem>
     </xsl:copy>
   </xsl:template>
 
   <!-- Use our own logging -->
-  <xsl:template match="/*[name(.)='config']/*[name(.)='subsystems']/*[name(.)='subsystem' and text()='logging.xml']">
+  <xsl:template match="/*[local-name()='config']/*[local-name()='subsystems']/*[local-name()='subsystem' and text()='logging.xml']">
     <xsl:copy>
       <xsl:text>hawkular-nest-logging.xml</xsl:text>
     </xsl:copy>
   </xsl:template>
 
   <!-- copy everything else as-is -->
-  <xsl:template match="node()|@*">
+  <xsl:template match="node()|comment()|@*">
     <xsl:copy>
-      <xsl:apply-templates select="node()|@*" />
+      <xsl:apply-templates select="node()|comment()|@*" />
     </xsl:copy>
   </xsl:template>
 
