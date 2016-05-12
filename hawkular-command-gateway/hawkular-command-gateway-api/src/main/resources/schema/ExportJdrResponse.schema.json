@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.ResourcePathResponse"
+  },
+  "javaType": "org.hawkular.cmdgw.api.ExportJdrResponse",
+  "description": "Results of the JDR export. The actual report file content must be appended to this JSON message.",
+  "additionalProperties": false,
+  "properties": {
+    "fileName": {
+      "description": "The report's file name to be presented to the client, based on the name generated at the server.",
+      "type": "string"
+    }
+  },
+  "required": ["fileName"]
+}

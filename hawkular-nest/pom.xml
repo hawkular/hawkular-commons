@@ -29,7 +29,7 @@
   <artifactId>hawkular-nest-parent</artifactId>
   <packaging>pom</packaging>
 
-  <name>Hawkular: Nest Root Parent</name>
+  <name>Hawkular Nest Parent</name>
   <inceptionYear>2015</inceptionYear>
 
   <modules>
@@ -38,25 +38,8 @@
     <module>hawkular-nest-itest</module>
   </modules>
 
-  <properties>
-
-    <!-- DEPENDENCY VERSIONS -->
-
-    <!-- CONVENTIONS: -->
-    <!-- - A version property must be specified in the format "version.{groupId}" -->
-    <!-- - If groupId is not unique, append the property name with ".{artifactId}" -->
-    <!-- - Version properties must be sorted alphabetically -->
-    <version.com.squareup.okhttp>2.6.0</version.com.squareup.okhttp>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
-
-      <dependency>
-        <groupId>com.squareup.okhttp</groupId>
-        <artifactId>okhttp</artifactId>
-        <version>${version.com.squareup.okhttp}</version>
-      </dependency>
 
       <dependency>
         <groupId>org.wildfly</groupId>

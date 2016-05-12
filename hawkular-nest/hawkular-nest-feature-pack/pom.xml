@@ -28,7 +28,7 @@
 
   <artifactId>hawkular-nest-feature-pack</artifactId>
   <packaging>pom</packaging>
-  <name>Hawkular: Nest Feature Pack</name>
+  <name>Hawkular Nest Feature Pack</name>
 
   <dependencies>
 
@@ -53,6 +53,12 @@
           <artifactId>slf4j-api</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-command-gateway-war</artifactId>
+      <type>war</type>
     </dependency>
 
     <dependency>

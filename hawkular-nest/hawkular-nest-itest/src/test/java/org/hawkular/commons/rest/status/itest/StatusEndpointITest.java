@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates
+ * Copyright 2015-2016 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,16 +21,15 @@ import java.io.IOException;
 
 import org.hawkular.commons.cassandra.driver.itest.CassandraDriverITest;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.impl.base.exporter.zip.ZipExporterImpl;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -40,8 +39,8 @@ import com.squareup.okhttp.Response;
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  *
  */
-@RunWith(Arquillian.class)
-public class StatusEndpointITest {
+public class StatusEndpointITest extends Arquillian {
+    public static final String GROUP = "rest-status";
 
     private static final String statusUrl = "http://127.0.0.1:8080/hawkular/nest/itest/status";
     private static final String shrinkwrapMavenSettings = System.getProperty("shrinkwrap.maven.settings");
@@ -73,7 +72,7 @@ public class StatusEndpointITest {
         return archive;
     }
 
-    @Test
+    @Test(groups = { GROUP })
     public void testStatusEndpoint() throws IOException, InterruptedException {
 
         OkHttpClient client = new OkHttpClient();
@@ -91,7 +90,7 @@ public class StatusEndpointITest {
             String expected = "{\"Implementation-Version\":\"1.2.3.4\","//
                     + "\"Built-From-Git-SHA1\":\"cofeebabe\","//
                     + "\"testKey1\":\"testValue1\"}";
-            Assert.assertEquals(expected, foundBody);
+            Assert.assertEquals(foundBody, expected);
         } else {
             Assert.fail("Could not get [" + statusUrl + "]: " + response.code() + " " + response.message());
         }

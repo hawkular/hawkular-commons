@@ -1,0 +1,34 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.ResourcePathRequest"
+  },
+  "javaType": "org.hawkular.cmdgw.api.AddJdbcDriverRequest",
+  "javaInterfaces" : ["org.hawkular.cmdgw.api.ResourcePathDestination"],
+  "description": "Adds a JDBC Driver to an Application Server instance given by the inventory path stored in resourcePath field. The driver module is created only if driverJarName is set (in such a case, the jar file content must be appended to this JSON message). Otherwise, the existence of the module given by moduleName and default slot \"main\" will be assumed.",
+  "additionalProperties": false,
+  "properties": {
+    "driverName": {
+      "type": "string"
+    },
+    "driverClass": {
+      "type": "string"
+    },
+    "driverMajorVersion": {
+      "type": "integer"
+    },
+    "driverMinorVersion": {
+      "type": "integer"
+    },
+    "moduleName": {
+      "description": "The name of the JBoss Module to create or use, such as \"org.example.jdbc.driver\"",
+      "type": "string"
+    },
+    "driverJarName": {
+      "description": "The name of the jar file that should be used when storing the binary data to in the module directory on the server. If this field is set the jar bits must be appended to this JSON message. If this field is set, the module will be created, otherwise the existence of the module given by moduleName and default slot \"main\" will be assumed.",
+      "type": "string"
+    }
+  },
+  "required": ["driverName", "moduleName"]
+}

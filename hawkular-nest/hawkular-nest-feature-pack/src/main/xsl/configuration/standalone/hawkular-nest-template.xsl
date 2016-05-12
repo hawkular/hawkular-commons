@@ -21,7 +21,6 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="2.0" exclude-result-prefixes="xalan">
 
   <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" xalan:indent-amount="4" standalone="no" />
-  <xsl:strip-space elements="*" />
 
   <!-- Add the Nest subsystem -->
   <xsl:template match="/*[name(.)='server']/*[name(.)='extensions']">
@@ -29,17 +28,14 @@
       <xsl:apply-templates select="node()|@*"/>
     </xsl:copy>
     <system-properties>
-      <property>
-        <xsl:attribute name="name">hawkular.backend</xsl:attribute>
-        <xsl:attribute name="value">${hawkular.backend:embedded_cassandra}</xsl:attribute>
-      </property>
+      <property name="hawkular.backend" value="${{hawkular.backend:embedded_cassandra}}"/>
     </system-properties>
   </xsl:template>
 
   <!-- copy everything else as-is -->
-  <xsl:template match="node()|@*">
+  <xsl:template match="node()|comment()|@*">
     <xsl:copy>
-      <xsl:apply-templates select="node()|@*" />
+      <xsl:apply-templates select="node()|comment()|@*" />
     </xsl:copy>
   </xsl:template>
 

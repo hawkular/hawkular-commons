@@ -19,22 +19,21 @@ package org.hawkular.inventory.paths;
 import java.io.IOException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  *
  */
-@RunWith(Arquillian.class)
-public class CanonicalPathITest {
+public class CanonicalPathITest extends Arquillian {
     private static final Logger log = Logger.getLogger(CanonicalPathITest.class);
+    public static final String GROUP = "inventory-paths";
 
     @Deployment
     public static WebArchive createDeployment() {
@@ -49,14 +48,14 @@ public class CanonicalPathITest {
         return archive;
     }
 
-    @Test
+    @Test(groups = { GROUP })
     public void testCanonicalPath() throws IOException, InterruptedException {
         CanonicalPath p = CanonicalPath.fromString("/t;t/f;f/r;r");
         checkPath(p, SegmentType.t, "t", SegmentType.f, "f", SegmentType.r, "r");
     }
 
     private void checkPath(CanonicalPath path, Object... pathSpec) {
-        Assert.assertEquals(pathSpec.length / 2, path.getPath().size());
+        Assert.assertEquals(path.getPath().size(), pathSpec.length / 2);
         for (int i = 0; i < pathSpec.length; i += 2) {
             SegmentType t = (SegmentType) pathSpec[i];
             String id = (String) pathSpec[i + 1];
@@ -64,8 +63,8 @@ public class CanonicalPathITest {
             CanonicalPath.Segment s = path.getPath().get(i / 2);
 
             //noinspection AssertEqualsBetweenInconvertibleTypes
-            Assert.assertEquals(t, s.getElementType());
-            Assert.assertEquals(id, s.getElementId());
+            Assert.assertEquals(s.getElementType(), t);
+            Assert.assertEquals(s.getElementId(), id);
         }
     }
 }

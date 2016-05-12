@@ -1,0 +1,45 @@
+{
+  "definitions": {
+    "statisticsSetting": {
+      "type": "string",
+      "javaType": "org.hawkular.cmdgw.api.StatisticsSetting",
+      "description": "The desired state of the statistics enabled flag.",
+      "enum": ["ENABLED", "DISABLED"]
+    }
+  },
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.ResourcePathRequest"
+  },
+  "javaType": "org.hawkular.cmdgw.api.StatisticsControlRequest",
+  "javaInterfaces" : ["org.hawkular.cmdgw.api.ResourcePathDestination"],
+  "description": "Turns on or off statistics emissions from the different WildFly subsystems.",
+  "additionalProperties": false,
+  "properties": {
+    "web": {
+      "$ref": "#/definitions/statisticsSetting",
+      "description": "Modifies statistics control for the web (aka undertow) subsystem"
+    },
+    "transactions": {
+      "$ref": "#/definitions/statisticsSetting",
+      "description": "Modifies statistics control for the transactions subsystem"
+    },
+    "datasources": {
+      "$ref": "#/definitions/statisticsSetting",
+      "description": "Modifies statistics control for all datasources"
+    },
+    "infinispan": {
+      "$ref": "#/definitions/statisticsSetting",
+      "description": "Modifies statistics control for all infinispan caches"
+    },
+    "ejb3": {
+      "$ref": "#/definitions/statisticsSetting",
+      "description": "Modifies statistics control for the EJB3 subsystem"
+    },
+    "messaging": {
+      "$ref": "#/definitions/statisticsSetting",
+      "description": "Modifies statistics control for the JMS messaging subsystem"
+    }
+  }
+}

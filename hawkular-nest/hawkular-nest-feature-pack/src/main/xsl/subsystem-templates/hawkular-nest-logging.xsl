@@ -21,7 +21,6 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="2.0" exclude-result-prefixes="xalan">
 
   <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" xalan:indent-amount="4" standalone="no" />
-  <xsl:strip-space elements="*" />
 
   <xsl:template
       match="//*[local-name()='config']/*[local-name()='subsystem']/*[local-name()='root-logger']/*[local-name()='level']">
@@ -31,8 +30,7 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template
-      match="//*[local-name()='config']/*[local-name()='subsystem']/*[local-name()='console-handler']/*[local-name()='level']">
+  <xsl:template match="//*[local-name()='config']/*[local-name()='subsystem']/*[local-name()='console-handler']/*[local-name()='level']">
     <xsl:copy>
       <xsl:apply-templates select="@*|node()"/>
       <xsl:attribute name="name">${hawkular.log.console:INFO}</xsl:attribute>
@@ -47,10 +45,28 @@
     </xsl:copy>
   </xsl:template>
 
-  <!-- copy everything else as-is -->
-  <xsl:template match="node()|@*">
+  <xsl:template match="//*[local-name()='config']/*[local-name()='supplement' and @name='default']/*[local-name()='replacement' and @placeholder='LOGGERS']">
     <xsl:copy>
-      <xsl:apply-templates select="node()|@*" />
+      <xsl:apply-templates select="@*|node()"/>
+      <logger category="org.hawkular.bus">
+        <level name="${{hawkular.log.bus:INFO}}" />
+      </logger>
+      <logger category="org.hawkular.cmdgw">
+        <level name="${{hawkular.log.cmdgw:INFO}}" />
+      </logger>
+      <logger category="org.hawkular.nest">
+        <level name="${{hawkular.log.nest:INFO}}" />
+      </logger>
+      <logger category="com.datastax.driver">
+        <level name="${{hawkular.log.datastax.driver:INFO}}"/>
+      </logger>
+    </xsl:copy>
+  </xsl:template>
+
+  <!-- copy everything else as-is -->
+  <xsl:template match="node()|comment()|@*">
+    <xsl:copy>
+      <xsl:apply-templates select="node()|comment()|@*" />
     </xsl:copy>
   </xsl:template>
 

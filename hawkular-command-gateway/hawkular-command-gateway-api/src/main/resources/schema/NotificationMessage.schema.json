@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.AuthMessage"
+  },
+  "javaType": "org.hawkular.cmdgw.api.NotificationMessage",
+  "description": "An general notification message.",
+  "additionalProperties": false,
+  "properties": {
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": ["message"]
+}

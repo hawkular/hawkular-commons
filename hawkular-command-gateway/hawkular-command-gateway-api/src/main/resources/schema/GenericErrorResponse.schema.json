@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.AuthMessage"
+  },
+  "javaType": "org.hawkular.cmdgw.api.GenericErrorResponse",
+  "description": "An general error message.",
+  "additionalProperties": false,
+  "properties": {
+    "errorMessage": {
+      "type": "string"
+    },
+    "stackTrace": {
+      "type": "string"
+    }
+  },
+  "required": ["errorMessage"]
+}

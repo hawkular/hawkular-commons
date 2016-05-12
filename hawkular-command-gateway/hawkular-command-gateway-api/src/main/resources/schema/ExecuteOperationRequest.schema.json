@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.ResourcePathRequest"
+  },
+  "javaType": "org.hawkular.cmdgw.api.ExecuteOperationRequest",
+  "javaInterfaces" : ["org.hawkular.cmdgw.api.ResourcePathDestination"],
+  "additionalProperties": false,
+  "description": "A request to execute an operation on a resource given by the inventory path stored in resourcePath field.",
+  "properties": {
+    "operationName": {
+      "type": "string"
+    },
+    "parameters": {
+      "description": "A simple map of named parameters.",
+      "type": "object",
+      "javaType": "java.util.Map<String, String>"
+    }
+  },
+  "required": ["operationName"]
+}
+

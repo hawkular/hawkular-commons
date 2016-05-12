@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.AuthMessage"
+  },
+  "javaType": "org.hawkular.cmdgw.api.GenericSuccessResponse",
+  "description": "An general success message.",
+  "additionalProperties": false,
+  "properties": {
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": ["message"]
+}
