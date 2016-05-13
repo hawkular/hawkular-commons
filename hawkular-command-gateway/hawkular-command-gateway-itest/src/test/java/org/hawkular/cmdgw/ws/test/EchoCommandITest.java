@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Red Hat, Inc. and/or its affiliates
+ * Copyright 2014-2016 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +39,7 @@ public class EchoCommandITest extends AbstractCommandITest {
      * @throws Throwable
      */
     @RunAsClient
-    @Test(groups = { GROUP }, dependsOnGroups = { org.hawkular.bus.itest.BusITest.GROUP })
+    @Test(groups = { GROUP })
     public void testEcho() throws Throwable {
 
         try (TestWebSocketClient testClient = TestWebSocketClient.builder()
@@ -52,7 +52,7 @@ public class EchoCommandITest extends AbstractCommandITest {
     }
 
     @RunAsClient
-    @Test(groups = { GROUP }, dependsOnGroups = { org.hawkular.bus.itest.BusITest.GROUP })
+    @Test(groups = { GROUP })
     public void testWithoutAuth() throws Throwable {
 
         try (TestWebSocketClient testClient = TestWebSocketClient.builder()
@@ -65,7 +65,7 @@ public class EchoCommandITest extends AbstractCommandITest {
     }
 
     @RunAsClient
-    @Test(groups = { GROUP }, dependsOnGroups = { org.hawkular.bus.itest.BusITest.GROUP })
+    @Test(groups = { GROUP })
     public void testBadPassword() throws Throwable {
         try (TestWebSocketClient testClient = TestWebSocketClient.builder()
                 .url(baseGwUri + "/ui/ws") //
@@ -77,7 +77,7 @@ public class EchoCommandITest extends AbstractCommandITest {
     }
 
     @RunAsClient
-    @Test(groups = { GROUP }, dependsOnGroups = { org.hawkular.bus.itest.BusITest.GROUP })
+    @Test(groups = { GROUP })
     public void testBadUserAndPassword() throws Throwable {
         try (TestWebSocketClient testClient = TestWebSocketClient.builder()
                 .url(baseGwUri + "/ui/ws") //

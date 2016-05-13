@@ -42,12 +42,6 @@
     <dependencies>
 
       <dependency>
-        <groupId>org.wildfly</groupId>
-        <artifactId>wildfly-arquillian-container-managed</artifactId>
-        <version>${version.org.wildfly.wildfly-arquillian-container-managed}</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.wildfly.core</groupId>
         <artifactId>wildfly-controller</artifactId>
         <version>${version.org.wildfly.core}</version>
