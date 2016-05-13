@@ -104,6 +104,14 @@
     <dependency>
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-command-gateway-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-command-gateway-itest</artifactId>
+      <scope>test</scope>
+      <type>test-jar</type>
     </dependency>
 
     <dependency>
@@ -122,12 +130,6 @@
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-nest-feature-pack</artifactId>
       <type>zip</type>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -173,22 +175,14 @@
           <skip>true</skip>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
+          <dependenciesToScan>
+            <dependency>org.hawkular.commons:hawkular-command-gateway-itest</dependency>
+          </dependenciesToScan>
           <includes>
             <include>${failsafe.itest.includes}</include>
           </includes>
