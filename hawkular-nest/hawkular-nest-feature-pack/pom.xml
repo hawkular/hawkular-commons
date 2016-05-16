@@ -91,6 +91,13 @@
 
     <dependency>
       <groupId>org.wildfly</groupId>
+      <artifactId>wildfly-ejb3</artifactId>
+      <version>${version.org.wildfly}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.wildfly</groupId>
       <artifactId>wildfly-feature-pack</artifactId>
       <version>${version.org.wildfly}</version>
       <type>zip</type>
@@ -128,6 +135,7 @@
             </goals>
             <configuration>
               <artifactItems>
+
                 <artifactItem>
                   <groupId>org.hawkular.commons</groupId>
                   <artifactId>hawkular-bus-feature-pack</artifactId>
@@ -135,19 +143,28 @@
                   <includes>configuration/standalone/template.xml,configuration/standalone/subsystems.xml</includes>
                   <outputDirectory>${project.build.directory}/upstream-subsystem-templates</outputDirectory>
                 </artifactItem>
+
+                <artifactItem>
+                  <groupId>org.wildfly</groupId>
+                  <artifactId>wildfly-ejb3</artifactId>
+                  <includes>subsystem-templates/*.xml</includes>
+                  <outputDirectory>${project.build.directory}/upstream-subsystem-templates</outputDirectory>
+                </artifactItem>
+
                 <artifactItem>
                   <groupId>org.wildfly.core</groupId>
                   <artifactId>wildfly-logging</artifactId>
-                  <version>${version.org.wildfly.core}</version>
                   <includes>subsystem-templates/logging.xml</includes>
                   <outputDirectory>${project.build.directory}/upstream-subsystem-templates</outputDirectory>
                 </artifactItem>
+
                 <artifactItem>
                   <groupId>org.wildfly</groupId>
                   <artifactId>wildfly-messaging-activemq</artifactId>
                   <includes>subsystem-templates/*.xml</includes>
                   <outputDirectory>${project.build.directory}/upstream-subsystem-templates</outputDirectory>
                 </artifactItem>
+
               </artifactItems>
             </configuration>
           </execution>
@@ -193,6 +210,21 @@
                     <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
                       <pattern>^configuration/standalone/(.*).xml$</pattern>
                       <replacement>configuration/standalone/hawkular-nest-$1.xml</replacement>
+                    </fileMapper>
+                  </fileMappers>
+                </transformationSet>
+
+                <transformationSet>
+                  <dir>${project.build.directory}/upstream-subsystem-templates</dir>
+                  <stylesheet>${basedir}/src/main/xsl/subsystem-templates/hawkular-nest-ejb3.xsl</stylesheet>
+                  <includes>
+                    <include>subsystem-templates/ejb3.xml</include>
+                  </includes>
+                  <outputDir>${project.build.directory}/feature-pack-resources</outputDir>
+                  <fileMappers>
+                    <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
+                      <pattern>^subsystem-templates/(.*)\.xml$</pattern>
+                      <replacement>subsystem-templates/hawkular-nest-$1.xml</replacement>
                     </fileMapper>
                   </fileMappers>
                 </transformationSet>
