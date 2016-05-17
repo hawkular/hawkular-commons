@@ -946,7 +946,7 @@ public abstract class Path {
         private SegmentType unambiguousPathNextStep(SegmentType targetType, SegmentType currentType,
                 boolean isLast, Map<SegmentType, Boolean> visitedTypes) {
 
-            if (targetType.equals(currentType)) {
+            if (currentType.equals(targetType)) {
                 return targetType;
             }
 
@@ -974,7 +974,7 @@ public abstract class Path {
         private boolean fillPossiblePathsToTarget(SegmentType targetType, SegmentType currentType,
                 Set<SegmentType> result, Map<SegmentType, Boolean> visitedTypes, boolean isStart) {
 
-            if (targetType.equals(currentType)) {
+            if (currentType.equals(targetType)) {
                 if (isStart) {
                     result.add(currentType);
                 }

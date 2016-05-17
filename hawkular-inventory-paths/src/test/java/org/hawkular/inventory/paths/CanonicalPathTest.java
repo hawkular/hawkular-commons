@@ -358,6 +358,24 @@ public class CanonicalPathTest {
         Assert.assertEquals(new Path.Segment(SegmentType.d, "configuration"), p.slide(2, 0).getTop());
     }
 
+    @Test
+    public void testUntypedDeserializationWithUnknownTargetType() throws Exception {
+        CanonicalPath root = CanonicalPath.of().tenant("t").get();
+        try {
+            Path.fromPartiallyUntypedString("/mtype", root, null, null);
+            Assert.fail("Detyped canonical path should not have been deserializable due to lack of information.");
+        } catch (IllegalArgumentException e) {
+            //expected - we're here to check that the above doesn't throw an unintelligible NPE
+        }
+
+        try {
+            Path.fromPartiallyUntypedString("mtype", null, root, null);
+            Assert.fail("Detyped relative path should not have been deserializable due to lack of information.");
+        } catch (IllegalArgumentException e) {
+            //expected, should not be an NPE
+        }
+    }
+
     private void checkPath(CanonicalPath path, Object... pathSpec) {
         Assert.assertEquals(pathSpec.length / 2, path.getPath().size());
         for (int i = 0; i < pathSpec.length; i += 2) {
