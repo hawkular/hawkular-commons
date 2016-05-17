@@ -28,6 +28,9 @@ import org.hawkular.cmdgw.log.GatewayLoggers;
 import org.hawkular.cmdgw.log.MsgLogger;
 
 /**
+ * A lazy JNDI lookup of {@link ConnectionFactory} bound to the name {@link Constants#CONNECTION_FACTORY_JNDI} with
+ * retries (see {@link #connectionFactoryRetryAfterMs}) and timeout {@link #connectionFactoryLookupTimeoutMs}.
+ *
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  */
 @ApplicationScoped
@@ -43,6 +46,16 @@ public class BusConnectionFactoryProvider {
             Integer.parseInt(System.getProperty(Constants.CONNECTION_FACTORY_JNDI_LOOKUP_RETRY_AFTER_MS,
                     String.valueOf(Constants.CONNECTION_FACTORY_JNDI_LOOKUP_RETRY_AFTER_MS_DEFAULT)));
 
+    /**
+     * Returns an instance of {@link ConnectionFactory} looked up lazily using the JNDI name
+     * {@link Constants#CONNECTION_FACTORY_JNDI}. The lookup is retried if necessary (see
+     * {@link #connectionFactoryRetryAfterMs}) and a {@link RuntimeException} is thrown if the timeout set in
+     * {@link #connectionFactoryLookupTimeoutMs} is exceeded.
+     *
+     * @return an instance of {@link ConnectionFactory}
+     * @throws RuntimeException if the timeout set in {@link #connectionFactoryLookupTimeoutMs} is exceeded or if a
+     *             {@link NamingException} other than {@link NameNotFoundException} occurs.
+     */
     public ConnectionFactory getConnectionFactory() {
         if (connectionFactory == null) {
             synchronized (connectionFactoryLock) {

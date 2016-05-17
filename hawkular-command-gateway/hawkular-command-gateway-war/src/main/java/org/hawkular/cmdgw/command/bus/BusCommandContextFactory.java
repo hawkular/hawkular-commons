@@ -17,7 +17,9 @@
 package org.hawkular.cmdgw.command.bus;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.jms.ConnectionFactory;
 
 import org.hawkular.bus.common.Endpoint;
 import org.hawkular.cmdgw.command.ws.WsEndpoints;
@@ -32,6 +34,11 @@ public class BusCommandContextFactory {
     @Inject
     private WsEndpoints wsEndpoints;
 
+    /**
+     * We might consider injecting an {@link Instance} of {@link ConnectionFactory} produced by
+     * {@link BusConnectionFactoryProvider} here. See
+     * https://github.com/hawkular/hawkular-commons/pull/65/files/4faa33502c68b6cd686a93fb3c0824e6574e0564#r63523505
+     */
     @Inject
     private BusConnectionFactoryProvider connectionFactoryProvider;
 
