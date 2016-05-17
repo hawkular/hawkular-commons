@@ -37,6 +37,7 @@
     <hawkular.port.offset>0</hawkular.port.offset>
     <!-- $hawkular.management.port must be equal to $hawkular.port.offset + 9990 -->
     <hawkular.management.port>9990</hawkular.management.port>
+
     <hawkular.log.root>INFO</hawkular.log.root>
     <hawkular.log.console>TRACE</hawkular.log.console>
     <hawkular.log.bus>TRACE</hawkular.log.bus>
@@ -93,12 +94,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-bus-common</artifactId>
       <scope>provided</scope>
@@ -148,6 +143,18 @@
     </dependency>
 
     <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.wildfly.arquillian</groupId>
       <artifactId>wildfly-arquillian-container-managed</artifactId>
       <scope>test</scope>
@@ -157,12 +164,6 @@
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jboss.shrinkwrap.resolver</groupId>
-      <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-      <scope>test</scope>
     </dependency>
 
   </dependencies>
@@ -191,7 +192,7 @@
           </includes>
           <systemPropertyVariables>
             <jboss.home>${project.build.directory}/${project.build.finalName}</jboss.home>
-            <jboss.options>-Xmx512m -XX:MaxPermSize=2048m
+            <jboss.options>-Xmx1024m -XX:MaxPermSize=1024m
                 -Dhawkular.log.root=${hawkular.log.root}
                 -Dhawkular.log.console=${hawkular.log.console}
                 -Dhawkular.log.bus=${hawkular.log.bus}
