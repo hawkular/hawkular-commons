@@ -16,13 +16,10 @@
  */
 package org.hawkular.cmdgw.command.bus;
 
-import javax.annotation.Resource;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.jms.ConnectionFactory;
 
 import org.hawkular.bus.common.Endpoint;
-import org.hawkular.cmdgw.Constants;
 import org.hawkular.cmdgw.command.ws.WsEndpoints;
 
 /**
@@ -35,8 +32,8 @@ public class BusCommandContextFactory {
     @Inject
     private WsEndpoints wsEndpoints;
 
-    @Resource(name = Constants.CONNECTION_FACTORY_JNDI)
-    private ConnectionFactory connectionFactory;
+    @Inject
+    private BusConnectionFactoryProvider connectionFactoryProvider;
 
     /**
      * Creates a new {@link BusCommandContext} with the given {@code endpoint}.
@@ -45,8 +42,8 @@ public class BusCommandContextFactory {
      * @return a new {@link BusCommandContext}
      */
     public BusCommandContext newCommandContext(Endpoint endpoint) {
-        return new BusCommandContext(endpoint, connectionFactory, wsEndpoints.getUiClientSessions(),
-                wsEndpoints.getFeedSessions());
+        return new BusCommandContext(endpoint, connectionFactoryProvider.getConnectionFactory(),
+                wsEndpoints.getUiClientSessions(), wsEndpoints.getFeedSessions());
     }
 
 }

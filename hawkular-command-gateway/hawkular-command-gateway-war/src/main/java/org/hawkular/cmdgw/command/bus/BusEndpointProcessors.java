@@ -19,13 +19,11 @@ package org.hawkular.cmdgw.command.bus;
 import java.io.IOException;
 import java.util.function.BiFunction;
 
-import javax.annotation.Resource;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Destroyed;
 import javax.enterprise.context.Initialized;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.websocket.Session;
 
@@ -90,7 +88,8 @@ public class BusEndpointProcessors {
                     busEndpointListener.getClass().getName(), messageSelector, endpoint);
 
             try {
-                connectionContextFactory = new ConnectionContextFactory(true, connectionFactory);
+                connectionContextFactory =
+                        new ConnectionContextFactory(true, connectionFactoryProvider.getConnectionFactory());
                 consumerConnectionContext = connectionContextFactory.createConsumerConnectionContext(endpoint,
                         messageSelector);
                 new MessageProcessor().listen(consumerConnectionContext, busEndpointListener);
@@ -222,8 +221,8 @@ public class BusEndpointProcessors {
     @Inject
     private BusCommandContextFactory commandContextFactory;
 
-    @Resource(name = Constants.CONNECTION_FACTORY_JNDI)
-    private ConnectionFactory connectionFactory;
+    @Inject
+    private BusConnectionFactoryProvider connectionFactoryProvider;
 
     private BiFunction<String, Session, WsSessionListener> feedSessionListenerProducer;
     private BiFunction<String, Session, WsSessionListener> uiClientSessionListenerProducer;

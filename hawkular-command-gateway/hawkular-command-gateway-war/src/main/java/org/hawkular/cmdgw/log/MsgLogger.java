@@ -179,4 +179,10 @@ public interface MsgLogger extends BasicLogger {
     @LogMessage(level = Logger.Level.ERROR)
     @Message(id = 39, value = "Could not initialize [%s]")
     void errorCouldNotInitialize(@Cause Throwable t, String name);
+
+    @Message(id = 40, value = "Failed to lookup [%s] using name [%s] within [%d] ms")
+    String errFailedToLookupConnectionFactory(String connectionFactoryClassName, String name, long timeoutMs);
+
+    @Message(id = 41, value = "Failed to lookup [%s] using name [%s]")
+    String errFailedToLookupConnectionFactory(String connectionFactoryClassName, String name);
 }
