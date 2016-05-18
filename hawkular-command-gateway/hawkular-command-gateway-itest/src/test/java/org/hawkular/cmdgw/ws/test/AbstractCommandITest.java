@@ -39,8 +39,6 @@ public abstract class AbstractCommandITest extends Arquillian {
         int httpPort = portOffset + 8080;
         baseGwUri = "ws://" + host + ":" + httpPort + "/hawkular/command-gateway";
         authentication = "{\"username\":\"" + testUser + "\",\"password\":\"" + testPasword + "\"}";
-        // System.out.println("testPasword = "+ testPasword);
-
     }
 
 }
