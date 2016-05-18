@@ -376,6 +376,13 @@ public class CanonicalPathTest {
         }
     }
 
+    @Test
+    public void testUntypedDeserializationWithUnknownRootType() throws Exception {
+        Path p = Path.fromPartiallyUntypedString("/c", null, null, SegmentType.t);
+        Assert.assertTrue(p instanceof CanonicalPath);
+        Assert.assertEquals(p.getSegment(), new Path.Segment(SegmentType.t, "c"));
+    }
+
     private void checkPath(CanonicalPath path, Object... pathSpec) {
         Assert.assertEquals(pathSpec.length / 2, path.getPath().size());
         for (int i = 0; i < pathSpec.length; i += 2) {
