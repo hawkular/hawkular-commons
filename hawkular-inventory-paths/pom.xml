@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.hawkular.commons</groupId>
     <artifactId>hawkular-commons-parent</artifactId>
-    <version>0.6.2.Final-SNAPSHOT</version>
+    <version>0.7.0.Final</version>
   </parent>
   <artifactId>hawkular-inventory-paths</artifactId>
   <name>Hawkular Commons Inventory Paths</name>

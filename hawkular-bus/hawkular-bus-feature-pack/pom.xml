@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.hawkular.commons</groupId>
     <artifactId>hawkular-bus-parent</artifactId>
-    <version>0.6.2.Final-SNAPSHOT</version>
+    <version>0.7.0.Final</version>
   </parent>
   <artifactId>hawkular-bus-feature-pack</artifactId>
   <packaging>pom</packaging>
