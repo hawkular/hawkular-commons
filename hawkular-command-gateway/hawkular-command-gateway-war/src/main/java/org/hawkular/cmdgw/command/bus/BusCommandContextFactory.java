@@ -16,13 +16,12 @@
  */
 package org.hawkular.cmdgw.command.bus;
 
-import javax.annotation.Resource;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.jms.ConnectionFactory;
 
 import org.hawkular.bus.common.Endpoint;
-import org.hawkular.cmdgw.Constants;
 import org.hawkular.cmdgw.command.ws.WsEndpoints;
 
 /**
@@ -35,8 +34,13 @@ public class BusCommandContextFactory {
     @Inject
     private WsEndpoints wsEndpoints;
 
-    @Resource(name = Constants.CONNECTION_FACTORY_JNDI)
-    private ConnectionFactory connectionFactory;
+    /**
+     * We might consider injecting an {@link Instance} of {@link ConnectionFactory} produced by
+     * {@link BusConnectionFactoryProvider} here. See
+     * https://github.com/hawkular/hawkular-commons/pull/65/files/4faa33502c68b6cd686a93fb3c0824e6574e0564#r63523505
+     */
+    @Inject
+    private BusConnectionFactoryProvider connectionFactoryProvider;
 
     /**
      * Creates a new {@link BusCommandContext} with the given {@code endpoint}.
@@ -45,8 +49,8 @@ public class BusCommandContextFactory {
      * @return a new {@link BusCommandContext}
      */
     public BusCommandContext newCommandContext(Endpoint endpoint) {
-        return new BusCommandContext(endpoint, connectionFactory, wsEndpoints.getUiClientSessions(),
-                wsEndpoints.getFeedSessions());
+        return new BusCommandContext(endpoint, connectionFactoryProvider.getConnectionFactory(),
+                wsEndpoints.getUiClientSessions(), wsEndpoints.getFeedSessions());
     }
 
 }

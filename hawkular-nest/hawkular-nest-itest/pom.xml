@@ -30,10 +30,14 @@
     <surefire.testng.verbose>3</surefire.testng.verbose>
     <failsafe.itest.includes>**/*ITest.class</failsafe.itest.includes>
 
+    <hawkular.itest.rest.user>itest-rest</hawkular.itest.rest.user>
+    <!-- <hawkular.itest.rest.password> set to a random value using gmaven plugin </hawkular.itest.rest.password> -->
+
     <hawkular.bind.address>127.0.0.1</hawkular.bind.address>
     <hawkular.port.offset>0</hawkular.port.offset>
     <!-- $hawkular.management.port must be equal to $hawkular.port.offset + 9990 -->
     <hawkular.management.port>9990</hawkular.management.port>
+
     <hawkular.log.root>INFO</hawkular.log.root>
     <hawkular.log.console>TRACE</hawkular.log.console>
     <hawkular.log.bus>TRACE</hawkular.log.bus>
@@ -90,12 +94,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-bus-common</artifactId>
       <scope>provided</scope>
@@ -145,6 +143,18 @@
     </dependency>
 
     <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.wildfly.arquillian</groupId>
       <artifactId>wildfly-arquillian-container-managed</artifactId>
       <scope>test</scope>
@@ -154,12 +164,6 @@
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jboss.shrinkwrap.resolver</groupId>
-      <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-      <scope>test</scope>
     </dependency>
 
   </dependencies>
@@ -188,7 +192,7 @@
           </includes>
           <systemPropertyVariables>
             <jboss.home>${project.build.directory}/${project.build.finalName}</jboss.home>
-            <jboss.options>-Xmx512m -XX:MaxPermSize=2048m
+            <jboss.options>-Xmx1024m -XX:MaxPermSize=1024m
                 -Dhawkular.log.root=${hawkular.log.root}
                 -Dhawkular.log.console=${hawkular.log.console}
                 -Dhawkular.log.bus=${hawkular.log.bus}
@@ -198,6 +202,10 @@
                 -Dhawkular.log.cassandra=${hawkular.log.cassandra}
             </jboss.options>
             <shrinkwrap.maven.settings>${project.build.directory}/shrinkwrap-maven-settings.xml</shrinkwrap.maven.settings>
+
+            <hawkular.itest.rest.user>${hawkular.itest.rest.user}</hawkular.itest.rest.user>
+            <hawkular.itest.rest.password>${hawkular.itest.rest.password}</hawkular.itest.rest.password>
+
             <hawkular.bind.address>${hawkular.bind.address}</hawkular.bind.address>
             <hawkular.port.offset>${hawkular.port.offset}</hawkular.port.offset>
             <!-- output over-the-wire traffic -->
@@ -252,17 +260,13 @@
           </execution>
         </executions>
         <configuration>
-          <properties>
-            <property>
-              <name>someProp</name>
-              <value>${someProp}</value>
-            </property>
-          </properties>
           <scripts>
             <script><![CDATA[
               import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer
               import org.apache.maven.settings.SettingsUtils
               import org.apache.maven.settings.Settings
+
+              project.properties['hawkular.itest.rest.password'] = UUID.randomUUID().toString()
 
               Settings settings = SettingsUtils.copySettings(session.settings)
               settings.setServers(null)
@@ -290,23 +294,34 @@
       </plugin>
 
       <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>copy-resources</id>
+            <id>create-itest-users</id>
             <phase>process-classes</phase>
             <goals>
-              <goal>copy-resources</goal>
+              <goal>exec</goal>
             </goals>
             <configuration>
-              <overwrite>true</overwrite>
-              <outputDirectory>${project.build.directory}/${project.build.finalName}/standalone/configuration/</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${project.basedir}/src/test/resources/standalone-configuration/</directory>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
+              <executable>java</executable>
+              <environmentVariables>
+                <JBOSS_HOME>${project.build.directory}/${project.build.finalName}</JBOSS_HOME>
+              </environmentVariables>
+              <arguments>
+                <argument>-jar</argument>
+                <argument>${project.build.directory}/${project.build.finalName}/jboss-modules.jar</argument>
+                <argument>-mp</argument>
+                <argument>${project.build.directory}/${project.build.finalName}/modules</argument>
+                <argument>org.jboss.as.domain-add-user</argument>
+                <argument>-a</argument>
+                <argument>--user</argument>
+                <argument>${hawkular.itest.rest.user}</argument>
+                <argument>--password</argument>
+                <argument>${hawkular.itest.rest.password}</argument>
+                <argument>--group</argument>
+                <argument>read-write,read-only</argument>
+              </arguments>
             </configuration>
           </execution>
         </executions>

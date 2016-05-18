@@ -27,6 +27,7 @@ import org.hawkular.bus.common.BasicMessage;
 import org.hawkular.bus.common.BasicMessageWithExtraData;
 import org.hawkular.cmdgw.NoCommandForMessageException;
 import org.hawkular.cmdgw.api.ApiDeserializer;
+import org.hawkular.cmdgw.api.AuthMessage;
 import org.hawkular.cmdgw.api.GenericErrorResponse;
 import org.hawkular.cmdgw.api.GenericErrorResponseBuilder;
 import org.hawkular.cmdgw.api.UiSessionOrigin;
@@ -86,6 +87,11 @@ public abstract class AbstractGatewayWebSocket {
             /* do not trust the sessionId provided by the client */
             log.tracef("[%s] is an instance of [%s]", request.getClass().getName(), UiSessionOrigin.class.getName());
             ((UiSessionOrigin) request).setSenderSessionId(session.getId());
+        }
+
+        if (request instanceof AuthMessage) {
+            /* we do not want to expose the credentials to any other part of the pipe */
+            ((AuthMessage) request).setAuthentication(null);
         }
 
         Class<BasicMessage> requestClass = (Class<BasicMessage>) request.getClass();

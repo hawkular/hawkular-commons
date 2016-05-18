@@ -18,30 +18,17 @@
 
 -->
 
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="2.0" exclude-result-prefixes="xalan">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="2.0"  exclude-result-prefixes="xalan">
 
   <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" xalan:indent-amount="4" standalone="no" />
 
-  <!-- Add the Nest subsystem -->
-  <xsl:template match="/*[local-name()='config']/*[local-name()='subsystems']">
+  <!-- //*[local-name()='config']/*[local-name()='supplement' and @name='default'] is an xPath's 1.0
+       way of saying of xPath's 2.0 prefix-less selector //*:config/*:supplement[@name='default']  -->
+  <xsl:template match="//*[local-name()='config']/*[local-name()='supplement' and @name='default']">
     <xsl:copy>
-      <xsl:apply-templates select="node()|comment()|@*"/>
-      <subsystem>hawkular-nest-messaging-activemq.xml</subsystem>
-      <subsystem>nest.xml</subsystem>
-    </xsl:copy>
-  </xsl:template>
-
-  <!-- Use our own logging -->
-  <xsl:template match="/*[local-name()='config']/*[local-name()='subsystems']/*[local-name()='subsystem' and text()='logging.xml']">
-    <xsl:copy>
-      <xsl:text>hawkular-nest-logging.xml</xsl:text>
-    </xsl:copy>
-  </xsl:template>
-
-  <!-- Use our own ejb3 -->
-  <xsl:template match="/*[local-name()='config']/*[local-name()='subsystems']/*[local-name()='subsystem' and text()='ejb3.xml']">
-    <xsl:copy>
-      <xsl:text>hawkular-nest-ejb3.xml</xsl:text>
+      <xsl:apply-templates select="node()|comment()|@*" />
+      <!-- Copy the MDB replacement from full to default -->
+      <xsl:copy-of select="//*[local-name()='config']/*[local-name()='supplement' and @name='full']/*[local-name()='replacement' and @placeholder='MDB']"/>
     </xsl:copy>
   </xsl:template>
 

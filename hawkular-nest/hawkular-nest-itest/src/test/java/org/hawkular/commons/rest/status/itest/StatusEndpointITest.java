@@ -47,7 +47,6 @@ public class StatusEndpointITest extends Arquillian {
 
     @Deployment
     public static WebArchive createDeployment() {
-        // System.out.println("shrinkwrapMavenSettings = "+ shrinkwrapMavenSettings);
         File[] libs = Maven.configureResolver().fromFile(shrinkwrapMavenSettings).loadPomFromFile("pom.xml")
                 .resolve("org.hawkular.commons:hawkular-rest-status", "com.squareup.okhttp:okhttp")
                 .withTransitivity().asFile();

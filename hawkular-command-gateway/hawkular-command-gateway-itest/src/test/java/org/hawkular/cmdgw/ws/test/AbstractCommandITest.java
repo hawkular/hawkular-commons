@@ -25,8 +25,8 @@ public abstract class AbstractCommandITest extends Arquillian {
     protected static final String authentication;
     protected static final String baseGwUri;
     protected static final String host;
-    protected static final String testPasword = "password";
-    protected static final String testUser = "jdoe";
+    protected static final String testPasword = System.getProperty("hawkular.itest.rest.password");
+    protected static final String testUser = System.getProperty("hawkular.itest.rest.user");
     public static final String authHeader = Credentials.basic(testUser, testPasword);
 
     static {
@@ -39,7 +39,6 @@ public abstract class AbstractCommandITest extends Arquillian {
         int httpPort = portOffset + 8080;
         baseGwUri = "ws://" + host + ":" + httpPort + "/hawkular/command-gateway";
         authentication = "{\"username\":\"" + testUser + "\",\"password\":\"" + testPasword + "\"}";
-
     }
 
 }
