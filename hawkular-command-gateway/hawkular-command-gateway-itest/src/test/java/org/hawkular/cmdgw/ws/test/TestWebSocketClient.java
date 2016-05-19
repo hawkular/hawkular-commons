@@ -21,7 +21,9 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
@@ -92,6 +94,10 @@ public class TestWebSocketClient implements Closeable {
             public String getReason() {
                 return reason;
             }
+            @Override
+            public String toString() {
+                return "ActualClose [code=" + code + ", reason=" + reason + "]";
+            }
         }
         public static class ActualFailure extends ActualEvent {
             private final IOException exception;
@@ -107,18 +113,44 @@ public class TestWebSocketClient implements Closeable {
             public Response getResponse() {
                 return response;
             }
+            @Override
+            public String toString() {
+                String stackTrace = "";
+                if (exception != null) {
+                    try (StringWriter w = new StringWriter(); PrintWriter pw = new PrintWriter(w, true)) {
+                        exception.printStackTrace(pw);
+                        stackTrace = w.toString();
+                    } catch (IOException ignored) {
+                    }
+                }
+                return "ActualFailure [response=" + response + ", exception=" + exception + ", stackTrace=["+ stackTrace +"]]";
+            }
+
         }
         public static class ActualMessage extends ActualEvent {
-            private final ResponseBody body;
-
-            public ActualMessage(TestListener testListener, int index, ResponseBody body) {
+            private final ReusableBuffer body;
+            private final MediaType type;
+            public ActualMessage(TestListener testListener, int index, ResponseBody body) throws IOException {
                 super(testListener, index);
-                this.body = body;
+                try (BufferedSource payload = body.source()) {
+                    this.type = body.contentType();
+                    this.body = new ReusableBuffer(body.source());
+                }
             }
 
-            public ResponseBody getBody() {
+            public ReusableBuffer getBody() {
                 return body;
             }
+
+            public MediaType getType() {
+                return type;
+            }
+
+            @Override
+            public String toString() {
+                return "ActualMessage [type=" + type + ", body=" + body + "]";
+            }
+
         }
         public static class ActualOpen extends ActualEvent {
             private final Response response;
@@ -133,6 +165,10 @@ public class TestWebSocketClient implements Closeable {
             }
             public WebSocket getWebSocket() {
                 return webSocket;
+            }
+            @Override
+            public String toString() {
+                return "ActualOpen [response=" + response + "]";
             }
         }
 
@@ -423,39 +459,33 @@ public class TestWebSocketClient implements Closeable {
             public MessageReport match(ActualEvent actualEvent) {
                 if (actualEvent instanceof ActualMessage) {
                     ActualMessage msg = (ActualMessage) actualEvent;
-                    ResponseBody body = msg.getBody();
-                    try {
-                        BufferedSource payload = body.source();
-                        MediaType type = body.contentType();
-                        ReusableBuffer message = new ReusableBuffer(payload);
+                    MediaType type = msg.getType();
+                    ReusableBuffer message = msg.getBody();
 
 
-                        Description description = new StringDescription();
-                        boolean fail = false;
-                        if (!inMessageMatcher.matches(message, actualEvent.getTestListener())) {
-                            description
-                                    .appendText("Expected: ")
-                                    .appendDescriptionOf(inMessageMatcher)
-                                    .appendText("\n     but: ");
-                            inMessageMatcher.describeMismatch(message, description);
-                            fail = true;
-                        }
-                        if (!inTypeMatcher.matches(type)) {
-                            description
-                                    .appendText("Expected: ")
-                                    .appendDescriptionOf(inTypeMatcher)
-                                    .appendText("\n     but: ");
-                            inTypeMatcher.describeMismatch(type, description);
-                            fail = true;
-                        }
+                    Description description = new StringDescription();
+                    boolean fail = false;
+                    if (!inMessageMatcher.matches(message, actualEvent.getTestListener())) {
+                        description
+                                .appendText("Expected: ")
+                                .appendDescriptionOf(inMessageMatcher)
+                                .appendText("\n     but: ");
+                        inMessageMatcher.describeMismatch(message, description);
+                        fail = true;
+                    }
+                    if (!inTypeMatcher.matches(type)) {
+                        description
+                                .appendText("Expected: ")
+                                .appendDescriptionOf(inTypeMatcher)
+                                .appendText("\n     but: ");
+                        inTypeMatcher.describeMismatch(type, description);
+                        fail = true;
+                    }
 
-                        if (fail) {
-                            return new MessageReport(new AssertionError(description.toString()), actualEvent.getIndex());
-                        } else {
-                            return MessageReport.passed(actualEvent.getIndex());
-                        }
-                    } catch (IOException e) {
-                        return new MessageReport(e, actualEvent.getIndex());
+                    if (fail) {
+                        return new MessageReport(new AssertionError(description.toString()), actualEvent.getIndex());
+                    } else {
+                        return MessageReport.passed(actualEvent.getIndex());
                     }
                 } else {
                     return unexpectedType(actualEvent);
@@ -494,10 +524,9 @@ public class TestWebSocketClient implements Closeable {
             }
         }
 
-
         protected MessageReport unexpectedType(ActualEvent actualEvent) {
             final String msg = "Expected one of [" + getExpectedTypes()
-                    + "] found [" + actualEvent.getClass().getName() +"]";
+                    + "] found [" + actualEvent.toString() +"]";
             log.fine(msg);
             return new MessageReport(new IllegalStateException(msg), actualEvent.getIndex());
         }
@@ -896,7 +925,8 @@ public class TestWebSocketClient implements Closeable {
             log.fine("Received message[" + actual.getIndex() + "] from WebSocket: [" + actual + "]");
             if (closed) {
                 throw new IllegalStateException("Received [" + (inMessageCounter + 1) + "]th message when only ["
-                        + expectedEvents.size() + "] messages were expected");
+                        + expectedEvents.size() + "] messages were expected. The received message was ["
+                        + actual.toString() + "]");
             }
             ExpectedEvent expected = expectedEvents.get(actual.getIndex());
             MessageReport report = expected.match(actual);
