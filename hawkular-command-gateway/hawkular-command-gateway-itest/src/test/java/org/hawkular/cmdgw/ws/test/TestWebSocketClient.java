@@ -56,6 +56,7 @@ import org.hawkular.cmdgw.api.WelcomeResponse;
 import org.hawkular.cmdgw.ws.test.TestWebSocketClient.ActualEvent.ActualClose;
 import org.hawkular.cmdgw.ws.test.TestWebSocketClient.ActualEvent.ActualFailure;
 import org.hawkular.cmdgw.ws.test.TestWebSocketClient.ActualEvent.ActualMessage;
+import org.hawkular.cmdgw.ws.test.TestWebSocketClient.ExpectedEvent.ExpectedClose;
 import org.hawkular.cmdgw.ws.test.TestWebSocketClient.ExpectedEvent.ExpectedMessage;
 import org.testng.Assert;
 
@@ -190,6 +191,22 @@ public class TestWebSocketClient implements Closeable {
     }
 
     public interface Answer {
+        Answer CLOSE = new Answer() {
+
+            @Override
+            public void schedule(ExecutorService executor, WebSocket webSocket) {
+                executor.execute(() -> {
+                    try {
+                        log.fine("About to send manual close");
+                        webSocket.close(1000, "OK");
+                        log.fine("Close sent");
+                    } catch (IOException e) {
+                        log.warning("Could not close WebSocket");
+                    }
+                });
+            }
+        };
+
         void schedule(final ExecutorService executor, final WebSocket webSocket);
     }
 
@@ -231,6 +248,9 @@ public class TestWebSocketClient implements Closeable {
 
         private String url;
 
+        private int connectTimeoutSeconds = 10;
+        private int readTimeoutSeconds = 120;
+
         public Builder authentication(String authentication) {
             this.authentication = authentication;
             return this;
@@ -243,20 +263,25 @@ public class TestWebSocketClient implements Closeable {
             }
             Request request = rb.build();
             TestListener listener = new TestListener(Collections.unmodifiableList(expectedEvents));
-            return new TestWebSocketClient(request, listener);
+            return new TestWebSocketClient(request, listener, connectTimeoutSeconds, readTimeoutSeconds);
         }
 
         /**
          * @param textPattern a regular expression
          * @param binaryMatcher a custom matcher to check the incoming binary attachment
+         * @param answer the answer to send after receiving the expected binary message
          * @return this builder
          */
-        public Builder expectBinary(String textPattern, TypeSafeMatcher<InputStream> binaryMatcher) {
+        public Builder expectBinary(String textPattern, TypeSafeMatcher<InputStream> binaryMatcher, Answer answer) {
             ExpectedEvent expectedEvent =
                     new ExpectedMessage(new BinaryAwareMatcher(textPattern, binaryMatcher),
-                            CoreMatchers.equalTo(WebSocket.BINARY), null);
+                            CoreMatchers.equalTo(WebSocket.BINARY), answer);
             expectedEvents.add(expectedEvent);
             return this;
+        }
+
+        public Builder expectBinary(String textPattern, TypeSafeMatcher<InputStream> binaryMatcher) {
+            return expectBinary(textPattern, binaryMatcher, null);
         }
 
         public Builder expectGenericSuccess(String feedId) {
@@ -300,6 +325,11 @@ public class TestWebSocketClient implements Closeable {
             return this;
         }
 
+        public Builder expectClose() {
+            expectedEvents.add(new ExpectedClose(1000, "OK"));
+            return this;
+        }
+
         /**
          * @param answer the text message to send out if the welcome came as expected
          * @param attachment bits to send out as a binary attachment of {@code answer}
@@ -325,6 +355,15 @@ public class TestWebSocketClient implements Closeable {
             return this;
         }
 
+        public Builder connectTimeout(int connectTimeoutSeconds) {
+            this.connectTimeoutSeconds = connectTimeoutSeconds;
+            return this;
+        }
+
+        public Builder readTimeout(int readTimeoutSeconds) {
+            this.readTimeoutSeconds = readTimeoutSeconds;
+            return this;
+        }
 
     }
 
@@ -889,7 +928,7 @@ public class TestWebSocketClient implements Closeable {
                     @Override
                     public void run() {
                         try {
-                            log.fine("About to send close");
+                            log.fine("About to send automatic close");
                             webSocket.close(1000, "OK");
                             log.fine("Close sent");
                         } catch (IOException e) {
@@ -924,7 +963,7 @@ public class TestWebSocketClient implements Closeable {
         private void handle(ActualEvent actual) {
             log.fine("Received message[" + actual.getIndex() + "] from WebSocket: [" + actual + "]");
             if (closed) {
-                throw new IllegalStateException("Received [" + (inMessageCounter + 1) + "]th message when only ["
+                throw new IllegalStateException("Received message[" + actual + "] message when only ["
                         + expectedEvents.size() + "] messages were expected. The received message was ["
                         + actual.toString() + "]");
             }
@@ -1108,14 +1147,19 @@ public class TestWebSocketClient implements Closeable {
 
     private final TestListener listener;
 
-    private TestWebSocketClient(Request request, TestListener testListener) {
+    private TestWebSocketClient(Request request, TestListener testListener, int connectTimeoutSeconds,
+            int readTimeoutSeconds) {
         super();
         if (request == null) {
             throw new IllegalStateException(
                     "Cannot build a [" + TestWebSocketClient.class.getName() + "] with a null request");
         }
         this.listener = testListener;
-        this.client = new OkHttpClient();
+        OkHttpClient c = new OkHttpClient();
+        c.setConnectTimeout(connectTimeoutSeconds, TimeUnit.SECONDS);
+        c.setReadTimeout(readTimeoutSeconds, TimeUnit.SECONDS);
+        this.client = c;
+
         WebSocketCall.create(client, request).enqueue(testListener);
     }
 
