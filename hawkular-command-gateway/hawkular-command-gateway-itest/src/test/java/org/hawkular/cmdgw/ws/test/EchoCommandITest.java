@@ -16,6 +16,7 @@
  */
 package org.hawkular.cmdgw.ws.test;
 
+import org.hawkular.cmdgw.ws.test.TestWebSocketClient.Answer;
 import org.hawkular.cmdgw.ws.test.TestWebSocketClient.ExpectedEvent.ExpectedFailure;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.testng.annotations.Test;
@@ -45,7 +46,8 @@ public class EchoCommandITest extends AbstractCommandITest {
         try (TestWebSocketClient testClient = TestWebSocketClient.builder()
                 .url(baseGwUri + "/ui/ws") //
                 .expectWelcome(String.format(echoRequestTemplate, "Yodel Ay EEE Oooo")) //
-                .expectText(String.format(echoResponseTemplate, "Yodel Ay EEE Oooo")) //
+                .expectText(String.format(echoResponseTemplate, "Yodel Ay EEE Oooo"), Answer.CLOSE) //
+                .expectClose()
                 .build()) {
             testClient.validate(10000);
         }
