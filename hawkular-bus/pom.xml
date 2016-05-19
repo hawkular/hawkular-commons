@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.hawkular.commons</groupId>
     <artifactId>hawkular-commons-parent</artifactId>
-    <version>0.7.2.Final-SNAPSHOT</version>
+    <version>0.7.2.Final</version>
   </parent>
 
   <artifactId>hawkular-bus-parent</artifactId>
@@ -35,7 +35,7 @@
     <connection>scm:git:git@github.com:hawkular/hawkular-bus.git</connection>
     <developerConnection>scm:git:git@github.com:hawkular/hawkular-bus.git</developerConnection>
     <url>https://github.com/hawkular/hawkular-bus</url>
-    <tag>head</tag>
+    <tag>0.7.2.Final</tag>
   </scm>
 
   <modules>
