@@ -30,7 +30,7 @@ import com.squareup.okhttp.Credentials;
 public class EchoCommandITest extends AbstractCommandITest {
     public static final String GROUP = "EchoCommandITest";
 
-    private static final String echoRequestTemplate = "EchoRequest={\"authentication\": " + authentication
+    private static final String echoRequestTemplate = "EchoRequest={\"authentication\": " + ClientConfig.authentication
             + ", \"echoMessage\": \"%s\"}";
     private static final String echoResponseTemplate = "EchoResponse={\"reply\":\"ECHO [%s]\"}";
 
@@ -44,7 +44,7 @@ public class EchoCommandITest extends AbstractCommandITest {
     public void testEcho() throws Throwable {
 
         try (TestWebSocketClient testClient = TestWebSocketClient.builder()
-                .url(baseGwUri + "/ui/ws") //
+                .url(ClientConfig.baseGwUri + "/ui/ws") //
                 .expectWelcome(String.format(echoRequestTemplate, "Yodel Ay EEE Oooo")) //
                 .expectText(String.format(echoResponseTemplate, "Yodel Ay EEE Oooo"), Answer.CLOSE) //
                 .expectClose()
@@ -58,7 +58,7 @@ public class EchoCommandITest extends AbstractCommandITest {
     public void testWithoutAuth() throws Throwable {
 
         try (TestWebSocketClient testClient = TestWebSocketClient.builder()
-                .url(baseGwUri + "/ui/ws") //
+                .url(ClientConfig.baseGwUri + "/ui/ws") //
                 .authentication(null) //
                 .expectMessage(ExpectedFailure.UNAUTHORIZED) //
                 .build()) {
@@ -70,8 +70,8 @@ public class EchoCommandITest extends AbstractCommandITest {
     @Test(groups = { GROUP })
     public void testBadPassword() throws Throwable {
         try (TestWebSocketClient testClient = TestWebSocketClient.builder()
-                .url(baseGwUri + "/ui/ws") //
-                .authentication(Credentials.basic(testUser, "bad password")) //
+                .url(ClientConfig.baseGwUri + "/ui/ws") //
+                .authentication(Credentials.basic(ClientConfig.testUser, "bad password")) //
                 .expectMessage(ExpectedFailure.UNAUTHORIZED) //
                 .build()) {
             testClient.validate(10000);
@@ -82,7 +82,7 @@ public class EchoCommandITest extends AbstractCommandITest {
     @Test(groups = { GROUP })
     public void testBadUserAndPassword() throws Throwable {
         try (TestWebSocketClient testClient = TestWebSocketClient.builder()
-                .url(baseGwUri + "/ui/ws") //
+                .url(ClientConfig.baseGwUri + "/ui/ws") //
                 .authentication(Credentials.basic("baduser", "bad password")) //
                 .expectMessage(ExpectedFailure.UNAUTHORIZED) //
                 .build()) {
