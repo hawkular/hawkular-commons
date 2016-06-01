@@ -19,6 +19,9 @@ package org.hawkular.inventory.paths;
 import java.util.Collection;
 import java.util.HashMap;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * An interface a data entity role must implement.
  *
@@ -27,6 +30,8 @@ import java.util.HashMap;
  * {@link Resource} enum, resource types only from {@link ResourceType} enum and operation types from the
  * {@link OperationType} enum.
  */
+@ApiModel(description = "A data role is a string restricted to only certain values depending on what entity contains" +
+        " the data with the given role.")
 public interface DataRole {
 
     /**
@@ -37,7 +42,7 @@ public interface DataRole {
      * @return the enum instance with given name
      */
     static DataRole valueOf(String name) {
-        return Resource.ImplDetail.instances.get(name);
+        return DataRole_ImplDetail.instances.get(name);
     }
 
     /**
@@ -45,18 +50,20 @@ public interface DataRole {
      * {@link Resource}, {@link ResourceType}, {@link OperationType}.
      */
     static DataRole[] values() {
-        Collection<DataRole> values = Resource.ImplDetail.instances.values();
+        Collection<DataRole> values = DataRole_ImplDetail.instances.values();
         return values.toArray(new DataRole[values.size()]);
     }
 
     /**
      * @return the unique name of the role
      */
+    @ApiModelProperty(hidden = true)
     String name();
 
     /**
      * @return true if this role represents a schema, false otherwise
      */
+    @ApiModelProperty(hidden = true)
     boolean isSchema();
 
     enum Resource implements DataRole {
@@ -65,39 +72,6 @@ public interface DataRole {
         @Override
         public boolean isSchema() {
             return false;
-        }
-
-
-        /**
-         * This is an implementation detail of the {@link DataRole} interface and its implementing enums. It has no data
-         * accessible to the users.
-         *
-         * <p>Placing this class in this enum has no other purpose but to hide it from the sight of the users -
-         * DataRole interface cannot have private members, so we need to put it in some class.
-         *
-         * <p>Keep this in sync with all the enums that implement the DataRole interface.
-         */
-        private static final class ImplDetail {
-            private static final HashMap<String, DataRole> instances;
-
-            static {
-                instances = new HashMap<>();
-                for (Resource r : Resource.values()) {
-                    instances.put(r.name(), r);
-                }
-
-                for (ResourceType r : ResourceType.values()) {
-                    instances.put(r.name(), r);
-                }
-
-                for (OperationType r : OperationType.values()) {
-                    instances.put(r.name(), r);
-                }
-            }
-
-            private ImplDetail() {
-
-            }
         }
     }
 
@@ -117,5 +91,35 @@ public interface DataRole {
         public boolean isSchema() {
             return true;
         }
+    }
+}
+
+/**
+ * This is an implementation detail of the {@link DataRole} interface and its implementing enums.
+ *
+ * <p>Keep this in sync with all the enums that implement the DataRole interface.
+ */
+//N.B. the name is chosen to lower the chance of class file name collisions if we ever want to have
+//another "ImplDetail" class in this package.
+final class DataRole_ImplDetail {
+    static final HashMap<String, DataRole> instances;
+
+    static {
+        instances = new HashMap<>();
+        for (DataRole.Resource r : DataRole.Resource.values()) {
+            instances.put(r.name(), r);
+        }
+
+        for (DataRole.ResourceType r : DataRole.ResourceType.values()) {
+            instances.put(r.name(), r);
+        }
+
+        for (DataRole.OperationType r : DataRole.OperationType.values()) {
+            instances.put(r.name(), r);
+        }
+    }
+
+    private DataRole_ImplDetail() {
+
     }
 }
