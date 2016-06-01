@@ -242,7 +242,7 @@ public class TestWebSocketClient implements Closeable {
      */
     public static class Builder {
 
-        private String authentication = AbstractCommandITest.authHeader;
+        private String authentication = ClientConfig.authHeader;
 
         private final List<ExpectedEvent> expectedEvents = new ArrayList<>();
 

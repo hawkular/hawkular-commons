@@ -18,27 +18,5 @@ package org.hawkular.cmdgw.ws.test;
 
 import org.jboss.arquillian.testng.Arquillian;
 
-import com.squareup.okhttp.Credentials;
-
 public abstract class AbstractCommandITest extends Arquillian {
-
-    protected static final String authentication;
-    protected static final String baseGwUri;
-    protected static final String host;
-    protected static final String testPasword = System.getProperty("hawkular.itest.rest.password");
-    protected static final String testUser = System.getProperty("hawkular.itest.rest.user");
-    public static final String authHeader = Credentials.basic(testUser, testPasword);
-
-    static {
-        String h = System.getProperty("hawkular.bind.address", "localhost");
-        if ("0.0.0.0".equals(h)) {
-            h = "localhost";
-        }
-        host = h;
-        int portOffset = Integer.parseInt(System.getProperty("hawkular.port.offset", "0"));
-        int httpPort = portOffset + 8080;
-        baseGwUri = "ws://" + host + ":" + httpPort + "/hawkular/command-gateway";
-        authentication = "{\"username\":\"" + testUser + "\",\"password\":\"" + testPasword + "\"}";
-    }
-
 }
