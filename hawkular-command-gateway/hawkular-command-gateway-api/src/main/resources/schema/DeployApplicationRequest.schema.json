@@ -15,6 +15,10 @@
     "enabled": {
       "description" : "If true, the deployment will be enabled immediately. If false, it will initially be disabled.",
       "type": "boolean"
+    },
+    "serverGroups": {
+      "description" : "Comma-separated list of domain server groups where the application is to be deployed. This is ignored if not deploying in a domain.",
+      "type": "string"
     }
   },
   "required": ["destinationFileName"]
