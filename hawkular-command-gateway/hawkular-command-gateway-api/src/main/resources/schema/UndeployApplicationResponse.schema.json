@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.ResourcePathResponse"
+  },
+  "javaType": "org.hawkular.cmdgw.api.UndeployApplicationResponse",
+  "javaInterfaces" : ["org.hawkular.cmdgw.api.EventDestination"],
+  "description": "Results of an application undeployment request.",
+  "additionalProperties": false,
+  "properties": {
+    "destinationFileName": {
+      "type": "string"
+    }
+  },
+  "required": ["destinationFileName"]
+}
