@@ -50,7 +50,7 @@
     <dependency>
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-tenant-jaxrs-filter</artifactId>
-      <version>0.7.3.Final-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>

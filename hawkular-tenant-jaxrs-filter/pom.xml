@@ -31,7 +31,7 @@
   <name>Hawkular REST Filter - Tenant</name>
   <description>
     A reusable implementation of a filter that makes Hawkular-Tenant required.
-    Provides also a @OptionalTenant so that endpoints can mark that they don't require a tenant.
+    Provides also a @TenantRequired so that endpoints can override the default at class or method level.
   </description>
 
   <dependencyManagement>

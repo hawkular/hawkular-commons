@@ -24,12 +24,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import javax.enterprise.util.Nonbinding;
-import javax.ws.rs.NameBinding;
 
 /**
+ * Explicitly marks a class or method on the requirement for the Hawkular-Tenant HTTP header. Method annotations have
+ * priority over class annotations, so, if a method sets this as "true" and the class sets as "false", a Hawkular-Tenant
+ * will be required for calls that end up on that method.
+ *
  * @author Juraci Paixão Kröhling
  */
-@NameBinding
 @Retention(RUNTIME)
 @Target({METHOD, TYPE})
 public @interface TenantRequired {
