@@ -24,10 +24,16 @@ import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.Provider;
 
 /**
+ * A JAX-RS dynamic feature that adds the {@link TenantFilter} to all methods which have {@link TenantRequired}
+ * effectively as "true", which might be the default value for {@link TenantRequired}. In the usual case, this feature
+ * is added to all classes and methods, except when classes/methods are annotated with "false".
+ *
  * @author Juraci Paixão Kröhling
  */
 @Provider
 public class TenantFeature implements DynamicFeature {
+    private static final TenantFilter TENANT_FILTER = new TenantFilter();
+
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
         Class<?> resourceClass = resourceInfo.getResourceClass();
@@ -43,7 +49,7 @@ public class TenantFeature implements DynamicFeature {
         }
 
         if (required) {
-            context.register(new TenantFilter());
+            context.register(TENANT_FILTER);
         }
     }
 }
