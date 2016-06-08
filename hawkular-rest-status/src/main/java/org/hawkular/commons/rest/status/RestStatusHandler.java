@@ -35,6 +35,7 @@ import javax.ws.rs.core.Response;
 
 import org.hawkular.commons.rest.status.log.MsgLogger;
 import org.hawkular.commons.rest.status.log.RestStatusLoggers;
+import org.hawkular.jaxrs.filter.tenant.TenantRequired;
 
 import io.swagger.annotations.Api;
 
@@ -52,6 +53,7 @@ import io.swagger.annotations.Api;
 @Path("/status")
 @Api(value = "/status", description = "Status of the component service.")
 @ApplicationScoped
+@TenantRequired(false)
 public class RestStatusHandler {
     private static final MsgLogger log = RestStatusLoggers.getLogger(RestStatusHandler.class);
 
