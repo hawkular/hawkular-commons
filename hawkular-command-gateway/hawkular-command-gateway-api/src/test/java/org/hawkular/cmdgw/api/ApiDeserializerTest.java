@@ -189,7 +189,7 @@ public class ApiDeserializerTest {
 
         GenericSuccessResponse msg = new GenericSuccessResponse();
         msg.setMessage(testMessage);
-        ByteArrayInputStream extraData = new ByteArrayInputStream(testExtraData.getBytes());
+        ByteArrayInputStream extraData = new ByteArrayInputStream(testExtraData.getBytes("UTF-8"));
         BinaryData fullData = ApiDeserializer.toHawkularFormat(msg, extraData);
 
         // now deserialize the data
