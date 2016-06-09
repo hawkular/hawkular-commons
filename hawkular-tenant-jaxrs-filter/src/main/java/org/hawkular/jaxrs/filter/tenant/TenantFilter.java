@@ -16,6 +16,8 @@
  */
 package org.hawkular.jaxrs.filter.tenant;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
+
 import java.io.IOException;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -27,14 +29,30 @@ import javax.ws.rs.core.Response;
  */
 public class TenantFilter implements ContainerRequestFilter {
     private static final String TENANT_HEADER_NAME = "Hawkular-Tenant";
+    private static final String MESSAGE = String.format("The HTTP header %s has to be provided.", TENANT_HEADER_NAME);
+    private static final Response BAD_REQUEST_MISSING_TENANT = Response
+            .status(Response.Status.BAD_REQUEST)
+            .entity(new ApiError(MESSAGE))
+            .type(APPLICATION_JSON_TYPE)
+            .build();
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         String headerValue = requestContext.getHeaderString(TENANT_HEADER_NAME);
         if (null == headerValue || headerValue.isEmpty()) {
-            String message = String.format("The HTTP header %s has to be provided.", TENANT_HEADER_NAME);
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(message).build();
-            requestContext.abortWith(response);
+            requestContext.abortWith(BAD_REQUEST_MISSING_TENANT);
+        }
+    }
+
+    static class ApiError {
+        private final String errorMsg;
+
+        ApiError(String errorMsg) {
+            this.errorMsg = errorMsg != null && !errorMsg.trim().isEmpty() ? errorMsg : "No details";
+        }
+
+        public String getErrorMsg() {
+            return errorMsg;
         }
     }
 }
