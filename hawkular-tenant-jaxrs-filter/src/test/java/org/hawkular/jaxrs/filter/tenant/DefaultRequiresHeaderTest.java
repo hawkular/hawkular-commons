@@ -63,7 +63,7 @@ public class DefaultRequiresHeaderTest {
         WebTarget target = client.target(baseUrl.toString()).path("foo");
         Response response = target.request(MediaType.APPLICATION_JSON_TYPE).get();
         assertEquals(400, response.getStatus());
-        assertTrue(response.readEntity(String.class).endsWith("has to be provided."));
+        assertTrue(response.readEntity(String.class).contains("has to be provided."));
     }
 
     @Test
