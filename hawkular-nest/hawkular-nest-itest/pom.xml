@@ -24,7 +24,7 @@
     <version>0.7.4.Final-SNAPSHOT</version>
   </parent>
   <artifactId>hawkular-nest-itest</artifactId>
-  <name>Hawkular Nest Intagration Tests</name>
+  <name>Hawkular Nest Integration Tests</name>
 
   <properties>
     <surefire.testng.verbose>3</surefire.testng.verbose>
@@ -166,6 +166,12 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-commons-embedded-cassandra-war</artifactId>
+      <type>war</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 
@@ -200,6 +206,7 @@
                 -Dhawkular.log.nest=${hawkular.log.nest}
                 -Dhawkular.log.datastax.driver=${hawkular.log.datastax.driver}
                 -Dhawkular.log.cassandra=${hawkular.log.cassandra}
+                -Dhawkular.backend=embedded_cassandra
             </jboss.options>
             <shrinkwrap.maven.settings>${project.build.directory}/shrinkwrap-maven-settings.xml</shrinkwrap.maven.settings>
 
@@ -322,6 +329,30 @@
                 <argument>--group</argument>
                 <argument>read-write,read-only</argument>
               </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>deploy-embedded-cassandra</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.hawkular.commons</groupId>
+                  <artifactId>hawkular-commons-embedded-cassandra-war</artifactId>
+                  <type>war</type>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}/${project.build.finalName}/modules/system/layers/hawkular/org/hawkular/nest/main/deployments/</outputDirectory>
             </configuration>
           </execution>
         </executions>

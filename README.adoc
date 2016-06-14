@@ -10,7 +10,6 @@ endif::[]
 == Build
 `mvn install`
 
-
 == License
 
 Hawkular is released under Apache License, Version 2.0 as described in the link:LICENSE[LICENSE] document

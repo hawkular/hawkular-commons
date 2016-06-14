@@ -63,12 +63,6 @@
 
     <dependency>
       <groupId>org.hawkular.commons</groupId>
-      <artifactId>hawkular-commons-embedded-cassandra-war</artifactId>
-      <type>war</type>
-    </dependency>
-
-    <dependency>
-      <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-bus-feature-pack</artifactId>
       <type>zip</type>
       <exclusions>
@@ -140,8 +134,16 @@
                   <groupId>org.hawkular.commons</groupId>
                   <artifactId>hawkular-bus-feature-pack</artifactId>
                   <type>zip</type>
-                  <includes>configuration/standalone/template.xml,configuration/standalone/subsystems.xml</includes>
+                  <includes>configuration/standalone/subsystems.xml</includes>
                   <outputDirectory>${project.build.directory}/upstream-subsystem-templates</outputDirectory>
+                </artifactItem>
+
+                <artifactItem>
+                  <groupId>org.hawkular.commons</groupId>
+                  <artifactId>hawkular-bus-feature-pack</artifactId>
+                  <type>zip</type>
+                  <includes>configuration/standalone/template.xml</includes>
+                  <outputDirectory>${project.build.directory}/feature-pack-resources</outputDirectory>
                 </artifactItem>
 
                 <artifactItem>
@@ -189,21 +191,6 @@
                   <stylesheet>${basedir}/src/main/xsl/configuration/standalone/hawkular-nest-subsystems.xsl</stylesheet>
                   <includes>
                     <include>configuration/standalone/subsystems.xml</include>
-                  </includes>
-                  <outputDir>${project.build.directory}/feature-pack-resources</outputDir>
-                  <fileMappers>
-                    <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
-                      <pattern>^configuration/standalone/(.*).xml$</pattern>
-                      <replacement>configuration/standalone/hawkular-nest-$1.xml</replacement>
-                    </fileMapper>
-                  </fileMappers>
-                </transformationSet>
-
-                <transformationSet>
-                  <dir>${project.build.directory}/upstream-subsystem-templates</dir>
-                  <stylesheet>${basedir}/src/main/xsl/configuration/standalone/hawkular-nest-template.xsl</stylesheet>
-                  <includes>
-                    <include>configuration/standalone/template.xml</include>
                   </includes>
                   <outputDir>${project.build.directory}/feature-pack-resources</outputDir>
                   <fileMappers>
