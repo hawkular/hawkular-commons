@@ -23,8 +23,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.enterprise.util.Nonbinding;
-
 /**
  * Explicitly marks a class or method on the requirement for the Hawkular-Tenant HTTP header. Method annotations have
  * priority over class annotations, so, if a method sets this as "true" and the class sets as "false", a Hawkular-Tenant
@@ -35,6 +33,5 @@ import javax.enterprise.util.Nonbinding;
 @Retention(RUNTIME)
 @Target({METHOD, TYPE})
 public @interface TenantRequired {
-    @Nonbinding
     boolean value() default true;
 }
