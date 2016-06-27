@@ -23,6 +23,7 @@
     <dependencies>
       <module name="org.hawkular.bus" />
       <module name="org.hawkular.commons.cassandra-driver" />
+      <module name="org.hawkular.commons.hawkular-inventory-paths"/>
       <module name="javaee.api" />
       <module name="org.wildfly.extension.messaging-activemq" />
     </dependencies>
