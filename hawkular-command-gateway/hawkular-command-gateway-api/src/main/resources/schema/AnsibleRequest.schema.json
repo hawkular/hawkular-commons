@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.AuthMessage"
+  },
+  "javaType": "org.hawkular.cmdgw.api.AnsibleRequest",
+  "description": "A request to invoke an Ansible playbook.",
+  "additionalProperties": false,
+  "properties": {
+    "playbook": {
+      "type": "string"
+    }
+  },
+  "required": ["playbook"]
+}
