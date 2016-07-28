@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.bus.common.AbstractMessage"
+  },
+  "javaType": "org.hawkular.cmdgw.api.FeedWebSocketClosedEvent",
+  "description": "Command gateway bus notification of Feed WebSocket closure event.",
+  "additionalProperties": false,
+  "properties": {
+    "feedId": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "code": {
+      "type": "string"
+    }
+  },
+  "required": ["feedId","code"]
+}
