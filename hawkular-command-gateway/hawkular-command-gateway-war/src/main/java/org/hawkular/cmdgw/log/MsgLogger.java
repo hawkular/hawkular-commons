@@ -185,4 +185,9 @@ public interface MsgLogger extends BasicLogger {
 
     @Message(id = 41, value = "Failed to lookup [%s] using name [%s]")
     String errFailedToLookupConnectionFactory(String connectionFactoryClassName, String name);
+
+    @LogMessage(level = Logger.Level.ERROR)
+    @Message(id = 42, value = "Failed sending feed closed message to bus: feedId [%s], reason [%s], code [%s]")
+    void errorFailedSendFeedClosedEvent(@Cause Throwable t, String feedId, String reason, String code);
+
 }

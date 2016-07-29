@@ -25,6 +25,14 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
+import org.hawkular.bus.common.ConnectionContextFactory;
+import org.hawkular.bus.common.Endpoint;
+import org.hawkular.bus.common.MessageId;
+import org.hawkular.bus.common.MessageProcessor;
+import org.hawkular.bus.common.producer.ProducerConnectionContext;
+import org.hawkular.cmdgw.Constants;
+import org.hawkular.cmdgw.api.FeedWebSocketClosedEvent;
+import org.hawkular.cmdgw.command.ws.WsCommandContext;
 import org.hawkular.cmdgw.log.GatewayLoggers;
 import org.hawkular.cmdgw.log.MsgLogger;
 
@@ -47,6 +55,22 @@ public class FeedWebSocket extends AbstractGatewayWebSocket {
     @OnClose
     public void feedSessionClose(Session session, CloseReason reason, @PathParam("feedId") String feedId) {
         log.infoWsSessionClosed(feedId, endpoint, reason);
+
+        // Notify bus that connection to the feed has been lost
+        WsCommandContext context = commandContextFactory.newCommandContext(session);
+        try (ConnectionContextFactory ccf = new ConnectionContextFactory(context.getConnectionFactory())) {
+            Endpoint endpoint = Constants.EVENTS_COMMAND_TOPIC;
+            ProducerConnectionContext pcc = ccf.createProducerConnectionContext(endpoint);
+            FeedWebSocketClosedEvent message = new FeedWebSocketClosedEvent();
+            message.setFeedId(feedId);
+            message.setReason(reason.getReasonPhrase());
+            message.setCode(String.valueOf(reason.getCloseCode().getCode()));
+            MessageId mid = new MessageProcessor().send(pcc, message);
+        } catch (Exception e) {
+            log.errorFailedSendFeedClosedEvent(e, feedId, reason.getReasonPhrase(),
+                    String.valueOf(reason.getCloseCode()));
+        }
+
         wsEndpoints.getFeedSessions().removeSession(feedId, session);
     }
 
