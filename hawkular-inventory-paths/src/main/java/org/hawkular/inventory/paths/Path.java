@@ -84,7 +84,8 @@ import io.swagger.annotations.ApiModelProperty;
  * @author Lukas Krejci
  * @since 0.2.0
  */
-@ApiModel
+@ApiModel(description = "A path is the super type of both canonical path and relative path.",
+        subTypes = {CanonicalPath.class, RelativePath.class})
 public abstract class Path {
 
     public static final char TYPE_DELIM = ';';
