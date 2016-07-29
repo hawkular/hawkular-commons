@@ -23,7 +23,7 @@
   <parent>
     <artifactId>hawkular-commons-parent</artifactId>
     <groupId>org.hawkular.commons</groupId>
-    <version>0.7.6.Final-SNAPSHOT</version>
+    <version>0.7.6.Final</version>
   </parent>
 
   <artifactId>hawkular-tenant-jaxrs-filter</artifactId>
