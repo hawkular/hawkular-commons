@@ -42,7 +42,8 @@ public interface Constants {
     Endpoint FEED_COMMAND_QUEUE = new Endpoint(Type.QUEUE, "FeedCommandQueue");
     Endpoint UI_COMMAND_QUEUE = new Endpoint(Type.QUEUE, "UiCommandQueue");
 
-    Endpoint EVENTS_COMMAND_TOPIC = new Endpoint(Type.TOPIC, "HawkularCommandEvent");
+    Endpoint EVENTS_COMMAND_QUEUE = new Endpoint(Type.QUEUE, "HawkularCommandEvent");
+    Endpoint HAWKULAR_TOPIC = new Endpoint(Type.TOPIC, "HawkularTopic");
 
     String CONNECTION_FACTORY_JNDI_LOOKUP_TIMEOUT_MS = "hawkular.cmdgw.connectionFactoryLookupTimeoutMs";
     int CONNECTION_FACTORY_JNDI_LOOKUP_TIMEOUT_MS_DEFAULT = 30000;
