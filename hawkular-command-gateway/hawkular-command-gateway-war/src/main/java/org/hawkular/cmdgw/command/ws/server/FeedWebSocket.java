@@ -59,7 +59,7 @@ public class FeedWebSocket extends AbstractGatewayWebSocket {
         // Notify bus that connection to the feed has been lost
         WsCommandContext context = commandContextFactory.newCommandContext(session);
         try (ConnectionContextFactory ccf = new ConnectionContextFactory(context.getConnectionFactory())) {
-            Endpoint endpoint = Constants.EVENTS_COMMAND_TOPIC;
+            Endpoint endpoint = Constants.HAWKULAR_TOPIC;
             ProducerConnectionContext pcc = ccf.createProducerConnectionContext(endpoint);
             FeedWebSocketClosedEvent message = new FeedWebSocketClosedEvent();
             message.setFeedId(feedId);

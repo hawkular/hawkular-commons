@@ -31,7 +31,7 @@ import org.hawkular.cmdgw.log.MsgLogger;
  * subsystem.
  * <p>
  * This particular command implementation always puts the message on the
- * {@link Constants#EVENTS_COMMAND_TOPIC} bus endpoint.
+ * {@link Constants#EVENTS_COMMAND_QUEUE} bus endpoint.
  */
 public class EventDestinationWsCommand implements WsCommand<EventDestination> {
     private static final MsgLogger log = GatewayLoggers.getLogger(EventDestinationWsCommand.class);
@@ -42,7 +42,7 @@ public class EventDestinationWsCommand implements WsCommand<EventDestination> {
         EventDestination request = message.getBasicMessage();
         try (ConnectionContextFactory ccf = new ConnectionContextFactory(context.getConnectionFactory())) {
 
-            ProducerConnectionContext pcc = ccf.createProducerConnectionContext(Constants.EVENTS_COMMAND_TOPIC);
+            ProducerConnectionContext pcc = ccf.createProducerConnectionContext(Constants.EVENTS_COMMAND_QUEUE);
             MessageId mid = new MessageProcessor().send(pcc, request);
             log.debugf("Event forwarded to bus: mid=[%s], request=[%s]", mid, request);
         }
