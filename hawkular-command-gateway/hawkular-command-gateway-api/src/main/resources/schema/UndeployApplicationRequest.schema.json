@@ -15,6 +15,10 @@
     "serverGroups": {
       "description" : "Comma-separated list of domain server groups where the application is to be undeployed. This is ignored if not undeploying from a domain.",
       "type": "string"
+    },
+    "removeContent": {
+      "description" : "If true the application content is removed from internal storage. If false, the content remains allowing for faster redeployment.",
+      "type": "boolean"
     }
   },
   "required": ["destinationFileName"]

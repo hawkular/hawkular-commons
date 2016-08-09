@@ -13,12 +13,16 @@
       "type": "string"
     },
     "enabled": {
-      "description" : "If true, the deployment will be enabled immediately. If false, it will initially be disabled.",
+      "description": "If true, the deployment will be enabled immediately. If false, it will initially be disabled.",
       "type": "boolean"
     },
     "serverGroups": {
-      "description" : "Comma-separated list of domain server groups where the application is to be deployed. This is ignored if not deploying in a domain.",
+      "description": "Comma-separated list of domain server groups where the application is to be deployed. This is ignored if not deploying in a domain.",
       "type": "string"
+    },
+    "forceDeploy": {
+      "description": "If true, this forces the content to be deployed even if the content with the same name exists. If false, existing content remains as-is and an error is returned if the deployment name already exists.",
+      "type": "boolean"
     }
   },
   "required": ["destinationFileName"]
