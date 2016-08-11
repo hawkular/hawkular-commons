@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.ResourcePathResponse"
+  },
+  "javaType": "org.hawkular.cmdgw.api.RestartApplicationResponse",
+  "javaInterfaces" : ["org.hawkular.cmdgw.api.EventDestination"],
+  "description": "Results of an application restart request.",
+  "additionalProperties": false,
+  "properties": {
+    "destinationFileName": {
+      "type": "string"
+    }
+  },
+  "required": ["destinationFileName"]
+}

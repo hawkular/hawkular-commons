@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.ResourcePathRequest"
+  },
+  "javaType": "org.hawkular.cmdgw.api.EnableApplicationRequest",
+  "javaInterfaces" : ["org.hawkular.cmdgw.api.ResourcePathDestination"],
+  "description": "If disabled, enable the deployment with destinationFileName, on the Application Server instance given by the inventory path stored in resourcePath field.",
+  "additionalProperties": false,
+  "properties": {
+    "destinationFileName": {
+      "type": "string"
+    },
+    "serverGroups": {
+      "description" : "Comma-separated list of domain server groups where the application is to be enabled. This is ignored if not enabling from a domain.",
+      "type": "string"
+    }
+  },
+  "required": ["destinationFileName"]
+}
