@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.hawkular.commons</groupId>
     <artifactId>hawkular-nest-parent</artifactId>
-    <version>0.7.8.Final</version>
+    <version>0.7.9.Final-SNAPSHOT</version>
   </parent>
 
   <artifactId>hawkular-nest-feature-pack</artifactId>
