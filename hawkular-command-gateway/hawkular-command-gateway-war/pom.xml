@@ -89,6 +89,11 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.hawkular.inventory</groupId>
+      <artifactId>hawkular-inventory-api</artifactId>
+      <version>0.17.1.Final</version>
+    </dependency>
   </dependencies>
 
   <build>

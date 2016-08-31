@@ -11,11 +11,15 @@
     "playbook": {
       "type": "string"
     },
+    "resourcePath": {
+      "description" : "The inventory path to the resource that is targeted by this request.",
+      "type": "string"
+    },
     "extraVars": {
       "description" : "Extra variables to pass to the Ansible playbook. This maps to the --extra-vars Ansible command line option.",
       "javaType" : "java.util.Map<String,String>",
       "type": "object"
     }
   },
-  "required": ["playbook"]
+  "required": ["resourcePath","playbook"]
 }

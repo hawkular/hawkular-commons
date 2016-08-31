@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.hawkular.bus.common.BasicMessage;
 import org.hawkular.cmdgw.NoCommandForMessageException;
@@ -46,7 +47,9 @@ public class WsCommands {
     private final EchoCommand echoCommand = new EchoCommand();
     private final UiSessionDestinationWsCommand uiSessionDestinationWsCommand = new UiSessionDestinationWsCommand();
     private final EventDestinationWsCommand eventDestinationWsCommand = new EventDestinationWsCommand();
-    private final AnsibleCommand ansibleCommand = new AnsibleCommand();
+
+    @Inject
+    private AnsibleCommand ansibleCommand;
 
     /**
      * Returns a collection of {@link WsCommand}s that should handle the given {@code requestClass}.

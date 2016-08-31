@@ -24,6 +24,7 @@
       <module name="org.hawkular.bus" />
       <module name="org.hawkular.commons.cassandra-driver" />
       <module name="org.hawkular.commons.hawkular-inventory-paths"/>
+      <module name="deployment.hawkular-inventory-dist.war" services="import"/>
       <module name="javaee.api" />
       <module name="org.wildfly.extension.messaging-activemq" />
     </dependencies>

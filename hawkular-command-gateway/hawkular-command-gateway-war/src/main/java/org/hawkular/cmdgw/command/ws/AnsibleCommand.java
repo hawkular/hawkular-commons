@@ -22,23 +22,58 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.enterprise.context.ApplicationScoped;
 
 import org.hawkular.bus.common.BasicMessageWithExtraData;
 import org.hawkular.cmdgw.api.AnsibleRequest;
 import org.hawkular.cmdgw.api.AnsibleResponse;
 import org.hawkular.cmdgw.command.ws.server.WebSocketHelper;
+import org.hawkular.inventory.api.Inventory;
+import org.hawkular.inventory.api.ResolvableToSingle;
+import org.hawkular.inventory.api.model.DataEntity;
+import org.hawkular.inventory.api.model.StructuredData;
+import org.hawkular.inventory.paths.CanonicalPath;
+import org.hawkular.inventory.paths.SegmentType;
 
+@ApplicationScoped
 public class AnsibleCommand implements WsCommand<AnsibleRequest> {
+
+
+    @javax.annotation.Resource(lookup = "java:global/Hawkular/Inventory")
+    private Inventory inventory;
 
     @Override
     public void execute(BasicMessageWithExtraData<AnsibleRequest> message, WsCommandContext context)
             throws Exception {
 
-        // determine what Ansible command line should be executed
         AnsibleRequest ansibleRequest = message.getBasicMessage();
-        List<String> commandLine = getAnsibleCommandLine(ansibleRequest);
+
+        String rawResourcePath = ansibleRequest.getResourcePath();
+        if (rawResourcePath == null) {
+            throw new IllegalStateException(ansibleRequest.getClass().getName() + ".resourcePath must not be null");
+        }
+
+        CanonicalPath resourcePath = CanonicalPath.fromString(rawResourcePath);
+        resourcePath = resourcePath.extend(SegmentType.d, "configuration").get();
+
+        DataEntity data = (DataEntity) inventory.inspect(resourcePath, ResolvableToSingle.class).entity();
+
+        Map<String, StructuredData> configData = data.getValue().map();
+
+        String host = configData.get("Hostname").string();
+        Map<String, String> extraVars = ansibleRequest.getExtraVars();
+        if (extraVars == null) {
+            extraVars = new HashMap<String, String>();
+        }
+        extraVars.put("wildfly_home_dir", configData.get("Home Directory").string());
+        extraVars.put("wildfly_bind_address", configData.get("Bound Address").string());
+
+        // determine what Ansible command line should be executed
+        List<String> commandLine = getAnsibleCommandLine(ansibleRequest.getPlaybook(), extraVars, host);
 
         // build the Ansible command
         ProcessBuilder pb = new ProcessBuilder(commandLine);
@@ -63,15 +98,14 @@ public class AnsibleCommand implements WsCommand<AnsibleRequest> {
         new WebSocketHelper().sendSync(context.getSession(), result);
     }
 
-    private List<String> getAnsibleCommandLine(AnsibleRequest ansibleRequest) throws Exception {
+    private List<String> getAnsibleCommandLine(String playbook, Map<String, String> extraVars, String host) throws
+            Exception {
         List<String> commandLine = new ArrayList<>();
 
         commandLine.add("ansible-playbook");
-
         commandLine.add("-i");
-        commandLine.add(getAnsibleFile("hosts").getAbsolutePath());
+        commandLine.add(host + ",");
 
-        Map<String, String> extraVars = ansibleRequest.getExtraVars();
         if (extraVars != null) {
             for (Map.Entry<String, String> extraVar : extraVars.entrySet()) {
                 commandLine.add("-e");
@@ -79,9 +113,8 @@ public class AnsibleCommand implements WsCommand<AnsibleRequest> {
             }
         }
 
-        File playbookFile = getAnsibleFile(ansibleRequest.getPlaybook());
+        File playbookFile = getAnsibleFile(playbook);
         commandLine.add(playbookFile.getAbsolutePath());
-
         return commandLine;
     }
 
