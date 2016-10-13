@@ -93,7 +93,7 @@
 
   <properties>
     <version.javax.javaee>7.0</version.javax.javaee>
-    <version.com.google.code.findbugs>1.3.8</version.com.google.code.findbugs>
+    <version.com.google.code.findbugs>1.3.9</version.com.google.code.findbugs>
     <version.commons-logging.commons-logging>1.1.1</version.commons-logging.commons-logging>
 
     <!-- Keep in sync with modules/system/layers/base/org/freemarker/main in the Keycloak or Hawkular Accounts feature pack -->
