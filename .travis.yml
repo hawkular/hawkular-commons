@@ -1,7 +1,13 @@
-sudo: false
 language: java
+
 jdk:
 - oraclejdk8
+
+# sudo: required and dist: trusty selects an Ubuntu 14.04 VM with 7.5 GB RAM
+sudo: required
+dist: trusty
+
+
 notifications:
   irc:
     channels:
@@ -22,6 +28,9 @@ addons:
     build_command: mvn -DskipTests=true compile
     branch_pattern: coverity_scan
 install:
+- bash .travis.install.maven.sh "3.3.9" "${HOME}/mvn-home"
+- export M2_HOME=${HOME}/mvn-home
+- export PATH=${HOME}/mvn-home/bin:${PATH}
 - echo $MAVEN_OPTS
 - mvn -version -B
 # unshallow is needed by license-maven-plugin

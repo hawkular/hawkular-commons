@@ -74,6 +74,7 @@
     <module>email</module>
     <module>hawkular-rest-status</module>
     <module>hawkular-inventory-paths</module>
+    <module>hawkular-inventory-api</module>
     <module>hawkular-bus</module>
     <module>hawkular-command-gateway</module>
     <module>hawkular-nest</module>
@@ -101,6 +102,7 @@
     <version.org.freemarker>2.3.23</version.org.freemarker>
     <version.org.jboss.arquillian>1.1.11.Final</version.org.jboss.arquillian>
     <version.org.wildfly.arquillian>2.0.0.Alpha1</version.org.wildfly.arquillian>
+    <version.io.reactivex>1.0.8</version.io.reactivex>
 
     <plugin.version.org.jsonschema2pojo>0.4.14</plugin.version.org.jsonschema2pojo>
   </properties>
@@ -108,7 +110,6 @@
   <!-- We manage the artifacts from Commons here so that hawkular-commons-parent can be imported as a BoM by downstream Hawkular components -->
   <dependencyManagement>
     <dependencies>
-
       <dependency>
         <groupId>org.freemarker</groupId>
         <artifactId>freemarker</artifactId>
