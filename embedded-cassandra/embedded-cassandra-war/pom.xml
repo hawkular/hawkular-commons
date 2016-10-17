@@ -35,6 +35,7 @@
     <dependency>
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-commons-embedded-cassandra-service</artifactId>
+      <version>${project.version}</version>
       <exclusions>
         <exclusion>
           <groupId>com.google.guava</groupId>

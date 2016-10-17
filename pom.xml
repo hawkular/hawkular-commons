@@ -68,19 +68,6 @@
     </developer>
   </developers>
 
-  <modules>
-    <module>embedded-cassandra</module>
-    <module>templates</module>
-    <module>email</module>
-    <module>hawkular-rest-status</module>
-    <module>hawkular-inventory-paths</module>
-    <module>hawkular-bus</module>
-    <module>hawkular-command-gateway</module>
-    <module>hawkular-nest</module>
-    <module>hawkular-tenant-jaxrs-filter</module>
-    <module>hawkular-cors-jaxrs-filter</module>
-  </modules>
-
   <scm>
     <connection>scm:git:git@github.com:hawkular/hawkular-commons</connection>
     <developerConnection>scm:git:git@github.com:hawkular/hawkular-commons</developerConnection>
@@ -105,10 +92,8 @@
     <plugin.version.org.jsonschema2pojo>0.4.14</plugin.version.org.jsonschema2pojo>
   </properties>
 
-  <!-- We manage the artifacts from Commons here so that hawkular-commons-parent can be imported as a BoM by downstream Hawkular components -->
   <dependencyManagement>
     <dependencies>
-
       <dependency>
         <groupId>org.freemarker</groupId>
         <artifactId>freemarker</artifactId>
@@ -121,110 +106,38 @@
         <version>${version.javax.javaee}</version>
         <scope>provided</scope>
       </dependency>
-
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-bus-common</artifactId>
-        <version>0.7.10.Final-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-bus-feature-pack</artifactId>
-        <version>0.7.10.Final-SNAPSHOT</version>
-        <type>pom</type>
-      </dependency>
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-bus-feature-pack</artifactId>
-        <version>0.7.10.Final-SNAPSHOT</version>
-        <type>zip</type>
-      </dependency>
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-bus-mdb</artifactId>
-        <version>0.7.10.Final-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-bus-rest-client</artifactId>
-        <version>0.7.10.Final-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-command-gateway-api</artifactId>
-        <version>0.7.10.Final-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-command-gateway-itest</artifactId>
-        <type>test-jar</type>
-        <version>0.7.10.Final-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-command-gateway-war</artifactId>
-        <version>0.7.10.Final-SNAPSHOT</version>
-        <type>war</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-commons-email</artifactId>
-        <version>0.7.10.Final-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-commons-embedded-cassandra-war</artifactId>
-        <version>0.7.10.Final-SNAPSHOT</version>
-        <type>war</type>
-      </dependency>
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-commons-embedded-cassandra-service</artifactId>
-        <version>0.7.10.Final-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-inventory-paths</artifactId>
-        <version>0.7.10.Final-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-commons-templates</artifactId>
-        <version>0.7.10.Final-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-nest-feature-pack</artifactId>
-        <version>0.7.10.Final-SNAPSHOT</version>
-        <type>pom</type>
-      </dependency>
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-nest-feature-pack</artifactId>
-        <version>0.7.10.Final-SNAPSHOT</version>
-        <type>zip</type>
-      </dependency>
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-nest-wf-extension</artifactId>
-        <version>0.7.10.Final-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.hawkular.commons</groupId>
-        <artifactId>hawkular-rest-status</artifactId>
-        <version>0.7.10.Final-SNAPSHOT</version>
-      </dependency>
-
     </dependencies>
   </dependencyManagement>
 
+  <profiles>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>embedded-cassandra</module>
+        <module>templates</module>
+        <module>email</module>
+        <module>hawkular-rest-status</module>
+        <module>hawkular-inventory-paths</module>
+        <module>hawkular-bus</module>
+        <module>hawkular-command-gateway</module>
+        <module>hawkular-nest</module>
+        <module>hawkular-tenant-jaxrs-filter</module>
+        <module>hawkular-cors-jaxrs-filter</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>openshift</id>
+      <properties>
+        <skipTests>true</skipTests>
+      </properties>
+      <modules>
+        <module>hawkular-tenant-jaxrs-filter</module>
+        <module>hawkular-cors-jaxrs-filter</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>
