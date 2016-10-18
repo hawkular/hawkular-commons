@@ -138,6 +138,19 @@
         <module>hawkular-tenant-jaxrs-filter</module>
         <module>hawkular-cors-jaxrs-filter</module>
       </modules>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.mycila</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+            <configuration>
+              <excludes combine.children="append">
+                <exclude>hawkular-rest-status/src/test/resources/manifests/*.txt</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>
