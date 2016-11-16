@@ -35,6 +35,11 @@ public abstract class AbstractOriginValidation {
 
     protected void init() {
         String allowedCorsOriginsConfig = getAllowedCorsOrigins();
+        if (allowedCorsOriginsConfig == null || allowedCorsOriginsConfig.isEmpty()) {
+            allowedOrigins = Collections.emptySet();
+            return;
+        }
+
         if (Headers.ALLOW_ALL_ORIGIN.equals(allowedCorsOriginsConfig.trim())) {
             allowAnyOrigin = true;
         } else {
@@ -60,7 +65,7 @@ public abstract class AbstractOriginValidation {
             return true;
         }
 
-        if (requestOrigin == null) {
+        if (requestOrigin == null || allowedOrigins.isEmpty()) {
             return false;
         }
 
