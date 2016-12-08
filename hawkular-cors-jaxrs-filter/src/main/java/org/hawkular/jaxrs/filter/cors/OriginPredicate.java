@@ -21,27 +21,28 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
  * @author Stefan Negrea
+ * @author Joel Takvorian
  */
-public abstract class AbstractOriginValidation {
+public class OriginPredicate implements Predicate<String> {
 
-    protected abstract String getAllowedCorsOrigins();
+    private final boolean allowAnyOrigin;
+    private final Set<URI> allowedOrigins;
 
-    private boolean allowAnyOrigin;
-    private Set<URI> allowedOrigins;
-
-    protected void init() {
-        String allowedCorsOriginsConfig = getAllowedCorsOrigins();
+    public OriginPredicate(String allowedCorsOriginsConfig) {
         if (allowedCorsOriginsConfig == null || allowedCorsOriginsConfig.isEmpty()) {
             allowedOrigins = Collections.emptySet();
+            allowAnyOrigin = false;
             return;
         }
 
         if (Headers.ALLOW_ALL_ORIGIN.equals(allowedCorsOriginsConfig.trim())) {
             allowAnyOrigin = true;
+            allowedOrigins = null;
         } else {
             allowAnyOrigin = false;
             Set<URI> parsedOrigins = Arrays.stream(allowedCorsOriginsConfig.split(","))
@@ -53,14 +54,12 @@ public abstract class AbstractOriginValidation {
     }
 
     /**
-     * Helper method to check whether requests from the specified origin
-     * must be allowed.
-     *
+     * Check whether requests from the specified origin must be allowed.
      * @param requestOrigin origin as reported by the client, {@code null} if unknown.
      *
      * @return {@code true} if the origin is allowed, else {@code false}.
      */
-    public boolean isAllowedOrigin(final String requestOrigin) {
+    @Override public boolean test(String requestOrigin) {
         if (allowAnyOrigin) {
             return true;
         }
