@@ -16,7 +16,7 @@
  */
 package org.hawkular.cmdgw.ws.test;
 
-import com.squareup.okhttp.Credentials;
+import okhttp3.Credentials;
 
 /**
  * This provides some static configuration needed by the test client.
