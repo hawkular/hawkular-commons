@@ -21,7 +21,7 @@ import org.hawkular.cmdgw.ws.test.TestWebSocketClient.ExpectedEvent.ExpectedFail
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.testng.annotations.Test;
 
-import com.squareup.okhttp.Credentials;
+import okhttp3.Credentials;
 
 /**
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>

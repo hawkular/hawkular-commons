@@ -31,9 +31,9 @@ import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
@@ -48,7 +48,7 @@ public class StatusEndpointITest extends Arquillian {
     @Deployment
     public static WebArchive createDeployment() {
         File[] libs = Maven.configureResolver().fromFile(shrinkwrapMavenSettings).loadPomFromFile("pom.xml")
-                .resolve("org.hawkular.commons:hawkular-rest-status", "com.squareup.okhttp:okhttp")
+                .resolve("org.hawkular.commons:hawkular-rest-status", "com.squareup.okhttp3:okhttp")
                 .withTransitivity().asFile();
         WebArchive archive = ShrinkWrap.create(WebArchive.class, StatusEndpointITest.class.getSimpleName() + ".war")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
@@ -74,7 +74,7 @@ public class StatusEndpointITest extends Arquillian {
     @Test(groups = { GROUP })
     public void testStatusEndpoint() throws IOException, InterruptedException {
 
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder().build();
 
         Request request = new Request.Builder()
                 .addHeader("Accept", "application/json")

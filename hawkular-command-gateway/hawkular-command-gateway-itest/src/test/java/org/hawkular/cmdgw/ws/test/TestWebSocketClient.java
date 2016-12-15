@@ -60,15 +60,15 @@ import org.hawkular.cmdgw.ws.test.TestWebSocketClient.ExpectedEvent.ExpectedClos
 import org.hawkular.cmdgw.ws.test.TestWebSocketClient.ExpectedEvent.ExpectedMessage;
 import org.testng.Assert;
 
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ResponseBody;
-import com.squareup.okhttp.ws.WebSocket;
-import com.squareup.okhttp.ws.WebSocketCall;
-import com.squareup.okhttp.ws.WebSocketListener;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okhttp3.ws.WebSocket;
+import okhttp3.ws.WebSocketCall;
+import okhttp3.ws.WebSocketListener;
 
 import okio.Buffer;
 import okio.BufferedSource;
@@ -257,7 +257,7 @@ public class TestWebSocketClient implements Closeable {
         }
 
         public TestWebSocketClient build() {
-            com.squareup.okhttp.Request.Builder rb = new Request.Builder().url(url);
+            okhttp3.Request.Builder rb = new Request.Builder().url(url);
             if (authentication != null) {
                 rb.addHeader("Authorization", authentication);
             }
@@ -754,7 +754,7 @@ public class TestWebSocketClient implements Closeable {
 
     public static class PingForeverAnswer implements Answer {
 
-        /** @see org.hawkular.cmdgw.ws.test.TestWebSocketClient.Answer#schedule(java.util.concurrent.ExecutorService, com.squareup.okhttp.ws.WebSocket) */
+        /** @see org.hawkular.cmdgw.ws.test.TestWebSocketClient.Answer#schedule(java.util.concurrent.ExecutorService, okhttp3.ws.WebSocket) */
         @Override
         public void schedule(final ExecutorService executor, final WebSocket webSocket) {
             Runnable r = new Runnable() {
@@ -992,7 +992,7 @@ public class TestWebSocketClient implements Closeable {
             handle(new ActualFailure(this, inMessageCounter++, e, response));
         }
 
-        /** @see com.squareup.okhttp.ws.WebSocketListener#onMessage(com.squareup.okhttp.ResponseBody) */
+        /** @see okhttp3.ws.WebSocketListener#onMessage(okhttp3.ResponseBody) */
         @Override
         public void onMessage(ResponseBody body) throws IOException {
             handle(new ActualMessage(this, inMessageCounter++, body));
@@ -1155,9 +1155,10 @@ public class TestWebSocketClient implements Closeable {
                     "Cannot build a [" + TestWebSocketClient.class.getName() + "] with a null request");
         }
         this.listener = testListener;
-        OkHttpClient c = new OkHttpClient();
-        c.setConnectTimeout(connectTimeoutSeconds, TimeUnit.SECONDS);
-        c.setReadTimeout(readTimeoutSeconds, TimeUnit.SECONDS);
+        OkHttpClient c = new OkHttpClient.Builder()
+                .connectTimeout(connectTimeoutSeconds, TimeUnit.SECONDS)
+                .readTimeout(readTimeoutSeconds, TimeUnit.SECONDS)
+                .build();
         this.client = c;
 
         WebSocketCall.create(client, request).enqueue(testListener);
@@ -1168,7 +1169,7 @@ public class TestWebSocketClient implements Closeable {
      */
     @Override
     public void close() throws IOException {
-        ExecutorService executor = client.getDispatcher().getExecutorService();
+        ExecutorService executor = client.dispatcher().executorService();
         executor.shutdown();
         try {
             executor.awaitTermination(5, TimeUnit.SECONDS);
