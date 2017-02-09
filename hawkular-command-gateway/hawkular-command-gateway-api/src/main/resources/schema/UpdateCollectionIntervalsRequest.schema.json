@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.ResourcePathRequest"
+  },
+  "javaType": "org.hawkular.cmdgw.api.UpdateCollectionIntervalsRequest",
+  "javaInterfaces" : ["org.hawkular.cmdgw.api.ResourcePathDestination"],
+  "additionalProperties": false,
+  "description": "A request to update one or more collection intervals. ResourcePath should be a resource managed by the target agent.",
+  "properties": {
+    "metricTypes": {
+      "description": "A map with key=metricTypeId, value=interval (seconds). metricType is inventory metric type id",
+      "type": "object",
+      "javaType": "java.util.Map<String, String>"
+    },
+    "availTypes": {
+      "description": "A map with key=availType, value=interval (seconds). metricType is inventory metric type id",
+      "type": "object",
+      "javaType": "java.util.Map<String, String>"
+    }
+  },
+  "required": ["metricTypes","availTypes"]
+}
+
