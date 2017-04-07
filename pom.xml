@@ -122,6 +122,7 @@
         <module>hawkular-rest-status</module>
         <module>hawkular-inventory-paths</module>
         <module>hawkular-bus</module>
+        <module>hawkular-client-api</module>
         <module>hawkular-command-gateway</module>
         <module>hawkular-nest</module>
         <module>hawkular-tenant-jaxrs-filter</module>
