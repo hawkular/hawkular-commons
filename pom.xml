@@ -106,6 +106,14 @@
         <version>${version.javax.javaee}</version>
         <scope>provided</scope>
       </dependency>
+
+      <dependency>
+        <groupId>org.wildfly.bom</groupId>
+        <artifactId>wildfly-javaee7</artifactId>
+        <version>${version.org.wildfly.bom}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -120,7 +128,7 @@
         <module>templates</module>
         <module>email</module>
         <module>hawkular-rest-status</module>
-        <module>hawkular-inventory-paths</module>
+        <module>hawkular-inventory-parent</module>
         <module>hawkular-bus</module>
         <module>hawkular-client-api</module>
         <module>hawkular-command-gateway</module>
