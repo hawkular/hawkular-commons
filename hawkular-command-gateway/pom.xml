@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.hawkular.commons</groupId>
     <artifactId>hawkular-commons-parent</artifactId>
-    <version>0.9.3.Final</version>
+    <version>0.9.4.Final-SNAPSHOT</version>
   </parent>
 
   <artifactId>hawkular-command-gateway</artifactId>
