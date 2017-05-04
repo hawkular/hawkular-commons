@@ -15,6 +15,12 @@
     "driverClass": {
       "type": "string"
     },
+    "driverXaDatasourceClassName": {
+      "type": "string"
+    },
+    "xaDatasourceClass": {
+      "type": "string"
+    },
     "driverMajorVersion": {
       "type": "integer"
     },
