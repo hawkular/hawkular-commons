@@ -21,6 +21,9 @@
     "xaDatasourceClass": {
       "type": "string"
     },
+    "jdbcCompliant": {
+      "type": "boolean"
+    },
     "driverMajorVersion": {
       "type": "integer"
     },
