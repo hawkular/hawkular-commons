@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.hawkular.commons</groupId>
     <artifactId>hawkular-command-gateway</artifactId>
-    <version>0.9.6.Final</version>
+    <version>0.9.7.Final-SNAPSHOT</version>
   </parent>
   <artifactId>hawkular-command-gateway-itest</artifactId>
   <name>Hawkular Command Gateway Integration Tests</name>
