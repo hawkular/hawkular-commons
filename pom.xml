@@ -80,6 +80,7 @@
   </ciManagement>
 
   <properties>
+    <version.io.vertx>3.4.1</version.io.vertx>
     <version.javax.javaee>7.0</version.javax.javaee>
     <version.com.google.code.findbugs>1.3.9</version.com.google.code.findbugs>
     <version.commons-logging.commons-logging>1.1.1</version.commons-logging.commons-logging>
@@ -90,6 +91,10 @@
     <version.org.wildfly.arquillian>2.0.0.Alpha1</version.org.wildfly.arquillian>
 
     <plugin.version.org.jsonschema2pojo>0.4.14</plugin.version.org.jsonschema2pojo>
+
+    <!-- Used for utils. Utils is used without Widlfly depenencies -->
+    <version.org.jboss.logging>3.3.1.Final</version.org.jboss.logging>
+    <version.org.jboss.logging.jboss-logging-tools>2.0.2.Final</version.org.jboss.logging.jboss-logging-tools>
   </properties>
 
   <dependencyManagement>
@@ -142,6 +147,9 @@
         <module>hawkular-nest</module>
         <module>hawkular-tenant-jaxrs-filter</module>
         <module>hawkular-cors-jaxrs-filter</module>
+        <module>utils</module>
+        <module>vertx/rest-api</module>
+        <module>vertx/server</module>
       </modules>
     </profile>
 
