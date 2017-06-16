@@ -16,9 +16,15 @@
  */
 package org.hawkular;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -69,11 +75,26 @@ public class HandlersManager {
                 try {
                     log.infof("Starting Endpoint [ %s ] - Handler [ %s ]", endpoint.getKey(), endpoint.getValue().getName());
                     String endpointPackage = endpoint.getValue().getPackage().getName();
-                    BaseApplication app = applications.get(endpointPackage);
+
+                    BaseApplication app = null;
+                    while (endpointPackage.length() != 0) {
+                        app = applications.get(endpointPackage);
+                        if (app != null) {
+                            break;
+                        }
+
+                        if (endpointPackage.lastIndexOf('.') == -1) {
+                            break;
+                        }
+
+                        endpointPackage = endpointPackage.substring(0, endpointPackage.lastIndexOf('.'));
+                    }
+
                     if (app == null) {
                         log.errorf("Handler [%s] does not belong to an application.", endpoint.getValue().getName());
                         return;
                     }
+
                     String baseUrl = app.baseUrl();
                     router.route(baseUrl + "*").handler(BodyHandler.create());
                     RestHandler handler = endpoint.getValue().newInstance();
@@ -97,40 +118,75 @@ public class HandlersManager {
         applications.entrySet().stream().forEach(application -> application.getValue().stop());
     }
 
-    @SuppressWarnings("unchecked")
     private void scan() throws IOException {
+        List<String> pathsToProcess = new ArrayList<>();
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL[] classLoaderPaths = ((URLClassLoader) classLoader).getURLs();
+        for (int i = 0; i < classLoaderPaths.length; i++) {
+            pathsToProcess.add(classLoaderPaths[i].getPath());
+        }
+
         String[] classpath = System.getProperty("java.class.path").split(":");
-        for (int i=0; i<classpath.length; i++) {
-            if (classpath[i].contains("hawkular") && classpath[i].endsWith("jar")) {
-                ZipInputStream zip = new ZipInputStream(new FileInputStream(classpath[i]));
-                for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
-                    if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
-                        String className = entry.getName().replace('/', '.'); // including ".class"
-                        className = className.substring(0, className.length() - 6);
-                        try {
-                            Class clazz = cl.loadClass(className);
-                            Class<?>[] interfaces = clazz.getInterfaces();
-                            for (int j = 0; j < interfaces.length; j++) {
-                                if (interfaces[j].equals(BaseApplication.class)) {
-                                    String appName = clazz.getPackage().getName();
-                                    applicationsClasses.put(appName, clazz);
-                                }
-                            }
-                            if (clazz.isAnnotationPresent(RestEndpoint.class)) {
-                                RestEndpoint endpoint = (RestEndpoint)clazz.getAnnotation(RestEndpoint.class);
-                                for (int j=0; j<interfaces.length; j++) {
-                                    if (interfaces[j].equals(RestHandler.class)) {
-                                        endpointsClasses.put(endpoint.path(), clazz);
-                                    }
-                                }
-                            }
-                        } catch (Exception e) {
-                            log.errorf(e, "Error loading Handler [%s].", className);
-                            System.exit(1);
-                        }
+        for (int i = 0; i < classpath.length; i++) {
+            pathsToProcess.add(classpath[i]);
+        }
+
+        for (String fileName : pathsToProcess) {
+            File file = new File(fileName);
+            if (file.isDirectory()) {
+                processDirectory(fileName, fileName.length());
+            } else if (fileName.contains("hawkular") && fileName.endsWith("jar")) {
+                processArchive(fileName);
+            }
+        }
+    }
+
+    private void processArchive(String path) throws IOException, FileNotFoundException {
+        try (ZipInputStream zip = new ZipInputStream(new FileInputStream(path))) {
+            for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+                if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
+                    processClass(entry.getName());
+                }
+            }
+        }
+    }
+
+    public void processDirectory(String directoryName, int rootLength) {
+        File directory = new File(directoryName);
+        for (File file : directory.listFiles()) {
+            if (file.isFile() && file.getName().endsWith(".class")) {
+                processClass(file.getPath().substring(rootLength));
+            } else if (file.isDirectory()) {
+                processDirectory(file.getAbsolutePath(), rootLength);
+            }
+        }
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private void processClass(String className) {
+        className = className.replace('/', '.'); // including ".class"
+        className = className.substring(0, className.length() - 6);
+        try {
+            Class clazz = cl.loadClass(className);
+            Class<?>[] interfaces = clazz.getInterfaces();
+            for (int j = 0; j < interfaces.length; j++) {
+                if (interfaces[j].equals(BaseApplication.class)) {
+                    String appName = clazz.getPackage().getName();
+                    applicationsClasses.put(appName, clazz);
+                }
+            }
+            if (clazz.isAnnotationPresent(RestEndpoint.class)) {
+                RestEndpoint endpoint = (RestEndpoint)clazz.getAnnotation(RestEndpoint.class);
+                for (int j=0; j<interfaces.length; j++) {
+                    if (interfaces[j].equals(RestHandler.class)) {
+                        endpointsClasses.put(endpoint.path(), clazz);
                     }
                 }
             }
+        } catch (Exception e) {
+            log.errorf(e, "Error loading Handler [%s].", className);
+            System.exit(1);
         }
     }
 }
