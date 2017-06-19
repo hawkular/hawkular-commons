@@ -132,17 +132,19 @@ public class HandlersManager {
             pathsToProcess.add(classpath[i]);
         }
 
-        for (String fileName : pathsToProcess) {
-            File file = new File(fileName);
+        for (String fullFileName : pathsToProcess) {
+            File file = new File(fullFileName);
+            String fileName = file.getName();
             if (file.isDirectory()) {
-                processDirectory(fileName, fileName.length());
+                processDirectory(fullFileName, fullFileName.length());
             } else if (fileName.contains("hawkular") && fileName.endsWith("jar")) {
-                processArchive(fileName);
+                processArchive(fullFileName);
             }
         }
     }
 
     private void processArchive(String path) throws IOException, FileNotFoundException {
+        log.debug(path);
         try (ZipInputStream zip = new ZipInputStream(new FileInputStream(path))) {
             for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
                 if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
@@ -153,6 +155,7 @@ public class HandlersManager {
     }
 
     public void processDirectory(String directoryName, int rootLength) {
+        log.debug(directoryName);
         File directory = new File(directoryName);
         for (File file : directory.listFiles()) {
             if (file.isFile() && file.getName().endsWith(".class")) {
@@ -167,6 +170,7 @@ public class HandlersManager {
     private void processClass(String className) {
         className = className.replace('/', '.'); // including ".class"
         className = className.substring(0, className.length() - 6);
+        log.debug(className);
         try {
             Class clazz = cl.loadClass(className);
             Class<?>[] interfaces = clazz.getInterfaces();
