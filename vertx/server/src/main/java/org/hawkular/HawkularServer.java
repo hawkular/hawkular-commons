@@ -17,6 +17,7 @@
 package org.hawkular;
 
 import java.lang.management.ManagementFactory;
+
 import javax.management.ObjectName;
 
 import org.hawkular.commons.log.MsgLogger;
@@ -25,6 +26,7 @@ import org.hawkular.commons.properties.HawkularProperties;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerOptions;
 
 /**
  * Lightweight HawkularServer based on Vert.X/Netty.
@@ -52,9 +54,14 @@ public class HawkularServer implements HawkularServerMBean {
 
         try {
             vertx = Vertx.vertx();
+
             handlers = new HandlersManager(vertx);
             handlers.start();
-            server = vertx.createHttpServer();
+
+            HttpServerOptions serverOptions = new HttpServerOptions();
+            serverOptions.setCompressionSupported(true);
+            server = vertx.createHttpServer(serverOptions);
+
             log.infof("Starting Server at http://%s:%s in [%s ms] ", bindAdress, port, (System.currentTimeMillis() - start));
             server.requestHandler(handlers::handle).listen(port, bindAdress);
         } catch (Exception e) {
