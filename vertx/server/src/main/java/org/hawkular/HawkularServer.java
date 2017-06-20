@@ -43,14 +43,20 @@ public class HawkularServer implements HawkularServerMBean {
     private static final String PORT_DEFAULT = "8080";
     private static final String JMX_NAME = "org.hawkular:name=HawkularServer";
 
+    private static final String REQUEST_COMPRESSION = "hawkular.request-compression";
+    private static final String REQUEST_COMPRESSION_DEFAULT = "true";
+
     private Vertx vertx;
     private HttpServer server;
     private HandlersManager handlers;
 
     public void start() {
         long start = System.currentTimeMillis();
+
         String bindAdress = HawkularProperties.getProperty(BIND_ADDRESS, BIND_ADDRESS_DEFAULT);
         Integer port = Integer.valueOf(HawkularProperties.getProperty(PORT, PORT_DEFAULT));
+        boolean requestCompression = Boolean
+                .valueOf(HawkularProperties.getProperty(REQUEST_COMPRESSION, REQUEST_COMPRESSION_DEFAULT));
 
         try {
             vertx = Vertx.vertx();
@@ -59,7 +65,7 @@ public class HawkularServer implements HawkularServerMBean {
             handlers.start();
 
             HttpServerOptions serverOptions = new HttpServerOptions();
-            serverOptions.setCompressionSupported(true);
+            serverOptions.setCompressionSupported(requestCompression);
             server = vertx.createHttpServer(serverOptions);
 
             log.infof("Starting Server at http://%s:%s in [%s ms] ", bindAdress, port, (System.currentTimeMillis() - start));
