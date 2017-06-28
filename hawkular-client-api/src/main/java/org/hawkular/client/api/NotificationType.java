@@ -24,7 +24,8 @@ import java.util.List;
  * @author Jay Shaughnessy
  */
 public enum NotificationType {
-    RESOURCE_ADDED("resourceType", "resourcePath");
+    RESOURCE_ADDED("resourceType", "resourcePath"),
+    AVAIL_CHANGE("resourceType", "resourcePath", "newAvail");
 
     private List<String> supportedProperties;
 
