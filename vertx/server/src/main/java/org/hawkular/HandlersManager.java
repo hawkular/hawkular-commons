@@ -147,7 +147,8 @@ public class HandlersManager {
         log.debug(path);
         try (ZipInputStream zip = new ZipInputStream(new FileInputStream(path))) {
             for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
-                if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
+                if (!entry.isDirectory() && entry.getName().endsWith(".class")
+                        && entry.getName().contains("hawkular")) {
                     processClass(entry.getName());
                 }
             }
@@ -188,7 +189,7 @@ public class HandlersManager {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception | Error e) {
             log.errorf(e, "Error loading Handler [%s].", className);
             System.exit(1);
         }
