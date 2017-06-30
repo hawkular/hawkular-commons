@@ -49,8 +49,8 @@ public class HandlersManager {
     private Router router;
     private Map<String, BaseApplication> applications = new HashMap<>();
     private Map<String, Class<BaseApplication>> applicationsClasses = new HashMap<>();
-    private Map<String, RestHandler> endpoints = new HashMap<>();
-    private Map<String, Class<RestHandler>> endpointsClasses = new HashMap<>();
+    private Map<EndpointKey, RestHandler> endpoints = new HashMap<>();
+    private Map<EndpointKey, Class<RestHandler>> endpointsClasses = new HashMap<>();
     private ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
     public HandlersManager(Vertx vertx) {
@@ -73,7 +73,6 @@ public class HandlersManager {
             });
             endpointsClasses.entrySet().stream().forEach(endpoint -> {
                 try {
-                    log.infof("Starting Endpoint [ %s ] - Handler [ %s ]", endpoint.getKey(), endpoint.getValue().getName());
                     String endpointPackage = endpoint.getValue().getPackage().getName();
 
                     BaseApplication app = null;
@@ -100,6 +99,7 @@ public class HandlersManager {
                     RestHandler handler = endpoint.getValue().newInstance();
                     handler.initRoutes(baseUrl, router);
                     endpoints.put(endpoint.getKey(), handler);
+                    log.infof("Starting on [ %s ]: Endpoint [ %s ] - Handler [ %s ]", baseUrl, endpoint.getKey().getEndpoint(), endpoint.getValue().getName());
                 } catch (Exception e) {
                     log.errorf(e, "Error loading Handler [%s]", endpoint);
                 }
@@ -185,13 +185,57 @@ public class HandlersManager {
                 RestEndpoint endpoint = (RestEndpoint)clazz.getAnnotation(RestEndpoint.class);
                 for (int j=0; j<interfaces.length; j++) {
                     if (interfaces[j].equals(RestHandler.class)) {
-                        endpointsClasses.put(endpoint.path(), clazz);
+                        endpointsClasses.put(new EndpointKey(endpoint.path(), clazz.getCanonicalName()), clazz);
                     }
                 }
             }
         } catch (Exception | Error e) {
             log.errorf(e, "Error loading Handler [%s].", className);
             System.exit(1);
+        }
+    }
+
+    public static class EndpointKey {
+        private String endpoint;
+        private String className;
+
+        public EndpointKey(String endpoint, String className) {
+            this.endpoint = endpoint;
+            this.className = className;
+        }
+
+        public String getEndpoint() {
+            return endpoint;
+        }
+
+        public void setEndpoint(String endpoint) {
+            this.endpoint = endpoint;
+        }
+
+        public String getClassName() {
+            return className;
+        }
+
+        public void setClassName(String className) {
+            this.className = className;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            EndpointKey that = (EndpointKey) o;
+
+            if (endpoint != null ? !endpoint.equals(that.endpoint) : that.endpoint != null) return false;
+            return className != null ? className.equals(that.className) : that.className == null;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = endpoint != null ? endpoint.hashCode() : 0;
+            result = 31 * result + (className != null ? className.hashCode() : 0);
+            return result;
         }
     }
 }
