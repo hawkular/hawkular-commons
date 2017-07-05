@@ -24,13 +24,16 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.hawkular.commons.log.MsgLogger;
 import org.hawkular.commons.log.MsgLogging;
+import org.hawkular.commons.properties.HawkularProperties;
 import org.hawkular.handlers.BaseApplication;
 import org.hawkular.handlers.RestEndpoint;
 import org.hawkular.handlers.RestHandler;
@@ -39,6 +42,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.CorsHandler;
 
 /**
  * @author Jay Shaughnessy
@@ -46,15 +50,25 @@ import io.vertx.ext.web.handler.BodyHandler;
  */
 public class HandlersManager {
     private static final MsgLogger log = MsgLogging.getMsgLogger(HandlersManager.class);
+
+    private static final String CORS_URL = "hawkular.cors-url";
+    private static final String CORS_URL_DEFAULT = "";
+    private static final String CORS_HEADERS = "hawkular.cors-headers";
+    private static final String CORS_HEADERS_DEFAULT = "";
+
     private Router router;
     private Map<String, BaseApplication> applications = new HashMap<>();
     private Map<String, Class<BaseApplication>> applicationsClasses = new HashMap<>();
     private Map<EndpointKey, RestHandler> endpoints = new HashMap<>();
     private Map<EndpointKey, Class<RestHandler>> endpointsClasses = new HashMap<>();
     private ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    private String corsUrl;
+    private String corsHeaders;
 
     public HandlersManager(Vertx vertx) {
         this.router = Router.router(vertx);
+        corsUrl = HawkularProperties.getProperty(CORS_URL, CORS_URL_DEFAULT);
+        corsHeaders = HawkularProperties.getProperty(CORS_HEADERS, CORS_HEADERS_DEFAULT);
     }
 
     public void start() {
@@ -96,6 +110,13 @@ public class HandlersManager {
 
                     String baseUrl = app.baseUrl();
                     router.route(baseUrl + "*").handler(BodyHandler.create());
+                    if (corsUrl.length() > 0) {
+                        CorsHandler corsHandler = CorsHandler.create(corsUrl);
+                        if (corsHeaders.length() > 0) {
+                            corsHandler.allowedHeaders(extractCorsHeaders(corsHeaders));
+                        }
+                        router.route(baseUrl + "*").handler(corsHandler);
+                    }
                     RestHandler handler = endpoint.getValue().newInstance();
                     handler.initRoutes(baseUrl, router);
                     endpoints.put(endpoint.getKey(), handler);
@@ -193,6 +214,17 @@ public class HandlersManager {
             log.errorf(e, "Error loading Handler [%s].", className);
             System.exit(1);
         }
+    }
+
+    private Set<String> extractCorsHeaders(String corsHeaders) {
+        Set<String> headers = new HashSet<>();
+        if (corsHeaders != null && corsHeaders.length() > 0) {
+            String[] splitted = corsHeaders.split(",");
+            for (int i = 0; i < splitted.length; i++) {
+                headers.add(splitted[i]);
+            }
+        }
+        return headers;
     }
 
     public static class EndpointKey {
