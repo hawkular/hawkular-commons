@@ -31,6 +31,7 @@ import java.util.zip.ZipInputStream;
 
 import org.hawkular.commons.log.MsgLogger;
 import org.hawkular.commons.log.MsgLogging;
+import org.hawkular.commons.properties.HawkularProperties;
 import org.hawkular.handlers.BaseApplication;
 import org.hawkular.handlers.RestEndpoint;
 import org.hawkular.handlers.RestHandler;
@@ -39,6 +40,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.CorsHandler;
 
 /**
  * @author Jay Shaughnessy
@@ -46,15 +48,21 @@ import io.vertx.ext.web.handler.BodyHandler;
  */
 public class HandlersManager {
     private static final MsgLogger log = MsgLogging.getMsgLogger(HandlersManager.class);
+
+    private static final String CORS_CONFIG = "hawkular.cors-url";
+    private static final String CORS_CONFIG_DEFAULT = "";
+
     private Router router;
     private Map<String, BaseApplication> applications = new HashMap<>();
     private Map<String, Class<BaseApplication>> applicationsClasses = new HashMap<>();
     private Map<EndpointKey, RestHandler> endpoints = new HashMap<>();
     private Map<EndpointKey, Class<RestHandler>> endpointsClasses = new HashMap<>();
     private ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    private String corsUrl;
 
     public HandlersManager(Vertx vertx) {
         this.router = Router.router(vertx);
+        corsUrl = HawkularProperties.getProperty(CORS_CONFIG, CORS_CONFIG_DEFAULT);
     }
 
     public void start() {
@@ -96,6 +104,9 @@ public class HandlersManager {
 
                     String baseUrl = app.baseUrl();
                     router.route(baseUrl + "*").handler(BodyHandler.create());
+                    if (corsUrl.length() > 0) {
+                        router.route(baseUrl + "*").handler(CorsHandler.create(corsUrl));
+                    }
                     RestHandler handler = endpoint.getValue().newInstance();
                     handler.initRoutes(baseUrl, router);
                     endpoints.put(endpoint.getKey(), handler);
