@@ -39,6 +39,7 @@ import org.hawkular.handlers.RestEndpoint;
 import org.hawkular.handlers.RestHandler;
 
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -51,10 +52,14 @@ import io.vertx.ext.web.handler.CorsHandler;
 public class HandlersManager {
     private static final MsgLogger log = MsgLogging.getMsgLogger(HandlersManager.class);
 
-    private static final String CORS_URL = "hawkular.cors-url";
-    private static final String CORS_URL_DEFAULT = "";
+    // For pattern examples see:
+    // github.com/vert-x3/vertx-web/blob/master/vertx-web/src/test/java/io/vertx/ext/web/handler/CORSHandlerTest.java
+    private static final String CORS_ORIGIN_PATTERN = "hawkular.cors-origin-pattern";
+    private static final String CORS_ORIGIN_PATTERN_DEFAULT = "*";
     private static final String CORS_HEADERS = "hawkular.cors-headers";
-    private static final String CORS_HEADERS_DEFAULT = "";
+    private static final String CORS_HEADERS_DEFAULT = "origin,accept,content-type,hawkular-tenant";
+    private static final String CORS_METHODS = "hawkular.cors-methods";
+    private static final String CORS_METHODS_DEFAULT = "GET,POST,PUT,PATCH,DELETE,OPTIONS,HEAD";
 
     private Router router;
     private Map<String, BaseApplication> applications = new HashMap<>();
@@ -62,13 +67,15 @@ public class HandlersManager {
     private Map<EndpointKey, RestHandler> endpoints = new HashMap<>();
     private Map<EndpointKey, Class<RestHandler>> endpointsClasses = new HashMap<>();
     private ClassLoader cl = Thread.currentThread().getContextClassLoader();
-    private String corsUrl;
+    private String corsAllowedOriginPattern;
     private String corsHeaders;
+    private String corsMethods;
 
     public HandlersManager(Vertx vertx) {
         this.router = Router.router(vertx);
-        corsUrl = HawkularProperties.getProperty(CORS_URL, CORS_URL_DEFAULT);
+        corsAllowedOriginPattern = HawkularProperties.getProperty(CORS_ORIGIN_PATTERN, CORS_ORIGIN_PATTERN_DEFAULT);
         corsHeaders = HawkularProperties.getProperty(CORS_HEADERS, CORS_HEADERS_DEFAULT);
+        corsMethods = HawkularProperties.getProperty(CORS_METHODS, CORS_METHODS_DEFAULT);
     }
 
     public void start() {
@@ -110,10 +117,14 @@ public class HandlersManager {
 
                     String baseUrl = app.baseUrl();
                     router.route(baseUrl + "*").handler(BodyHandler.create());
-                    if (corsUrl.length() > 0) {
-                        CorsHandler corsHandler = CorsHandler.create(corsUrl);
+
+                    if (corsAllowedOriginPattern.length() > 0) {
+                        CorsHandler corsHandler = CorsHandler.create(corsAllowedOriginPattern);
                         if (corsHeaders.length() > 0) {
                             corsHandler.allowedHeaders(extractCorsHeaders(corsHeaders));
+                        }
+                        if (corsMethods.length() > 0) {
+                            corsHandler.allowedMethods(extractCorsMethods(corsMethods));
                         }
                         router.route(baseUrl + "*").handler(corsHandler);
                     }
@@ -225,6 +236,21 @@ public class HandlersManager {
             }
         }
         return headers;
+    }
+
+    private Set<HttpMethod> extractCorsMethods(String corsMethods) {
+        Set<HttpMethod> methods = new HashSet<>();
+        if (corsMethods != null && corsMethods.length() > 0) {
+            String[] splitted = corsMethods.split(",");
+            for (int i = 0; i < splitted.length; i++) {
+                try {
+                    methods.add(HttpMethod.valueOf(splitted[i]));
+                } catch (Exception e) {
+                    log.warnf("Skipping unknown CORS method [%s]: %s", splitted[i], e.getMessage());
+                }
+            }
+        }
+        return methods;
     }
 
     public static class EndpointKey {
