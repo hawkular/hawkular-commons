@@ -7,5 +7,12 @@
   "javaType": "org.hawkular.cmdgw.api.ExportJdrRequest",
   "javaInterfaces" : ["org.hawkular.cmdgw.api.ResourcePathDestination"],
   "description": "Exports a JDR from the Application Server instance given by the inventory path stored in resourcePath field.",
-  "additionalProperties": false
+  "additionalProperties": false,
+  "properties": {
+    "deleteImmediately": {
+      "description": "Set to false if the report should remain in the server node. Otherwise, set to true.",
+      "type": "boolean",
+      "javaType": "boolean"
+    }
+  }
 }
