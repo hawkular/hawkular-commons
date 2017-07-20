@@ -20,9 +20,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.hawkular.bus.common.BasicMessage;
 import org.hawkular.cmdgw.NoCommandForMessageException;
+import org.hawkular.cmdgw.api.AnsibleRequest;
 import org.hawkular.cmdgw.api.EchoRequest;
 import org.hawkular.cmdgw.api.EventDestination;
 import org.hawkular.cmdgw.api.ResourcePathDestination;
@@ -40,11 +42,14 @@ public class WsCommands {
     // Notice we instantiate them here - these must be thread-safe.
 
     private final ResourcePathDestinationWsCommand resourcePathDestinationWsCommand = //
-    new ResourcePathDestinationWsCommand();
+            new ResourcePathDestinationWsCommand();
 
     private final EchoCommand echoCommand = new EchoCommand();
     private final UiSessionDestinationWsCommand uiSessionDestinationWsCommand = new UiSessionDestinationWsCommand();
     private final EventDestinationWsCommand eventDestinationWsCommand = new EventDestinationWsCommand();
+
+    @Inject
+    private AnsibleCommand ansibleCommand;
 
     /**
      * Returns a collection of {@link WsCommand}s that should handle the given {@code requestClass}.
@@ -65,14 +70,15 @@ public class WsCommands {
             results.add((WsCommand<REQ>) uiSessionDestinationWsCommand);
         } else if (EchoRequest.class.isAssignableFrom(requestClass)) {
             results.add((WsCommand<REQ>) echoCommand);
+        } else if (AnsibleRequest.class.isAssignableFrom(requestClass)) {
+            results.add((WsCommand<REQ>) ansibleCommand);
         }
+        // new commands will need to be added here
 
         // some commands may also want the message sent to events
         if (EventDestination.class.isAssignableFrom(requestClass)) {
             results.add((WsCommand<REQ>) eventDestinationWsCommand);
         }
-
-        // new commands will need to be added here
 
         if (results.isEmpty()) {
             throw new NoCommandForMessageException(
