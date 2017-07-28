@@ -28,7 +28,7 @@
 
   <groupId>org.hawkular.commons</groupId>
   <artifactId>hawkular-commons-parent</artifactId>
-  <version>0.9.7.Final-SNAPSHOT</version>
+  <version>0.9.7.Final</version>
   <packaging>pom</packaging>
 
   <name>Hawkular Commons</name>
@@ -72,7 +72,7 @@
     <connection>scm:git:git@github.com:hawkular/hawkular-commons</connection>
     <developerConnection>scm:git:git@github.com:hawkular/hawkular-commons</developerConnection>
     <url>https://github.com/hawkular/hawkular-commons</url>
-    <tag>HEAD</tag>
+    <tag>0.9.7.Final</tag>
   </scm>
   <ciManagement>
     <system>Travis-ci</system>
