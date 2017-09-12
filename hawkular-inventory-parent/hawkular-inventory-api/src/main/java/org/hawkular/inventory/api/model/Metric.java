@@ -20,9 +20,42 @@ package org.hawkular.inventory.api.model;
  * @author Joel Takvorian
  */
 public class Metric {
-    private String id;
-    private String name;
-    private String feed;    // Index; But not sure if feeds are still in play if the inventory is built from directly prometheus scans
-    private MetricType type;  // Index [Search all metrics of type xx]
-    private String root; // needed? Check if query exists "select all metrics for root"
+
+    private final String id;    // Unique index
+    private final String name;
+    private final String feed;    // Index; But not sure if feeds are still in play if the inventory is built from directly prometheus scans
+    private final String typeId;  // Index [Search all metrics of type xx]
+
+    // Lazy loaded
+    private MetricType type;
+
+    public Metric(String id, String name, String feed, String typeId) {
+        this.id = id;
+        this.name = name;
+        this.feed = feed;
+        this.typeId = typeId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getFeed() {
+        return feed;
+    }
+
+    public String getTypeId() {
+        return typeId;
+    }
+
+    public MetricType getType() {
+        if (type == null) {
+            // TODO: lazy load
+        }
+        return type;
+    }
 }
