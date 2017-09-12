@@ -16,140 +16,21 @@
  */
 package org.hawkular.inventory.api.model;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
-
-import org.hawkular.inventory.paths.CanonicalPath;
-import org.hawkular.inventory.paths.SegmentType;
-
-import io.swagger.annotations.ApiModel;
-
 
 /**
- * A resource is a grouping of other data (currently just metrics). A resource can have a type, which prescribes how
- * the data in the resource should look like.
- *
- * @author Heiko Rupp
- * @author Lukas Krejci
+ * @author Joel Takvorian
  */
-@ApiModel(description = "A resource has a type, can have configuration and connection configuration and can" +
-        " incorporate metrics.", parent = Entity.class)
-public final class Resource extends Entity {
+public class Resource {
+    private String id;  // Unique index [Search resource by id]
+    private String name;
+    private ResourceType type;  // Index [Search all resources of type xx]
+    private String feed;    // Index; But not sure if feeds are still in play if the inventory is built from directly prometheus scans
+    private String rootId;  // Nullable; Index [Search all resources under root xx]
+    private Map<String, String> properties;
 
-    public static final SegmentType SEGMENT_TYPE = SegmentType.r;
-
-    private final ResourceType type;
-
-    /**
-     * Jackson support
-     */
-    @SuppressWarnings("unused")
-    private Resource() {
-        type = null;
-    }
-
-    public Resource(CanonicalPath path, ResourceType type) {
-        this(path, type, null);
-    }
-
-    public Resource(String name, CanonicalPath path, ResourceType type) {
-        this(name, path, type, null);
-    }
-
-    public Resource(CanonicalPath path, ResourceType type,
-                    Map<String, Object> properties) {
-        super(path, properties);
-        this.type = type;
-    }
-
-    public Resource(String name, CanonicalPath path, ResourceType type, Map<String, Object> properties) {
-        super(name, path, properties);
-        this.type = type;
-    }
-
-    public ResourceType getType() {
-        return type;
-    }
-
-    @Override
-    public <R, P> R accept(ElementVisitor<R, P> visitor, P parameter) {
-        return visitor.visitResource(this, parameter);
-    }
-
-    @Override
-    protected void appendToString(StringBuilder toStringBuilder) {
-        super.appendToString(toStringBuilder);
-        toStringBuilder.append(", type=").append(type);
-    }
-
-    /**
-     * Data required to create a resource.
-     *
-     * <p>Note that tenantId, etc., are not needed here because they are provided by the context in which the
-     * {@link org.hawkular.inventory.api.WriteInterface#create(org.hawkular.inventory.api.model.Blueprint)} method is
-     * called.
-     */
-    @ApiModel("ResourceBlueprint")
-    public static final class Blueprint extends Entity.Blueprint {
-        private final String resourceTypePath;
-
-        public static Builder builder() {
-            return new Builder();
-        }
-
-        /**
-         * JAXB support
-         */
-        @SuppressWarnings("unused")
-        private Blueprint() {
-            resourceTypePath = null;
-        }
-
-        public Blueprint(String id, String resourceTypePath) {
-            this(id, resourceTypePath, Collections.emptyMap());
-        }
-
-        public Blueprint(String id, String resourceTypePath, Map<String, Object> properties) {
-            super(id, properties);
-            this.resourceTypePath = resourceTypePath;
-        }
-
-        public Blueprint(String id, String resourceTypePath, Map<String, Object> properties,
-                         Map<String, Set<CanonicalPath>> outgoing,
-                         Map<String, Set<CanonicalPath>> incoming) {
-            super(id, properties, outgoing, incoming);
-            this.resourceTypePath = resourceTypePath;
-        }
-
-        public Blueprint(String id, String name, String resourceTypePath, Map<String, Object> properties,
-                         Map<String, Set<CanonicalPath>> outgoing,
-                         Map<String, Set<CanonicalPath>> incoming) {
-            super(id, name, properties, outgoing, incoming);
-            this.resourceTypePath = resourceTypePath;
-        }
-
-        public String getResourceTypePath() {
-            return resourceTypePath;
-        }
-
-        @Override
-        public <R, P> R accept(ElementBlueprintVisitor<R, P> visitor, P parameter) {
-            return visitor.visitResource(this, parameter);
-        }
-
-        public static final class Builder extends Entity.Blueprint.Builder<Blueprint, Builder> {
-            private String resourceTypePath;
-
-            public Builder withResourceTypePath(String resourceTypePath) {
-                this.resourceTypePath = resourceTypePath;
-                return this;
-            }
-
-            @Override
-            public Blueprint build() {
-                return new Blueprint(id, name, resourceTypePath, properties, outgoing, incoming);
-            }
-        }
-    }
+    // Maybe "children" and "metrics" should be removed from "Resource" and put in another class that represents the whole tree
+    private Collection<Resource> children;
+    private Collection<Metric> metrics;
 }

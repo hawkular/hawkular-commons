@@ -19,9 +19,6 @@ package org.hawkular.inventory.api.model;
 /**
  * @author Joel Takvorian
  */
-public class MetricType {
-    private String id;  // Unique index [Search metric type by id]
-    private String feed;    // Index; But not sure if feeds are still in play if the inventory is built from directly prometheus scans
-    private MetricUnit unit;
-    // ...
+public class Operation {
+    private String name;
 }

@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.inventory.api.model;
+package org.hawkular.inventory.api.oldmodel;
 
-import static org.hawkular.inventory.api.model.Helper.ENTITY_ORDER;
+import static org.hawkular.inventory.api.oldmodel.Helper.ENTITY_ORDER;
 import static org.hawkular.inventory.paths.SegmentType.r;
 
 import java.io.Serializable;

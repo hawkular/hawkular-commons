@@ -16,107 +16,17 @@
  */
 package org.hawkular.inventory.api.model;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
-
-import org.hawkular.inventory.paths.CanonicalPath;
-import org.hawkular.inventory.paths.SegmentType;
-
-import io.swagger.annotations.ApiModel;
 
 /**
- * Type of a resource. A resource type is versioned and currently just defines the types of metrics that should be
- * present in the resources of this type.
- *
- * @author Lukas Krejci
+ * @author Joel Takvorian
  */
-@ApiModel(description = "A resource type contains metadata about resources it defines. It contains" +
-        " \"configurationSchema\" and \"connectionConfigurationSchema\" data entities that can prescribe a JSON" +
-        " schema to which the configurations of the resources should conform.",
-        parent = Entity.class)
-public final class ResourceType extends Entity {
+public class ResourceType {
+    private String id;  // Unique index [Search resource type by id]
+    private String feed;    // Index; But not sure if feeds are still in play if the inventory is built from directly prometheus scans
+    private Map<String, String> properties;
 
-    public static final SegmentType SEGMENT_TYPE = SegmentType.rt;
-
-    /**
-     * Jackson support
-     */
-    @SuppressWarnings("unused")
-    private ResourceType() {
-    }
-
-    public ResourceType(CanonicalPath path) {
-        super(path);
-    }
-
-    public ResourceType(String name, CanonicalPath path) {
-        super(name, path);
-    }
-
-    public ResourceType(CanonicalPath path, Map<String, Object> properties) {
-        super(path, properties);
-    }
-
-    public ResourceType(String name, CanonicalPath path, Map<String, Object> properties) {
-        super(name, path, properties);
-    }
-
-    @Override
-    public <R, P> R accept(ElementVisitor<R, P> visitor, P parameter) {
-        return visitor.visitResourceType(this, parameter);
-    }
-
-    /**
-     * Data required to create a resource type.
-     *
-     * <p>Note that tenantId, etc., are not needed here because they are provided by the context in which the
-     * {@link org.hawkular.inventory.api.WriteInterface#create(org.hawkular.inventory.api.model.Blueprint)} method is
-     * called.
-     */
-    @ApiModel("ResourceTypeBlueprint")
-    public static final class Blueprint extends Entity.Blueprint {
-
-        public static Builder builder() {
-            return new Builder();
-        }
-
-        //JAXB support
-        @SuppressWarnings("unused")
-        private Blueprint() {
-        }
-
-        public Blueprint(String id) {
-            this(id, Collections.emptyMap());
-        }
-
-        public Blueprint(String id, Map<String, Object> properties) {
-            super(id, properties);
-        }
-
-        public Blueprint(String id, Map<String, Object> properties,
-                         Map<String, Set<CanonicalPath>> outgoing,
-                         Map<String, Set<CanonicalPath>> incoming) {
-            super(id, properties, outgoing, incoming);
-        }
-
-        public Blueprint(String id, String name, Map<String, Object> properties,
-                         Map<String, Set<CanonicalPath>> outgoing,
-                         Map<String, Set<CanonicalPath>> incoming) {
-            super(id, name, properties, outgoing, incoming);
-        }
-
-        @Override
-        public <R, P> R accept(ElementBlueprintVisitor<R, P> visitor, P parameter) {
-            return visitor.visitResourceType(this, parameter);
-        }
-
-        public static final class Builder extends Entity.Blueprint.Builder<Blueprint, Builder> {
-
-            @Override
-            public Blueprint build() {
-                return new Blueprint(id, name, properties, outgoing, incoming);
-            }
-        }
-    }
+    // Maybe "operations" should be removed from "ResourceType" and put in another class that represents the whole tree
+    private Collection<Operation> operations;
 }
