@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.hawkular.inventory.api.model.StructuredData;
+import org.hawkular.inventory.api.oldmodel.StructuredData;
 import org.junit.Assert;
 import org.junit.Test;
 

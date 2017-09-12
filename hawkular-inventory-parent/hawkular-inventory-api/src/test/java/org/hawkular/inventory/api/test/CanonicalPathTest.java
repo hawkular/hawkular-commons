@@ -16,7 +16,7 @@
  */
 package org.hawkular.inventory.api.test;
 
-import org.hawkular.inventory.api.model.Environment;
+import org.hawkular.inventory.api.oldmodel.Environment;
 import org.hawkular.inventory.paths.CanonicalPath;
 import org.junit.Assert;
 import org.junit.Test;
