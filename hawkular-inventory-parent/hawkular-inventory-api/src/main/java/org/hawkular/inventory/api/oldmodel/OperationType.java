@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.inventory.api.model;
+package org.hawkular.inventory.api.oldmodel;
 
 import java.util.Map;
 import java.util.Set;
@@ -25,75 +25,64 @@ import org.hawkular.inventory.paths.SegmentType;
 import io.swagger.annotations.ApiModel;
 
 /**
- * Feed is a source of data. It reports about resources and metrics it knows about (and can send the actual data to
- * other Hawkular components like metrics).
- *
- * <p>Note that the feed does not have a dedicated blueprint type (i.e. data required to create a new feed
- * in some context), because the only data needed to create a new feed is its ID, which can easily be modelled
- * by a {@code String}.
- *
  * @author Lukas Krejci
- * @since 0.1.0
+ * @since 0.4.0
  */
-@ApiModel(description = "A feed represents a remote \"agent\" that is reporting its data to Hawkular.",
+@ApiModel(description = "Defines an type of operation that can be executed on resources of a resource type" +
+        " that contains this operation type. The operation type contains \"returnType\" and \"parameterTypes\"" +
+        " data entities which correspond to JSON schemas of values expected during the operation execution.",
         parent = Entity.class)
-public final class Feed extends Entity {
+public final class OperationType extends Entity {
 
-    public static final SegmentType SEGMENT_TYPE = SegmentType.f;
+    public static final SegmentType SEGMENT_TYPE = SegmentType.ot;
 
-    /**
-     * JAXB support
-     */
     @SuppressWarnings("unused")
-    private Feed() {
+    private OperationType() {
     }
 
-    public Feed(CanonicalPath path) {
-        this(path, null);
+    public OperationType(CanonicalPath path) {
+        super(path);
     }
 
-    public Feed(String name, CanonicalPath path) {
+    public OperationType(String name, CanonicalPath path) {
         super(name, path);
     }
 
-    public Feed(CanonicalPath path, Map<String, Object> properties) {
+    public OperationType(CanonicalPath path, Map<String, Object> properties) {
         super(path, properties);
     }
 
-    public Feed(String name, CanonicalPath path, Map<String, Object> properties) {
+    public OperationType(String name, CanonicalPath path, Map<String, Object> properties) {
         super(name, path, properties);
     }
 
     @Override
     public <R, P> R accept(ElementVisitor<R, P> visitor, P parameter) {
-        return visitor.visitFeed(this, parameter);
+        return visitor.visitOperationType(this, parameter);
     }
 
-    @ApiModel("FeedBlueprint")
+    @ApiModel("OperationTypeBlueprint")
     public static final class Blueprint extends Entity.Blueprint {
 
         public static Builder builder() {
             return new Builder();
         }
-        private static final String AUTO_ID_FLAG = "__auto-generate-id";
 
-        //JAXB support
+        /**
+         * Serialization support
+         */
         @SuppressWarnings("unused")
         private Blueprint() {
         }
 
         public Blueprint(String id, Map<String, Object> properties) {
-            super(id == null ? AUTO_ID_FLAG : id, properties);
+            super(id, properties);
         }
 
         public Blueprint(String id, Map<String, Object> properties,
                          Map<String, Set<CanonicalPath>> outgoing,
                          Map<String, Set<CanonicalPath>> incoming) {
             super(id, properties, outgoing, incoming);
-        }
-
-        public Blueprint(String id, String name, Map<String, Object> properties) {
-            super(id, name, properties);
         }
 
         public Blueprint(String id, String name, Map<String, Object> properties,
@@ -104,11 +93,10 @@ public final class Feed extends Entity {
 
         @Override
         public <R, P> R accept(ElementBlueprintVisitor<R, P> visitor, P parameter) {
-            return visitor.visitFeed(this, parameter);
+            return visitor.visitOperationType(this, parameter);
         }
 
         public static final class Builder extends Entity.Blueprint.Builder<Blueprint, Builder> {
-
             @Override
             public Blueprint build() {
                 return new Blueprint(id, name, properties, outgoing, incoming);

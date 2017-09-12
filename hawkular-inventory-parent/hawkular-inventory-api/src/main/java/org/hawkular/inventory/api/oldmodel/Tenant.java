@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.inventory.api.model;
+package org.hawkular.inventory.api.oldmodel;
 
 import java.util.Collections;
 import java.util.Map;
@@ -26,48 +26,45 @@ import org.hawkular.inventory.paths.SegmentType;
 import io.swagger.annotations.ApiModel;
 
 /**
- * An environment is supposed to contain resources that belong to one infrastructure. Examples being "development",
- * "testing", "staging", "production", etc.
+ * A tenant is a top level entity that owns everything else. Multiple tenants are not supposed to share anything between
+ * each other.
  *
- * <p>Note that the environment does not have a dedicated blueprint type (i.e. data required to create a new environment
- * in some context), because the only data needed to create a new environment is its ID, which can easily be modelled
+ * <p>Note that the tenant does not have a dedicated blueprint type (i.e. data required to create a new tenant
+ * in some context), because the only data needed to create a new tenant is its ID, which can easily be modelled
  * by a {@code String}.
  *
  * @author Lukas Krejci
- * @since 1.0
+ * @since 0.0.1
  */
-@ApiModel(description = "Environment can incorporate feeds and can contain resources and metrics.",
+@ApiModel(description = "The tenants partition the data in the inventory graph." +
+        " No relationships between entities from 2 different tenants can exist.",
         parent = Entity.class)
-public final class Environment extends Entity {
+public final class Tenant extends Entity {
 
-    public static final SegmentType SEGMENT_TYPE = SegmentType.e;
+    public static final SegmentType SEGMENT_TYPE = SegmentType.t;
 
-    @SuppressWarnings("unused")
-    private Environment() {
-    }
-
-    public Environment(CanonicalPath path) {
+    public Tenant(CanonicalPath path) {
         super(path);
     }
 
-    public Environment(String name, CanonicalPath path) {
+    public Tenant(String name, CanonicalPath path) {
         super(name, path);
     }
 
-    public Environment(CanonicalPath path, Map<String, Object> properties) {
-        this(null, path, properties);
+    public Tenant(CanonicalPath path, Map<String, Object> properties) {
+        super(path, properties);
     }
 
-    public Environment(String name, CanonicalPath path, Map<String, Object> properties) {
+    public Tenant(String name, CanonicalPath path, Map<String, Object> properties) {
         super(name, path, properties);
     }
 
     @Override
     public <R, P> R accept(ElementVisitor<R, P> visitor, P parameter) {
-        return visitor.visitEnvironment(this, parameter);
+        return visitor.visitTenant(this, parameter);
     }
 
-    @ApiModel("EnvironmentBlueprint")
+    @ApiModel("TenantBlueprint")
     public static final class Blueprint extends Entity.Blueprint {
 
         public static Builder builder() {
@@ -80,7 +77,7 @@ public final class Environment extends Entity {
         }
 
         public Blueprint(String id) {
-            this(id, Collections.emptyMap());
+            super(id, Collections.emptyMap());
         }
 
         public Blueprint(String id, Map<String, Object> properties) {
@@ -101,7 +98,7 @@ public final class Environment extends Entity {
 
         @Override
         public <R, P> R accept(ElementBlueprintVisitor<R, P> visitor, P parameter) {
-            return visitor.visitEnvironment(this, parameter);
+            return visitor.visitTenant(this, parameter);
         }
 
         public static final class Builder extends Entity.Blueprint.Builder<Blueprint, Builder> {

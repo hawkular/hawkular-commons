@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.inventory.api.model;
+package org.hawkular.inventory.api.oldmodel;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -178,7 +178,7 @@ public abstract class AbstractElement {
         return getPath().hashCode();
     }
 
-    public abstract static class Blueprint implements org.hawkular.inventory.api.model.Blueprint {
+    public abstract static class Blueprint implements org.hawkular.inventory.api.oldmodel.Blueprint {
         private final Map<String, Object> properties;
 
         protected Blueprint(Map<String, Object> properties) {

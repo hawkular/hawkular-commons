@@ -18,19 +18,19 @@ package org.hawkular.inventory.api;
 
 import java.util.EnumMap;
 
-import org.hawkular.inventory.api.model.AbstractElement;
-import org.hawkular.inventory.api.model.Blueprint;
-import org.hawkular.inventory.api.model.DataEntity;
-import org.hawkular.inventory.api.model.Environment;
-import org.hawkular.inventory.api.model.Feed;
-import org.hawkular.inventory.api.model.MetadataPack;
-import org.hawkular.inventory.api.model.Metric;
-import org.hawkular.inventory.api.model.MetricType;
-import org.hawkular.inventory.api.model.OperationType;
-import org.hawkular.inventory.api.model.Relationship;
-import org.hawkular.inventory.api.model.Resource;
-import org.hawkular.inventory.api.model.ResourceType;
-import org.hawkular.inventory.api.model.Tenant;
+import org.hawkular.inventory.api.oldmodel.AbstractElement;
+import org.hawkular.inventory.api.oldmodel.Blueprint;
+import org.hawkular.inventory.api.oldmodel.DataEntity;
+import org.hawkular.inventory.api.oldmodel.Environment;
+import org.hawkular.inventory.api.oldmodel.Feed;
+import org.hawkular.inventory.api.oldmodel.MetadataPack;
+import org.hawkular.inventory.api.oldmodel.Metric;
+import org.hawkular.inventory.api.oldmodel.MetricType;
+import org.hawkular.inventory.api.oldmodel.OperationType;
+import org.hawkular.inventory.api.oldmodel.Relationship;
+import org.hawkular.inventory.api.oldmodel.Resource;
+import org.hawkular.inventory.api.oldmodel.ResourceType;
+import org.hawkular.inventory.api.oldmodel.Tenant;
 import org.hawkular.inventory.paths.SegmentType;
 
 /**

@@ -16,21 +16,9 @@
  */
 package org.hawkular.inventory.api.model;
 
-import java.util.Collection;
-import java.util.Map;
-
 /**
  * @author Joel Takvorian
  */
-public class Resource {
-    private String id;  // Unique index [Search resource by id]
+public class Operation {
     private String name;
-    private ResourceType type;  // Index [Search all resources of type xx]
-    private String feed;    // Index; But not sure if feeds are still in play if the inventory is built from directly prometheus scans
-    private String rootId;  // Nullable; Index [Search all resources under root xx]
-    private Map<String, String> properties;
-
-    // Maybe "children" and "metrics" should be removed from "Resource" and put in another class that represents the whole tree
-    private Collection<Resource> children;
-    private Collection<Metric> metrics;
 }
