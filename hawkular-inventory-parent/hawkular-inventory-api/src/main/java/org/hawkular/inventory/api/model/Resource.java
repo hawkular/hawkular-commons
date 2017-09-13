@@ -16,21 +16,99 @@
  */
 package org.hawkular.inventory.api.model;
 
-import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Joel Takvorian
  */
 public class Resource {
-    private String id;  // Unique index [Search resource by id]
-    private String name;
-    private ResourceType type;  // Index [Search all resources of type xx]
-    private String feed;    // Index; But not sure if feeds are still in play if the inventory is built from directly prometheus scans
-    private String rootId;  // Nullable; Index [Search all resources under root xx]
-    private Map<String, String> properties;
+    private final String id;  // Unique index [Search resource by id]
+    private final String name;
+    private final String typeId;  // Index [Search all resources of type xx]
+    private final String feed;    // Index; But not sure if feeds are still in play if the inventory is built from directly prometheus scans
+    private final String rootId;  // Nullable; Index [Search all resources under root xx]
+    private final List<String> childrenIds;
+    private final List<String> metricIds;
+    private final Map<String, String> properties;
 
-    // Maybe "children" and "metrics" should be removed from "Resource" and put in another class that represents the whole tree
-    private Collection<Resource> children;
-    private Collection<Metric> metrics;
+    // Lazy-loaded references
+    private ResourceType type;
+    private List<Resource> children;
+    private List<Metric> metrics;
+
+    public Resource(String id, String name, String typeId, String feed, String rootId, List<String> childrenIds,
+                    List<String> metricIds, Map<String, String> properties) {
+        this.id = id;
+        this.name = name;
+        this.typeId = typeId;
+        this.feed = feed;
+        this.rootId = rootId;
+        this.childrenIds = childrenIds;
+        this.metricIds = metricIds;
+        this.properties = properties;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getTypeId() {
+        return typeId;
+    }
+
+    public String getFeed() {
+        return feed;
+    }
+
+    public String getRootId() {
+        return rootId;
+    }
+
+    public List<String> getChildrenIds() {
+        return childrenIds;
+    }
+
+    public List<String> getMetricIds() {
+        return metricIds;
+    }
+
+    public Map<String, String> getProperties() {
+        return Collections.unmodifiableMap(properties);
+    }
+
+    public ResourceType getType(Function<String, ResourceType> loader) {
+        // lazy loading
+        if (type == null) {
+            type = loader.apply(typeId);
+        }
+        return type;
+    }
+
+    public List<Resource> getChildren(Function<String, Resource> loader) {
+        // lazy loading
+        if (children == null) {
+            children = childrenIds.stream()
+                    .map(loader)
+                    .collect(Collectors.toList());
+        }
+        return Collections.unmodifiableList(children);
+    }
+
+    public List<Metric> getMetrics(Function<String, Metric> loader) {
+        // lazy loading
+        if (metrics == null) {
+            metrics = metricIds.stream()
+                    .map(loader)
+                    .collect(Collectors.toList());
+        }
+        return Collections.unmodifiableList(metrics);
+    }
 }
