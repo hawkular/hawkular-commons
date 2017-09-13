@@ -26,15 +26,17 @@ public class Metric {
 
     private final String id;    // Unique index ; Random UUID?
     private final String name;  // Prometheus short name? This field may not be necessary, name could just be a metadata put in properties
+    private final String type;  // Ex: Deployment status, Server availability
     private final String feed;    // Index; But not sure if feeds are still in play if the inventory is built from directly prometheus scans
     private final MetricUnit unit;
     private final int collectionInterval;   // Not sure if we can get it from prometheus
     private final Map<String, String> properties;   // properties may contain, for instance, the full prometheus metric name
 
-    public Metric(String id, String name, String feed, MetricUnit unit,
+    public Metric(String id, String name, String type, String feed, MetricUnit unit,
                   int collectionInterval, Map<String, String> properties) {
         this.id = id;
         this.name = name;
+        this.type = type;
         this.feed = feed;
         this.unit = unit;
         this.collectionInterval = collectionInterval;
@@ -47,6 +49,10 @@ public class Metric {
 
     public String getName() {
         return name;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public String getFeed() {

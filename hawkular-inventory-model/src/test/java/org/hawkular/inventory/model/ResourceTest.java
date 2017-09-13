@@ -77,9 +77,9 @@ public class ResourceTest {
 
     @Test
     public void shouldLazyLoadMetrics() {
-        Metric m1 = new Metric("m-1", "name-1", "feed", MetricUnit.BYTES, 10,
+        Metric m1 = new Metric("m-1", "name-1", "mtype", "feed", MetricUnit.BYTES, 10,
                 new HashMap<>());
-        Metric m2 = new Metric("m-2", "name-2", "feed", MetricUnit.BYTES, 10,
+        Metric m2 = new Metric("m-2", "name-2", "mtype", "feed", MetricUnit.BYTES, 10,
                 new HashMap<>());
         LongAdder numberOfCalls = new LongAdder();
         Function<String, Metric> loader = id -> {
