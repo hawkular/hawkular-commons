@@ -145,7 +145,7 @@
         <module>hawkular-bus</module>
         <module>hawkular-client-api</module>
         <module>hawkular-command-gateway</module>
-        <module>hawkular-nest</module>
+        <!--<module>hawkular-nest</module>-->
         <module>hawkular-tenant-jaxrs-filter</module>
         <module>hawkular-cors-jaxrs-filter</module>
         <module>utils</module>

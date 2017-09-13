@@ -68,13 +68,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.hawkular.commons</groupId>
-      <artifactId>hawkular-inventory-paths</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope> <!-- the nest provides this -->
-    </dependency>
-
-    <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging</artifactId>
       <scope>provided</scope>
