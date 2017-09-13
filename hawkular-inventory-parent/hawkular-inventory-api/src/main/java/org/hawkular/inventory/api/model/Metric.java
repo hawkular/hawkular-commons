@@ -16,24 +16,29 @@
  */
 package org.hawkular.inventory.api.model;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * @author Joel Takvorian
  */
 public class Metric {
 
-    private final String id;    // Unique index
-    private final String name;
+    private final String id;    // Unique index ; Random UUID?
+    private final String name;  // Prometheus short name? This field may not be necessary, name could just be a metadata put in properties
     private final String feed;    // Index; But not sure if feeds are still in play if the inventory is built from directly prometheus scans
-    private final String typeId;  // Index [Search all metrics of type xx]
+    private final MetricUnit unit;
+    private final int collectionInterval;   // Not sure if we can get it from prometheus
+    private final Map<String, String> properties;   // properties may contain, for instance, the full prometheus metric name
 
-    // Lazy loaded
-    private MetricType type;
-
-    public Metric(String id, String name, String feed, String typeId) {
+    public Metric(String id, String name, String feed, MetricUnit unit,
+                  int collectionInterval, Map<String, String> properties) {
         this.id = id;
         this.name = name;
         this.feed = feed;
-        this.typeId = typeId;
+        this.unit = unit;
+        this.collectionInterval = collectionInterval;
+        this.properties = properties;
     }
 
     public String getId() {
@@ -48,14 +53,15 @@ public class Metric {
         return feed;
     }
 
-    public String getTypeId() {
-        return typeId;
+    public MetricUnit getUnit() {
+        return unit;
     }
 
-    public MetricType getType() {
-        if (type == null) {
-            // TODO: lazy load
-        }
-        return type;
+    public int getCollectionInterval() {
+        return collectionInterval;
+    }
+
+    public Map<String, String> getProperties() {
+        return Collections.unmodifiableMap(properties);
     }
 }

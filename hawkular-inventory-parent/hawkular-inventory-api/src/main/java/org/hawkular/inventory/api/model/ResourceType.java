@@ -17,16 +17,38 @@
 package org.hawkular.inventory.api.model;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 /**
  * @author Joel Takvorian
  */
 public class ResourceType {
-    private String id;  // Unique index [Search resource type by id]
-    private String feed;    // Index; But not sure if feeds are still in play if the inventory is built from directly prometheus scans
-    private Map<String, String> properties;
+    private final String id;  // Unique index [Search resource type by id]
+    private final String feed;    // Index; But not sure if feeds are still in play if the inventory is built from directly prometheus scans
+    private final Collection<Operation> operations;
+    private final Map<String, String> properties;
 
-    // Maybe "operations" should be removed from "ResourceType" and put in another class that represents the whole tree
-    private Collection<Operation> operations;
+    public ResourceType(String id, String feed, Collection<Operation> operations, Map<String, String> properties) {
+        this.id = id;
+        this.feed = feed;
+        this.operations = operations;
+        this.properties = properties;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getFeed() {
+        return feed;
+    }
+
+    public Collection<Operation> getOperations() {
+        return Collections.unmodifiableCollection(operations);
+    }
+
+    public Map<String, String> getProperties() {
+        return Collections.unmodifiableMap(properties);
+    }
 }

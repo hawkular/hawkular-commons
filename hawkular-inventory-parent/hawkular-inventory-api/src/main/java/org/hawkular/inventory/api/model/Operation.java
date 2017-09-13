@@ -16,9 +16,26 @@
  */
 package org.hawkular.inventory.api.model;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * @author Joel Takvorian
  */
 public class Operation {
-    private String name;
+    private final String name;    // Ex: "Shutdown"
+    private final Map<String, Map<String, String>> parameterTypes;  // Ex: "restart" => {"type": "bool", "description": "If true, blablabla", "required": false}
+
+    public Operation(String name, Map<String, Map<String, String>> parameterTypes) {
+        this.name = name;
+        this.parameterTypes = parameterTypes;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Map<String, Map<String, String>> getParameterTypes() {
+        return Collections.unmodifiableMap(parameterTypes);
+    }
 }
