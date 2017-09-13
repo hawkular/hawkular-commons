@@ -19,6 +19,7 @@ package org.hawkular.inventory.model;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -97,6 +98,7 @@ public class Resource {
         if (children == null) {
             children = childrenIds.stream()
                     .map(loader)
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toList());
         }
         return Collections.unmodifiableList(children);
@@ -107,6 +109,7 @@ public class Resource {
         if (metrics == null) {
             metrics = metricIds.stream()
                     .map(loader)
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toList());
         }
         return Collections.unmodifiableList(metrics);

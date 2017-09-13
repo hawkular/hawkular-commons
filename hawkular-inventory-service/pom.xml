@@ -33,6 +33,12 @@
   <dependencies>
 
     <dependency>
+      <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-inventory-model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
