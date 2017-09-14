@@ -30,7 +30,6 @@ public class Resource {
     private final String id;  // Unique index [Search resource by id]
     private final String name;
     private final String typeId;  // Index [Search all resources of type xx]
-    private final String feed;    // Index; But not sure if feeds are still in play if the inventory is built from directly prometheus scans
     private final String rootId;  // Nullable; Index [Search all resources under root xx]
     private final List<String> childrenIds;
     private final List<String> metricIds;
@@ -41,12 +40,11 @@ public class Resource {
     private List<Resource> children;
     private List<Metric> metrics;
 
-    public Resource(String id, String name, String typeId, String feed, String rootId, List<String> childrenIds,
+    public Resource(String id, String name, String typeId, String rootId, List<String> childrenIds,
                     List<String> metricIds, Map<String, String> properties) {
         this.id = id;
         this.name = name;
         this.typeId = typeId;
-        this.feed = feed;
         this.rootId = rootId;
         this.childrenIds = childrenIds;
         this.metricIds = metricIds;
@@ -63,10 +61,6 @@ public class Resource {
 
     public String getTypeId() {
         return typeId;
-    }
-
-    public String getFeed() {
-        return feed;
     }
 
     public String getRootId() {

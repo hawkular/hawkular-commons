@@ -31,12 +31,12 @@ import org.junit.Test;
  */
 public class ResourceTest {
 
-    private final Resource r = new Resource("id", "name", "EAP", "feed", null,
+    private final Resource r = new Resource("id", "name", "EAP", null,
             Arrays.asList("child-1", "child-2"), Arrays.asList("m-1", "m-2"), new HashMap<>());
 
     @Test
     public void shouldLazyLoadResourceType() {
-        ResourceType eap = new ResourceType("EAP", "feed", new ArrayList<>(), new HashMap<>());
+        ResourceType eap = new ResourceType("EAP", new ArrayList<>(), new HashMap<>());
         LongAdder numberOfCalls = new LongAdder();
         Function<String, ResourceType> loader = id -> {
             numberOfCalls.increment();
@@ -53,9 +53,9 @@ public class ResourceTest {
 
     @Test
     public void shouldLazyLoadChildren() {
-        Resource child1 = new Resource("child-1", "name-1", "t", "feed", "id",
+        Resource child1 = new Resource("child-1", "name-1", "t", "id",
                 new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-        Resource child2 = new Resource("child-2", "name-2", "t", "feed", "id",
+        Resource child2 = new Resource("child-2", "name-2", "t", "id",
                 new ArrayList<>(), new ArrayList<>(), new HashMap<>());
         LongAdder numberOfCalls = new LongAdder();
         Function<String, Resource> loader = id -> {
@@ -77,9 +77,9 @@ public class ResourceTest {
 
     @Test
     public void shouldLazyLoadMetrics() {
-        Metric m1 = new Metric("m-1", "name-1", "mtype", "feed", MetricUnit.BYTES, 10,
+        Metric m1 = new Metric("m-1", "name-1", "mtype", MetricUnit.BYTES, 10,
                 new HashMap<>());
-        Metric m2 = new Metric("m-2", "name-2", "mtype", "feed", MetricUnit.BYTES, 10,
+        Metric m2 = new Metric("m-2", "name-2", "mtype", MetricUnit.BYTES, 10,
                 new HashMap<>());
         LongAdder numberOfCalls = new LongAdder();
         Function<String, Metric> loader = id -> {

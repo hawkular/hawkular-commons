@@ -25,23 +25,17 @@ import java.util.Map;
  */
 public class ResourceType {
     private final String id;  // Unique index [Search resource type by id]
-    private final String feed;    // Index; But not sure if feeds are still in play if the inventory is built from directly prometheus scans
     private final Collection<Operation> operations;
     private final Map<String, String> properties;
 
-    public ResourceType(String id, String feed, Collection<Operation> operations, Map<String, String> properties) {
+    public ResourceType(String id, Collection<Operation> operations, Map<String, String> properties) {
         this.id = id;
-        this.feed = feed;
         this.operations = operations;
         this.properties = properties;
     }
 
     public String getId() {
         return id;
-    }
-
-    public String getFeed() {
-        return feed;
     }
 
     public Collection<Operation> getOperations() {
