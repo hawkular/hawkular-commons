@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 Red Hat, Inc. and/or its affiliates
+ * Copyright 2014-2017 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,6 @@ package org.hawkular.commons.rest.status.itest;
 import java.io.File;
 import java.io.IOException;
 
-import org.hawkular.commons.cassandra.driver.itest.CassandraDriverITest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -53,16 +52,16 @@ public class StatusEndpointITest extends Arquillian {
         WebArchive archive = ShrinkWrap.create(WebArchive.class, StatusEndpointITest.class.getSimpleName() + ".war")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
                 .addAsWebInfResource(
-                        CassandraDriverITest.class.getResource("/rest-status/jboss-deployment-structure.xml"),
+                        StatusEndpointITest.class.getResource("/rest-status/jboss-deployment-structure.xml"),
                         "jboss-deployment-structure.xml")
                 .addAsWebInfResource(
-                        CassandraDriverITest.class.getResource("/rest-status/jboss-web.xml"),
+                        StatusEndpointITest.class.getResource("/rest-status/jboss-web.xml"),
                         "jboss-web.xml")
                 .addAsWebInfResource(
-                        CassandraDriverITest.class.getResource("/rest-status/web.xml"),
+                        StatusEndpointITest.class.getResource("/rest-status/web.xml"),
                         "web.xml")
                 .addAsManifestResource(
-                        CassandraDriverITest.class.getResource("/rest-status/MANIFEST.MF"),
+                        StatusEndpointITest.class.getResource("/rest-status/MANIFEST.MF"),
                         "MANIFEST.MF")
                 .addPackage(StatusEndpointITest.class.getPackage())
                 .addAsLibraries(libs);

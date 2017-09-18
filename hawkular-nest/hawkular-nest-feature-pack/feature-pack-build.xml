@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2014-2016 Red Hat, Inc. and/or its affiliates
+    Copyright 2014-2017 Red Hat, Inc. and/or its affiliates
     and other contributors as indicated by the @author tags.
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,8 +28,4 @@
                 subsystems="configuration/standalone/hawkular-nest-subsystems.xml"
                 output-file="standalone/configuration/standalone.xml" />
   </config>
-
-  <copy-artifacts>
-    <copy-artifact artifact="org.hawkular.commons:hawkular-command-gateway-war" to-location="modules/system/layers/hawkular/org/hawkular/nest/main/deployments/hawkular-command-gateway-war.war" />
-  </copy-artifacts>
 </build>
