@@ -44,8 +44,9 @@
   </dependencyManagement>
 
   <modules>
-    <module>hawkular-inventory-paths</module>
+    <module>hawkular-inventory-model</module>
     <module>hawkular-inventory-api</module>
-    <module>hawkular-inventory-json-helper</module>
+    <module>hawkular-inventory-service</module>
   </modules>
+
 </project>
