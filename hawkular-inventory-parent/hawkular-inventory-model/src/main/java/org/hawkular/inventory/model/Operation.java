@@ -16,17 +16,28 @@
  */
 package org.hawkular.inventory.model;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.*;
+
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Joel Takvorian
  */
-public class Operation {
+public class Operation implements Serializable {
+
+    @JsonInclude(Include.NON_NULL)
     private final String name;    // Ex: "Shutdown"
+
+    @JsonInclude(Include.NON_NULL)
     private final Map<String, Map<String, String>> parameterTypes;  // Ex: "restart" => {"type": "bool", "description": "If true, blablabla", "required": false}
 
-    public Operation(String name, Map<String, Map<String, String>> parameterTypes) {
+    public Operation(@JsonProperty("name") String name,
+                     @JsonProperty("parameterTypes") Map<String, Map<String, String>> parameterTypes) {
         this.name = name;
         this.parameterTypes = parameterTypes;
     }
@@ -36,6 +47,6 @@ public class Operation {
     }
 
     public Map<String, Map<String, String>> getParameterTypes() {
-        return Collections.unmodifiableMap(parameterTypes);
+        return parameterTypes != null ? Collections.unmodifiableMap(parameterTypes) : Collections.EMPTY_MAP;
     }
 }

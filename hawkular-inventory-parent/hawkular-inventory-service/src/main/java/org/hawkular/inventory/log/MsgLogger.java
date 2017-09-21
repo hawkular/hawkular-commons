@@ -18,6 +18,7 @@ package org.hawkular.inventory.log;
 
 import org.jboss.logging.Logger;
 import org.jboss.logging.Logger.Level;
+import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
@@ -31,4 +32,12 @@ public interface MsgLogger {
     @LogMessage(level = Level.INFO)
     @Message(id = 100000, value = "Inventory App Started")
     void infoInventoryAppStarted();
+
+    @LogMessage(level = Level.ERROR)
+    @Message(id = 100001, value = "Inventory backend cache is not found")
+    void errorInventoryCacheNotFound();
+
+    @LogMessage(level = Level.ERROR)
+    @Message(id = 100002, value = "Inventory configuration cache is not found")
+    void errorInventoryCacheConfigurationNotFound(@Cause Throwable e);
 }

@@ -27,20 +27,39 @@ import org.hawkular.inventory.model.Metric;
 import org.hawkular.inventory.model.Resource;
 import org.hawkular.inventory.model.ResourceType;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author Joel Takvorian
  */
 public class ResourceNode {
+
+    @JsonInclude(Include.NON_NULL)
     private final String id;
+
+    @JsonInclude(Include.NON_NULL)
     private final String name;
+
+    @JsonInclude(Include.NON_NULL)
     private final Map<String, String> properties;
+
+    @JsonInclude(Include.NON_NULL)
     private final ResourceType type;
+
+    @JsonInclude(Include.NON_NULL)
     private final List<ResourceNode> children;
+
+    @JsonInclude(Include.NON_NULL)
     private final List<Metric> metrics;
 
-    public ResourceNode(String id, String name, Map<String, String> properties,
-                        ResourceType type, List<ResourceNode> children,
-                        List<Metric> metrics) {
+    public ResourceNode(@JsonProperty("id") String id,
+                        @JsonProperty("name") String name,
+                        @JsonProperty("properties") Map<String, String> properties,
+                        @JsonProperty("type") ResourceType type,
+                        @JsonProperty("children") List<ResourceNode> children,
+                        @JsonProperty("metrics") List<Metric> metrics) {
         this.id = id;
         this.name = name;
         this.properties = properties;
