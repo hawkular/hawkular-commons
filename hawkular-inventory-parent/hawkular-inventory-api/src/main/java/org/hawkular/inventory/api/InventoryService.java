@@ -30,7 +30,6 @@ public interface InventoryService {
     void addResource(Resource r);
     void addMetric(Metric m);
     void addResourceType(ResourceType rt);
-    void updateIndexes();
     Optional<Resource> getResourceById(String id);
     Optional<ResourceNode> getTree(String parentId);
     Collection<Resource> getAllTopResources();

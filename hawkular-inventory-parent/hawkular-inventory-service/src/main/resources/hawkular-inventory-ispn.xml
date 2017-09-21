@@ -17,11 +17,18 @@
     limitations under the License.
 
 -->
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
-         version="3.1">
+<infinispan
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:infinispan:config:8.2 http://www.infinispan.org/schemas/infinispan-config-8.2.xsd"
+    xmlns="urn:infinispan:config:8.2">
 
-  <display-name>Hawkular Inventory Service</display-name>
-
-</web-app>
+  <cache-container name="hawkular-inventory" default-cache="backend">
+    <local-cache name="backend">
+      <persistence>
+        <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="${jboss.server.data.dir}/hawkular-inventory">
+          <write-behind thread-pool-size="5" modification-queue-size="10000" />
+        </file-store>
+      </persistence>
+    </local-cache>
+  </cache-container>
+</infinispan>

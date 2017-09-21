@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.hawkular</groupId>
     <artifactId>hawkular-parent</artifactId>
-    <version>57-SRC-revision-6ff7cd6a763bf4c875d5cb1a0a52a6396bc0dcb4</version>
+    <version>56</version>
   </parent>
 
   <groupId>org.hawkular.commons</groupId>
@@ -87,6 +87,8 @@
     <version.org.assertj>3.6.1</version.org.assertj>
     <!-- Keep in sync with modules/system/layers/base/org/freemarker/main in the Keycloak or Hawkular Accounts feature pack -->
     <version.org.freemarker>2.3.23</version.org.freemarker>
+    <version.org.infinispan.wildfly>8.2.4.Final</version.org.infinispan.wildfly>
+    <version.org.infinispan.eap>8.2.6.Final</version.org.infinispan.eap>
     <version.org.jboss.arquillian>1.1.11.Final</version.org.jboss.arquillian>
     <version.org.wildfly.arquillian>2.0.0.Alpha1</version.org.wildfly.arquillian>
 

@@ -16,19 +16,33 @@
  */
 package org.hawkular.inventory.model;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.*;
+
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author Joel Takvorian
  */
-public class ResourceType {
+public class ResourceType implements Serializable {
+
+    @JsonInclude(Include.NON_NULL)
     private final String id;  // Unique index [Search resource type by id]
+
+    @JsonInclude(Include.NON_NULL)
     private final Collection<Operation> operations;
+
+    @JsonInclude(Include.NON_NULL)
     private final Map<String, String> properties;
 
-    public ResourceType(String id, Collection<Operation> operations, Map<String, String> properties) {
+    public ResourceType(@JsonProperty("id") String id,
+                        @JsonProperty("operations") Collection<Operation> operations,
+                        @JsonProperty("properties") Map<String, String> properties) {
         this.id = id;
         this.operations = operations;
         this.properties = properties;
@@ -44,5 +58,29 @@ public class ResourceType {
 
     public Map<String, String> getProperties() {
         return Collections.unmodifiableMap(properties);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ResourceType that = (ResourceType) o;
+
+        return id != null ? id.equals(that.id) : that.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "ResourceType{" +
+                "id='" + id + '\'' +
+                ", operations=" + operations +
+                ", properties=" + properties +
+                '}';
     }
 }
