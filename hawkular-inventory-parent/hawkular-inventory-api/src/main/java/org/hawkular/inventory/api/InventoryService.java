@@ -36,7 +36,6 @@ public interface InventoryService {
     Collection<ResourceType> getAllResourceTypes();
     Collection<Resource> getResourcesByType(String typeId);
     Optional<ResourceType> getResourceType(String typeId);
-    Optional<String> getAgentConfig(String resourceType);
-
+    Optional<String> getAgentConfig(String templateName);
     Optional<String> getJMXExporterConfig(String templateName);
 }
