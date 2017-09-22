@@ -67,13 +67,13 @@ public class InventoryConfig {
     }
 
     @Produces
-    @InventoryCache
+    @Inventory
     public Cache<String, Object> getInventoryCache() {
         return backend;
     }
 
     @Produces
-    @InventoryCache
+    @Inventory
     public QueryFactory getQueryFactory() {
         return queryFactory;
     }

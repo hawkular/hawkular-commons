@@ -27,7 +27,9 @@ import org.hawkular.inventory.model.ResourceType;
  */
 public interface InventoryService {
     void addResource(Resource r);
+    void addResource(Collection<Resource> r);
     void addResourceType(ResourceType rt);
+    void addResourceType(Collection<ResourceType> rt);
     void deleteResource(String id);
     void deleteResourceType(String type);
     Optional<Resource> getResourceById(String id);
