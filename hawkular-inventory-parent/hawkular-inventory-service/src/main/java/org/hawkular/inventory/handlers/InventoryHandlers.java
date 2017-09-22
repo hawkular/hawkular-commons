@@ -19,8 +19,6 @@ package org.hawkular.inventory.handlers;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
-import static org.hawkular.inventory.handlers.ResponseUtil.isEmpty;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,16 +79,8 @@ public class InventoryHandlers {
     public Response createResource(final Import inventory) {
         try {
             if (inventory != null) {
-                if (!isEmpty(inventory.getResources())) {
-                    for (Resource resource : inventory.getResources()) {
-                        inventoryService.addResource(resource);
-                    }
-                }
-                if (!isEmpty(inventory.getTypes())) {
-                    for (ResourceType type : inventory.getTypes()) {
-                        inventoryService.addResourceType(type);
-                    }
-                }
+                inventoryService.addResource(inventory.getResources());
+                inventoryService.addResourceType(inventory.getTypes());
             }
             return ResponseUtil.ok();
         } catch (Exception e) {

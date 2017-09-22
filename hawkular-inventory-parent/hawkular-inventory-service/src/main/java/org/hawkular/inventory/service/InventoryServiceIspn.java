@@ -20,8 +20,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.ejb.Local;
 import javax.ejb.Stateless;
@@ -37,8 +40,6 @@ import org.infinispan.Cache;
 import org.infinispan.query.Search;
 import org.infinispan.query.dsl.QueryFactory;
 
-import infinispan.com.google.common.annotations.VisibleForTesting;
-
 /**
  * @author Joel Takvorian
  */
@@ -51,18 +52,17 @@ public class InventoryServiceIspn implements InventoryService {
     private final Path configPath;
 
     @Inject
-    @InventoryCache
+    @Inventory
     private Cache<String, Object> backend;
 
     @Inject
-    @InventoryCache
+    @Inventory
     private QueryFactory queryFactory;
 
     public InventoryServiceIspn() {
         configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
     }
 
-    @VisibleForTesting
     InventoryServiceIspn(Cache<String, Object> backend, String configPath) {
         this.backend = backend;
         queryFactory = Search.getQueryFactory(backend);
@@ -71,18 +71,34 @@ public class InventoryServiceIspn implements InventoryService {
 
     @Override
     public void addResource(Resource r) {
-        if (isEmpty(r)) {
-            throw new IllegalArgumentException("Resource must be not null");
+        addResource(Arrays.asList(r));
+    }
+
+    @Override
+    public void addResource(Collection<Resource> resources) {
+        if (isEmpty(resources)) {
+            return;
         }
-        backend.put(IspnPK.pk(r), r);
+        Map<String, Resource> map = resources.stream()
+                .parallel()
+                .collect(Collectors.toMap(r -> IspnPK.pk(r), r -> r));
+        backend.putAll(map);
     }
 
     @Override
     public void addResourceType(ResourceType rt) {
-        if (isEmpty(rt)) {
-            throw new IllegalArgumentException("ResourceType must be not null");
+        addResourceType(Arrays.asList(rt));
+    }
+
+    @Override
+    public void addResourceType(Collection<ResourceType> resourceTypes) {
+        if (isEmpty(resourceTypes)) {
+            return;
         }
-        backend.put(IspnPK.pk(rt), rt);
+        Map<String, ResourceType> map = resourceTypes.stream()
+                .parallel()
+                .collect(Collectors.toMap(rt -> IspnPK.pk(rt), rt -> rt));
+        backend.putAll(map);
     }
 
     @Override
@@ -125,7 +141,7 @@ public class InventoryServiceIspn implements InventoryService {
     public Collection<Resource> getAllTopResources() {
         return queryFactory.from(Resource.class)
                 .having("rootId").isNull()
-                .toBuilder().build().list();
+                .build().list();
     }
 
     @Override
@@ -138,7 +154,7 @@ public class InventoryServiceIspn implements InventoryService {
     public Collection<Resource> getResourcesByType(String typeId) {
         return queryFactory.from(Resource.class)
                 .having("typeId").equal(typeId)
-                .toBuilder().build().list();
+                .build().list();
     }
 
     @Override
@@ -189,6 +205,10 @@ public class InventoryServiceIspn implements InventoryService {
 
     private boolean isEmpty(String s) {
         return s == null || s.isEmpty();
+    }
+
+    private boolean isEmpty(Collection c) {
+        return c == null || c.isEmpty();
     }
 
 }
