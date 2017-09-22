@@ -52,8 +52,8 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.FixMethodOrder;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
@@ -158,19 +158,31 @@ public class InventoryRestTest {
         return new Import(null, resourceTypes);
     }
 
-    public static Import createLargeInventory(int from, int to) {
+    public static Import createLargeInventory(int from, int to, int children, int metrics) {
         List<Resource> resources = new ArrayList<>();
         for (int i = from; i < to; i++) {
             String typeId = (i % 2 == 0) ? "EAP" : "JDG";
             String id = "Server-" + i;
             String name = "Server " + typeId + " with Id " + id;
-            String childId1 = id + "-child-1";
-            String childId2 = id + "-child-2";
-            String childName1 = "Child 1 from " + id;
-            String childName2 = "Child 2 from " + id;
 
-            Metric metric1 = new Metric("memory", "Memory", MetricUnit.BYTES, 10, new HashMap<>());
-            Metric metric2 = new Metric("gc", "GC", MetricUnit.NONE, 10, new HashMap<>());
+            List<Resource> childrenResource = new ArrayList<>();
+            List<String> childrenIds = new ArrayList<>();
+            for (int j = 0; j < children; j++) {
+                String childType = (j % 2 == 0) ? "FOO" : "BAR";
+                String childIdX = id + "-child-" + j;
+                String childNameX = "Child "+ j + " from " + id;
+                childrenIds.add(childIdX);
+                Resource childX = new Resource(childIdX, childNameX, childType, id,
+                        new ArrayList<>(), new ArrayList<>(), new HashMap<>());
+
+                childrenResource.add(childX);
+            }
+
+            List<Metric> metricsResource = new ArrayList<>();
+            for (int k = 0; k < metrics; k++) {
+                Metric metricX = new Metric("metric-" + k, "Metric " + k, MetricUnit.BYTES, 10, new HashMap<>());
+                metricsResource.add(metricX);
+            }
 
             Map<String, String> propsX = new HashMap<>();
             propsX.put("description", "This is a description for " + id);
@@ -178,17 +190,12 @@ public class InventoryRestTest {
                     name,
                     typeId,
                     null,
-                    Arrays.asList(childId1, childId2),
-                    Arrays.asList(metric1, metric2),
+                    childrenIds,
+                    metricsResource,
                     propsX);
-            Resource child1 = new Resource(childId1, childName1, "FOO", id,
-                    new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-            Resource child2 = new Resource(childId2, childName2, "BAR", id,
-                    new ArrayList<>(), new ArrayList<>(), new HashMap<>());
 
             resources.add(serverX);
-            resources.add(child1);
-            resources.add(child2);
+            resources.addAll(childrenResource);
         }
 
         return new Import(resources, null);
@@ -434,19 +441,7 @@ public class InventoryRestTest {
     }
 
     @Test
-    public void zzz_clean() {
-        // FIXME: proper way for "AfterClass" with arquillian given there's non-static stuff needed?
-        // Delete resources
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString());
-        IMPORT.getResources().forEach(r -> target.path("resource/" + r.getId()).request().delete().close());
-        IMPORT.getTypes().forEach(t -> target.path("type/" + t.getId()).request().delete().close());
-        target.path("resource/CP").request().delete().close();
-        target.path("resource/CC").request().delete().close();
-    }
-
-    @Test
-    @Ignore
+    @Category(Performance.class)
     public void test016_largeImport() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("import");
@@ -456,7 +451,9 @@ public class InventoryRestTest {
         assertEquals(200, response.getStatus());
 
         int maxIterations = 1000;
-        int maxServersPerIteration = 1000;
+        int maxServersPerIteration = 100;
+        int childrenPerServer = 100;
+        int metricsPerServer = 20;
 
         for (int i = 0; i < maxIterations; i++) {
             int from = i * maxServersPerIteration;
@@ -465,13 +462,25 @@ public class InventoryRestTest {
             target = client.target(baseUrl.toString()).path("import");
             response = target
                     .request(MediaType.APPLICATION_JSON_TYPE)
-                    .post(Entity.entity(createLargeInventory(from, to), MediaType.APPLICATION_JSON_TYPE));
+                    .post(Entity.entity(createLargeInventory(from, to, childrenPerServer, metricsPerServer), MediaType.APPLICATION_JSON_TYPE));
             assertEquals(200, response.getStatus());
             int mod = maxIterations > 100 ? 100 : 10;
             if ( i % mod == 0) {
                 log.infof("Creating [%s] Servers", (i * maxServersPerIteration));
             }
         }
+    }
+
+    @Test
+    public void zzz_clean() {
+        // FIXME: proper way for "AfterClass" with arquillian given there's non-static stuff needed?
+        // Delete resources
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString());
+        IMPORT.getResources().forEach(r -> target.path("resource/" + r.getId()).request().delete().close());
+        IMPORT.getTypes().forEach(t -> target.path("type/" + t.getId()).request().delete().close());
+        target.path("resource/CP").request().delete().close();
+        target.path("resource/CC").request().delete().close();
     }
 
 }
