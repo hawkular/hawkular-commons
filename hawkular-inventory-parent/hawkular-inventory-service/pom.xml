@@ -252,7 +252,8 @@
                 <resource>
                   <directory>src/test/resources</directory>
                   <includes>
-                    <include>test.yml</include>
+                    <include>test-inventory.yml</include>
+                    <include>test-jmx-exporter.yml</include>
                   </includes>
                 </resource>
               </resources>

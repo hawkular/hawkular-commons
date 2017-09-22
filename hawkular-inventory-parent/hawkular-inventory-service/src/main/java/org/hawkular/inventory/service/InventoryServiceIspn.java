@@ -166,11 +166,20 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public Optional<String> getAgentConfig(String resourceType) {
+    public Optional<String> getAgentConfig(String templateName) {
+        return getConfig(templateName + "-inventory.yml");
+    }
+
+    @Override
+    public Optional<String> getJMXExporterConfig(String templateName) {
+        return getConfig(templateName + "-jmx-exporter.yml");
+    }
+
+    private Optional<String> getConfig(String fileName) {
         // TODO: maybe some defensive check against file traversal attack?
         //  Or check that "resourceType" is in a whitelist of types?
         try {
-            byte[] encoded = Files.readAllBytes(configPath.resolve(resourceType + ".yml"));
+            byte[] encoded = Files.readAllBytes(configPath.resolve(fileName));
             return Optional.of(new String(encoded, "UTF-8"));
         } catch (IOException e) {
             return Optional.empty();

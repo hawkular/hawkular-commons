@@ -205,6 +205,17 @@ public class InventoryServiceIspnTest {
     }
 
     @Test
+    public void shouldNotGetJMXExporterConfig() {
+        assertThat(service.getJMXExporterConfig("nada")).isNotPresent();
+    }
+
+    @Test
+    public void shouldGetJMXExporterConfig() throws IOException {
+        assertThat(service.getJMXExporterConfig("test")).isPresent()
+                .hasValueSatisfying(s -> assertThat(s).contains("JMX EXPORTER TEST"));
+    }
+
+    @Test
     public void shouldRemoveResource() {
         assertThat(service.getResourceById("EAP-1")).isPresent();
         service.deleteResource("EAP-1");

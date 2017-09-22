@@ -414,7 +414,7 @@ public class InventoryRestTest {
     @Test
     public void test016_shouldGetAgentConfig() {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString()).path("agentconfig/test");
+        WebTarget target = client.target(baseUrl.toString()).path("get-inventory-config/test");
         Response response = target
                 .request(MediaType.TEXT_PLAIN)
                 .get();
@@ -426,7 +426,7 @@ public class InventoryRestTest {
     @Test
     public void test017_shouldNotGetAgentConfig() {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString()).path("agentconfig/nada");
+        WebTarget target = client.target(baseUrl.toString()).path("get-inventory-config/nada");
         Response response = target
                 .request(MediaType.TEXT_PLAIN)
                 .get();
