@@ -87,8 +87,8 @@
     <version.org.assertj>3.6.1</version.org.assertj>
     <!-- Keep in sync with modules/system/layers/base/org/freemarker/main in the Keycloak or Hawkular Accounts feature pack -->
     <version.org.freemarker>2.3.23</version.org.freemarker>
-    <version.org.infinispan.wildfly>8.2.4.Final</version.org.infinispan.wildfly>
-    <version.org.infinispan.eap>8.2.6.Final</version.org.infinispan.eap>
+    <version.org.infinispan.community>9.1.1.Final</version.org.infinispan.community>
+    <version.org.infinispan.product>8.5.0.Final</version.org.infinispan.product>
     <version.org.jboss.arquillian>1.1.11.Final</version.org.jboss.arquillian>
     <version.org.wildfly.arquillian>2.0.0.Alpha1</version.org.wildfly.arquillian>
 

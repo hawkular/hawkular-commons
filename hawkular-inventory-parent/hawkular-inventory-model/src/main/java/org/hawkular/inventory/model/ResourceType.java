@@ -23,12 +23,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import org.hibernate.search.annotations.Indexed;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Joel Takvorian
  */
+@Indexed
 public class ResourceType implements Serializable {
 
     @JsonInclude(Include.NON_NULL)

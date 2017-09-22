@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.client.Client;
@@ -46,10 +47,12 @@ import org.hawkular.inventory.model.ResourceType;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -61,6 +64,8 @@ import org.junit.runners.MethodSorters;
 @RunWith(Arquillian.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class InventoryRestTest {
+    private final Logger log = Logger.getLogger(InventoryRestTest.class);
+
     private static final Metric METRIC1
             = new Metric("memory1", "Memory", MetricUnit.BYTES, 10, new HashMap<>());
     private static final Metric METRIC2
@@ -110,6 +115,84 @@ public class InventoryRestTest {
 
     private static final Import IMPORT = new Import(Arrays.asList(EAP1, EAP2, CHILD1, CHILD2, CHILD3, CHILD4),
             Collections.singletonList(TYPE_EAP));
+
+    public static Import createResourceTypes() {
+        Map<String, Map<String, String>> reload;
+        reload = new HashMap<>();
+        reload.put("param1", new HashMap<>());
+        reload.get("param1").put("type", "bool");
+        reload.get("param1").put("description", "Description of param1 for Reload op");
+        reload.put("param2", new HashMap<>());
+        reload.get("param2").put("type", "bool");
+        reload.get("param2").put("description", "Description of param2 for Reload op");
+
+        Map<String, Map<String, String>> shutdown;
+        shutdown = new HashMap<>();
+        shutdown.put("param1", new HashMap<>());
+        shutdown.get("param1").put("type", "bool");
+        shutdown.get("param1").put("description", "Description of param1 for Shutdown op");
+        shutdown.put("param2", new HashMap<>());
+        shutdown.get("param2").put("type", "bool");
+        shutdown.get("param2").put("description", "Description of param2 for Shutdown op");
+        Collection<Operation> eapOps = Arrays.asList(
+                new Operation("Reload", reload),
+                new Operation("Shutdown", shutdown),
+                new Operation("Start", Collections.EMPTY_MAP));
+        ResourceType eapType = new ResourceType("EAP", eapOps, new HashMap<>());
+
+        Map<String, Map<String, String>> flush;
+        flush = new HashMap<>();
+        flush.put("param1", new HashMap<>());
+        flush.get("param1").put("type", "bool");
+        flush.get("param1").put("description", "Description of param1 for Flush op");
+        flush.put("param2", new HashMap<>());
+        flush.get("param2").put("type", "bool");
+        flush.get("param2").put("description", "Description of param2 for Flush op");
+        Collection<Operation> jdgOps = Arrays.asList(
+                new Operation("Flush", flush),
+                new Operation("Delete", Collections.EMPTY_MAP));
+        ResourceType jdgType = new ResourceType("JDG", jdgOps, new HashMap<>());
+
+        List<ResourceType> resourceTypes = Arrays.asList(eapType, jdgType);
+
+        return new Import(null, resourceTypes);
+    }
+
+    public static Import createLargeInventory(int from, int to) {
+        List<Resource> resources = new ArrayList<>();
+        for (int i = from; i < to; i++) {
+            String typeId = (i % 2 == 0) ? "EAP" : "JDG";
+            String id = "Server-" + i;
+            String name = "Server " + typeId + " with Id " + id;
+            String childId1 = id + "-child-1";
+            String childId2 = id + "-child-2";
+            String childName1 = "Child 1 from " + id;
+            String childName2 = "Child 2 from " + id;
+
+            Metric metric1 = new Metric("memory", "Memory", MetricUnit.BYTES, 10, new HashMap<>());
+            Metric metric2 = new Metric("gc", "GC", MetricUnit.NONE, 10, new HashMap<>());
+
+            Map<String, String> propsX = new HashMap<>();
+            propsX.put("description", "This is a description for " + id);
+            Resource serverX = new Resource(id,
+                    name,
+                    typeId,
+                    null,
+                    Arrays.asList(childId1, childId2),
+                    Arrays.asList(metric1, metric2),
+                    propsX);
+            Resource child1 = new Resource(childId1, childName1, "FOO", id,
+                    new ArrayList<>(), new ArrayList<>(), new HashMap<>());
+            Resource child2 = new Resource(childId2, childName2, "BAR", id,
+                    new ArrayList<>(), new ArrayList<>(), new HashMap<>());
+
+            resources.add(serverX);
+            resources.add(child1);
+            resources.add(child2);
+        }
+
+        return new Import(resources, null);
+    }
 
     @ArquillianResource
     private URL baseUrl;
@@ -361,4 +444,34 @@ public class InventoryRestTest {
         target.path("resource/CP").request().delete().close();
         target.path("resource/CC").request().delete().close();
     }
+
+    @Test
+    @Ignore
+    public void test016_largeImport() {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString()).path("import");
+        Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .post(Entity.entity(createResourceTypes(), MediaType.APPLICATION_JSON_TYPE));
+        assertEquals(200, response.getStatus());
+
+        int maxIterations = 1000;
+        int maxServersPerIteration = 1000;
+
+        for (int i = 0; i < maxIterations; i++) {
+            int from = i * maxServersPerIteration;
+            int to = ((i + 1) * maxServersPerIteration) - 1;
+            client = ClientBuilder.newClient();
+            target = client.target(baseUrl.toString()).path("import");
+            response = target
+                    .request(MediaType.APPLICATION_JSON_TYPE)
+                    .post(Entity.entity(createLargeInventory(from, to), MediaType.APPLICATION_JSON_TYPE));
+            assertEquals(200, response.getStatus());
+            int mod = maxIterations > 100 ? 100 : 10;
+            if ( i % mod == 0) {
+                log.infof("Creating [%s] Servers", (i * maxServersPerIteration));
+            }
+        }
+    }
+
 }

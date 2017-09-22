@@ -70,13 +70,13 @@
     <dependency>
       <groupId>org.infinispan</groupId>
       <artifactId>infinispan-embedded</artifactId>
-      <version>${version.org.infinispan.wildfly}</version>
+      <version>${version.org.infinispan.community}</version>
     </dependency>
 
     <dependency>
       <groupId>org.infinispan</groupId>
       <artifactId>infinispan-embedded-query</artifactId>
-      <version>${version.org.infinispan.wildfly}</version>
+      <version>${version.org.infinispan.community}</version>
     </dependency>
 
     <dependency>
