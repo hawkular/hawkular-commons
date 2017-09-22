@@ -16,7 +16,6 @@
  */
 package org.hawkular.inventory.service;
 
-import org.hawkular.inventory.model.Metric;
 import org.hawkular.inventory.model.Resource;
 import org.hawkular.inventory.model.ResourceType;
 
@@ -32,16 +31,6 @@ public class IspnPK {
 
     public static String pkResource(String id) {
         return new StringBuilder("Resource-")
-                .append(id)
-                .toString();
-    }
-
-    public static String pk(Metric m) {
-        return pkMetric(m.getId());
-    }
-
-    public static String pkMetric(String id) {
-        return new StringBuilder("Metric-")
                 .append(id)
                 .toString();
     }

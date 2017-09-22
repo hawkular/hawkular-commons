@@ -38,18 +38,19 @@ import org.infinispan.query.dsl.QueryFactory;
 @Startup
 @Singleton
 public class InventoryConfig {
+
     private static final MsgLogger log = InventoryLoggers.getLogger(InventoryConfig.class);
     public static final String CACHE_CONFIGURATION = "/hawkular-inventory-ispn.xml";
     public static final String CACHE_NAME = "backend";
 
-    private EmbeddedCacheManager cacheManager;
-    private Cache backend;
+    private Cache<String, Object> backend;
     private QueryFactory queryFactory;
 
     @PostConstruct
     public void init() {
         try {
-            cacheManager = new DefaultCacheManager(InventoryConfig.class.getResourceAsStream(CACHE_CONFIGURATION));
+            EmbeddedCacheManager cacheManager =
+                    new DefaultCacheManager(InventoryConfig.class.getResourceAsStream(CACHE_CONFIGURATION));
             backend = cacheManager.getCache(CACHE_NAME);
             if (backend == null) {
                 log.errorInventoryCacheNotFound();
@@ -67,7 +68,7 @@ public class InventoryConfig {
 
     @Produces
     @InventoryCache
-    public Cache getInventoryCache() {
+    public Cache<String, Object> getInventoryCache() {
         return backend;
     }
 

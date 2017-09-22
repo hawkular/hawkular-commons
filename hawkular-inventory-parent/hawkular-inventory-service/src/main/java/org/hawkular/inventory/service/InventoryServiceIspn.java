@@ -16,11 +16,11 @@
  */
 package org.hawkular.inventory.service;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.ejb.Local;
@@ -31,11 +31,13 @@ import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.api.ResourceNode;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
-import org.hawkular.inventory.model.Metric;
 import org.hawkular.inventory.model.Resource;
 import org.hawkular.inventory.model.ResourceType;
 import org.infinispan.Cache;
+import org.infinispan.query.Search;
 import org.infinispan.query.dsl.QueryFactory;
+
+import infinispan.com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author Joel Takvorian
@@ -43,22 +45,29 @@ import org.infinispan.query.dsl.QueryFactory;
 @Local(InventoryService.class)
 @Stateless
 public class InventoryServiceIspn implements InventoryService {
+
     private static final MsgLogger log = InventoryLoggers.getLogger(InventoryServiceIspn.class);
+
+    private final Path configPath;
 
     @Inject
     @InventoryCache
-    private Cache backend;
+    private Cache<String, Object> backend;
 
     @Inject
     @InventoryCache
     private QueryFactory queryFactory;
 
-    // Temp (ispn mock: stores)
-    private Collection<ResourceType> allResourceTypes = new ArrayList<>();
+    public InventoryServiceIspn() {
+        configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
+    }
 
-    // Temp (ispn mock: indexes)
-    private Map<String, List<Resource>> resourcesByType = new HashMap<>();
-    private Map<String, Metric> metricsById = new HashMap<>();
+    @VisibleForTesting
+    InventoryServiceIspn(Cache<String, Object> backend, String configPath) {
+        this.backend = backend;
+        queryFactory = Search.getQueryFactory(backend);
+        this.configPath = Paths.get(configPath);
+    }
 
     @Override
     public void addResource(Resource r) {
@@ -69,19 +78,28 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public void addMetric(Metric m) {
-        if (isEmpty(m)) {
-            throw new IllegalArgumentException("Metric must be not null");
-        }
-        backend.put(IspnPK.pk(m), m);
-    }
-
-    @Override
     public void addResourceType(ResourceType rt) {
         if (isEmpty(rt)) {
             throw new IllegalArgumentException("ResourceType must be not null");
         }
         backend.put(IspnPK.pk(rt), rt);
+    }
+
+    @Override
+    public void deleteResource(String id) {
+        if (isEmpty(id)) {
+            throw new IllegalArgumentException("Id must be not null");
+        }
+        // FIXME: remove subtree?
+        backend.remove(IspnPK.pkResource(id));
+    }
+
+    @Override
+    public void deleteResourceType(String type) {
+        if (isEmpty(type)) {
+            throw new IllegalArgumentException("Type must be not null");
+        }
+        backend.remove(IspnPK.pkResourceType(type));
     }
 
     @Override
@@ -100,8 +118,7 @@ public class InventoryServiceIspn implements InventoryService {
         return getResourceById(parentId)
                 .map(r -> ResourceNode.fromResource(r,
                         this::getNullableResourceType,
-                        this::getNullableResource,
-                        this::getNullableMetric));
+                        this::getNullableResource));
     }
 
     @Override
@@ -125,17 +142,23 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public Optional<Collection<Metric>> getResourceMetrics(String id) {
-        return getResourceById(id)
-                .map(r -> r.getMetrics(metricId -> (Metric) backend.get(IspnPK.pkMetric(metricId))));
-    }
-
-    @Override
     public Optional<ResourceType> getResourceType(String typeId) {
         if (isEmpty(typeId)) {
             throw new IllegalArgumentException("ResourceType id must be not null");
         }
         return Optional.ofNullable((ResourceType) backend.get(IspnPK.pkResourceType(typeId)));
+    }
+
+    @Override
+    public Optional<String> getAgentConfig(String resourceType) {
+        // TODO: maybe some defensive check against file traversal attack?
+        //  Or check that "resourceType" is in a whitelist of types?
+        try {
+            byte[] encoded = Files.readAllBytes(configPath.resolve(resourceType + ".yml"));
+            return Optional.of(new String(encoded, "UTF-8"));
+        } catch (IOException e) {
+            return Optional.empty();
+        }
     }
 
     private Resource getNullableResource(String id) {
@@ -152,23 +175,12 @@ public class InventoryServiceIspn implements InventoryService {
         return (ResourceType) backend.get(IspnPK.pkResourceType(id));
     }
 
-    private Metric getNullableMetric(String id) {
-        if (isEmpty(id)) {
-            return null;
-        }
-        return (Metric) backend.get(IspnPK.pkMetric(id));
-    }
-
     private void checkBackend() {
-
+        // FIXME: check if up? make public / return bool / used for readiness?
     }
 
     private boolean isEmpty(Resource r) {
         return r == null || r.getId() == null || r.getId().isEmpty();
-    }
-
-    private boolean isEmpty(Metric m) {
-        return m == null || m.getId() == null || m.getId().isEmpty();
     }
 
     private boolean isEmpty(ResourceType rt) {

@@ -17,17 +17,18 @@
 package org.hawkular.inventory.handlers;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 import static org.hawkular.inventory.handlers.ResponseUtil.isEmpty;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.ejb.EJB;
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -39,10 +40,8 @@ import javax.ws.rs.core.Response;
 
 import org.hawkular.inventory.api.Import;
 import org.hawkular.inventory.api.InventoryService;
-import org.hawkular.inventory.api.ResourceNode;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
-import org.hawkular.inventory.model.Metric;
 import org.hawkular.inventory.model.Resource;
 import org.hawkular.inventory.model.ResourceType;
 
@@ -52,14 +51,28 @@ import org.hawkular.inventory.model.ResourceType;
  */
 @Path("/")
 public class InventoryHandlers {
+
     private static final MsgLogger log = InventoryLoggers.getLogger(InventoryHandlers.class);
 
     @EJB
-    InventoryService inventoryService;
+    private InventoryService inventoryService;
 
     /*
         Let's order the methods by their Path
      */
+
+    @GET
+    @Path("/agentconfig/{type}")
+    @Produces(TEXT_PLAIN)
+    public Response getAgentConfig(@PathParam("type") final String type) {
+        try {
+            return inventoryService.getAgentConfig(type)
+                    .map(ResponseUtil::ok)
+                    .orElseGet(() -> ResponseUtil.notFound("Agent config [" + type + "] not found"));
+        } catch (Exception e) {
+            return ResponseUtil.internalError(e);
+        }
+    }
 
     @POST
     @Path("/import")
@@ -78,11 +91,6 @@ public class InventoryHandlers {
                         inventoryService.addResourceType(type);
                     }
                 }
-                if (!isEmpty(inventory.getMetrics())) {
-                    for (Metric metric : inventory.getMetrics()) {
-                        inventoryService.addMetric(metric);
-                    }
-                }
             }
             return ResponseUtil.ok();
         } catch (Exception e) {
@@ -95,28 +103,21 @@ public class InventoryHandlers {
     @Produces(APPLICATION_JSON)
     public Response getResourceById(@PathParam("id") final String id) {
         try {
-            Optional<Resource> resource = inventoryService.getResourceById(id);
-            if (resource.isPresent()) {
-                return ResponseUtil.ok(resource.get());
-            } else {
-                return ResponseUtil.notFound("Resource id [" + id + "] not found");
-            }
+            return inventoryService.getResourceById(id)
+                    .map(ResponseUtil::ok)
+                    .orElseGet(() -> ResponseUtil.notFound("Resource id [" + id + "] not found"));
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }
     }
 
-    @GET
-    @Path("/resource/{id}/metrics")
+    @DELETE
+    @Path("/resource/{id}")
     @Produces(APPLICATION_JSON)
-    public Response getResourceMetrics(@PathParam("id") final String id) {
+    public Response deleteResource(@PathParam("id") final String id) {
         try {
-            Optional<Collection<Metric>> resource = inventoryService.getResourceMetrics(id);
-            if (resource.isPresent()) {
-                return ResponseUtil.ok(resource.get());
-            } else {
-                return ResponseUtil.notFound("Resource id [" + id + "] not found");
-            }
+            inventoryService.deleteResource(id);
+            return ResponseUtil.ok();
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }
@@ -127,12 +128,9 @@ public class InventoryHandlers {
     @Produces(APPLICATION_JSON)
     public Response getTree(@PathParam("parentId") final String parentId) {
         try {
-            Optional<ResourceNode> resource = inventoryService.getTree(parentId);
-            if (resource.isPresent()) {
-                return ResponseUtil.ok(resource.get());
-            } else {
-                return ResponseUtil.notFound("Resource id [" + parentId + "] not found");
-            }
+            return inventoryService.getTree(parentId)
+                    .map(ResponseUtil::ok)
+                    .orElseGet(() -> ResponseUtil.notFound("Resource id [" + parentId + "] not found"));
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }
@@ -163,12 +161,24 @@ public class InventoryHandlers {
     }
 
     @GET
-    @Path("/resources/types")
+    @Path("/types")
     @Produces(APPLICATION_JSON)
     public Response getAllResourceTypes() {
         try {
             GenericEntity<Collection<ResourceType>> resourceTypes = new GenericEntity<Collection<ResourceType>>(inventoryService.getAllResourceTypes()) {};
             return ResponseUtil.ok(resourceTypes);
+        } catch (Exception e) {
+            return ResponseUtil.internalError(e);
+        }
+    }
+
+    @DELETE
+    @Path("/type/{type}")
+    @Produces(APPLICATION_JSON)
+    public Response deleteResourceType(@PathParam("type") final String type) {
+        try {
+            inventoryService.deleteResourceType(type);
+            return ResponseUtil.ok();
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }

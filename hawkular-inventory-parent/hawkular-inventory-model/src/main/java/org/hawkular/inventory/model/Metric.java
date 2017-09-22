@@ -30,9 +30,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Metric implements Serializable {
 
     @JsonInclude(Include.NON_NULL)
-    private final String id;    // Unique index ; Random UUID?
-
-    @JsonInclude(Include.NON_NULL)
     private final String name;  // Prometheus short name? This field may not be necessary, name could just be a metadata put in properties
 
     @JsonInclude(Include.NON_NULL)
@@ -47,22 +44,16 @@ public class Metric implements Serializable {
     @JsonInclude(Include.NON_NULL)
     private final Map<String, String> properties;   // properties may contain, for instance, the full prometheus metric name
 
-    public Metric(@JsonProperty("id") String id,
-                  @JsonProperty("name") String name,
+    public Metric(@JsonProperty("name") String name,
                   @JsonProperty("type") String type,
                   @JsonProperty("unit") MetricUnit unit,
                   @JsonProperty("collectionInterval") Integer collectionInterval,
                   @JsonProperty("properties") Map<String, String> properties) {
-        this.id = id;
         this.name = name;
         this.type = type;
         this.unit = unit;
         this.collectionInterval = collectionInterval;
         this.properties = properties;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public String getName() {
@@ -86,25 +77,9 @@ public class Metric implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Metric metric = (Metric) o;
-
-        return id != null ? id.equals(metric.id) : metric.id == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
-    }
-
-    @Override
     public String toString() {
         return "Metric{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
+                "name='" + name + '\'' +
                 ", type='" + type + '\'' +
                 ", unit=" + unit +
                 ", collectionInterval=" + collectionInterval +
