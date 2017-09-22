@@ -16,7 +16,7 @@
  */
 package org.hawkular.inventory.model;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.*;
+import static com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -50,7 +50,7 @@ public class Resource implements Serializable {
     private final List<String> childrenIds;
 
     @JsonInclude(Include.NON_NULL)
-    private final List<String> metricIds;
+    private final List<Metric> metrics;
 
     @JsonInclude(Include.NON_NULL)
     private final Map<String, String> properties;
@@ -58,21 +58,20 @@ public class Resource implements Serializable {
     // Lazy-loaded references
     private ResourceType type;
     private List<Resource> children;
-    private List<Metric> metrics;
 
     public Resource(@JsonProperty("id") String id,
                     @JsonProperty("name") String name,
                     @JsonProperty("typeId") String typeId,
                     @JsonProperty("rootId") String rootId,
                     @JsonProperty("childrenIds") List<String> childrenIds,
-                    @JsonProperty("metricIds") List<String> metricIds,
+                    @JsonProperty("metricIds") List<Metric> metrics,
                     @JsonProperty("properties") Map<String, String> properties) {
         this.id = id;
         this.name = name;
         this.typeId = typeId;
         this.rootId = rootId;
         this.childrenIds = childrenIds;
-        this.metricIds = metricIds;
+        this.metrics = metrics;
         this.properties = properties;
     }
 
@@ -96,8 +95,8 @@ public class Resource implements Serializable {
         return childrenIds;
     }
 
-    public List<String> getMetricIds() {
-        return metricIds;
+    public List<Metric> getMetrics() {
+        return metrics;
     }
 
     public Map<String, String> getProperties() {
@@ -123,17 +122,6 @@ public class Resource implements Serializable {
         return Collections.unmodifiableList(children);
     }
 
-    public List<Metric> getMetrics(Function<String, Metric> loader) {
-        // lazy loading
-        if (metrics == null) {
-            metrics = metricIds.stream()
-                    .map(loader)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-        }
-        return Collections.unmodifiableList(metrics);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -157,7 +145,6 @@ public class Resource implements Serializable {
                 ", typeId='" + typeId + '\'' +
                 ", rootId='" + rootId + '\'' +
                 ", childrenIds=" + childrenIds +
-                ", metricIds=" + metricIds +
                 ", properties=" + properties +
                 ", type=" + type +
                 ", children=" + children +

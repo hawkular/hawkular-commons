@@ -19,7 +19,6 @@ package org.hawkular.inventory.api;
 import java.io.Serializable;
 import java.util.List;
 
-import org.hawkular.inventory.model.Metric;
 import org.hawkular.inventory.model.Resource;
 import org.hawkular.inventory.model.ResourceType;
 
@@ -39,15 +38,10 @@ public class Import implements Serializable {
     @JsonInclude(Include.NON_NULL)
     private List<ResourceType> types;
 
-    @JsonInclude(Include.NON_NULL)
-    private List<Metric> metrics;
-
     public Import(@JsonProperty("resources") List<Resource> resources,
-                  @JsonProperty("types") List<ResourceType> types,
-                  @JsonProperty("metrics") List<Metric> metrics) {
+                  @JsonProperty("types") List<ResourceType> types) {
         this.resources = resources;
         this.types = types;
-        this.metrics = metrics;
     }
 
     public List<Resource> getResources() {
@@ -66,14 +60,6 @@ public class Import implements Serializable {
         this.types = types;
     }
 
-    public List<Metric> getMetrics() {
-        return metrics;
-    }
-
-    public void setMetrics(List<Metric> metrics) {
-        this.metrics = metrics;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -82,15 +68,13 @@ public class Import implements Serializable {
         Import anImport = (Import) o;
 
         if (resources != null ? !resources.equals(anImport.resources) : anImport.resources != null) return false;
-        if (types != null ? !types.equals(anImport.types) : anImport.types != null) return false;
-        return metrics != null ? metrics.equals(anImport.metrics) : anImport.metrics == null;
+        return types != null ? types.equals(anImport.types) : anImport.types == null;
     }
 
     @Override
     public int hashCode() {
         int result = resources != null ? resources.hashCode() : 0;
         result = 31 * result + (types != null ? types.hashCode() : 0);
-        result = 31 * result + (metrics != null ? metrics.hashCode() : 0);
         return result;
     }
 
@@ -99,7 +83,6 @@ public class Import implements Serializable {
         return "Import{" +
                 "resources=" + resources +
                 ", types=" + types +
-                ", metrics=" + metrics +
                 '}';
     }
 }

@@ -236,6 +236,30 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <!-- FIXME: this is for arquillian only, there's probably another way to do it -->
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>process-test-classes</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/wildfly-${version.org.wildfly}/standalone/configuration/hawkular</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/test/resources</directory>
+                  <includes>
+                    <include>test.yml</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
 
     </plugins>
   </build>

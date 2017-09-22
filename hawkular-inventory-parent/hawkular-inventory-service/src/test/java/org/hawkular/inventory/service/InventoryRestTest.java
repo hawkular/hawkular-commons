@@ -61,19 +61,28 @@ import org.junit.runners.MethodSorters;
 @RunWith(Arquillian.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class InventoryRestTest {
-    public static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "EAP", null,
-            Arrays.asList("child-1", "child-2"), Arrays.asList("m-1", "m-2"), new HashMap<>());
-    public static final Resource EAP2 = new Resource("EAP-2", "EAP-2", "EAP", null,
-            Arrays.asList("child-3", "child-4"), Arrays.asList("m-3", "m-4"), new HashMap<>());
-    public static final Resource CHILD1 = new Resource("child-1", "Child 1", "FOO", "EAP-1",
+    private static final Metric METRIC1
+            = new Metric("memory1", "Memory", MetricUnit.BYTES, 10, new HashMap<>());
+    private static final Metric METRIC2
+            = new Metric("gc1", "GC", MetricUnit.NONE, 10, new HashMap<>());
+    private static final Metric METRIC3
+            = new Metric("memory2", "Memory", MetricUnit.BYTES, 10, new HashMap<>());
+    private static final Metric METRIC4
+            = new Metric("gc2", "GC", MetricUnit.NONE, 10, new HashMap<>());
+
+    private static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "EAP", null,
+            Arrays.asList("child-1", "child-2"), Arrays.asList(METRIC1, METRIC2), new HashMap<>());
+    private static final Resource EAP2 = new Resource("EAP-2", "EAP-2", "EAP", null,
+            Arrays.asList("child-3", "child-4"), Arrays.asList(METRIC3, METRIC4), new HashMap<>());
+    private static final Resource CHILD1 = new Resource("child-1", "Child 1", "FOO", "EAP-1",
             new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    public static final Resource CHILD2 = new Resource("child-2", "Child 2", "BAR", "EAP-1",
+    private static final Resource CHILD2 = new Resource("child-2", "Child 2", "BAR", "EAP-1",
             new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    public static final Resource CHILD3 = new Resource("child-3", "Child 3", "FOO", "EAP-2",
+    private static final Resource CHILD3 = new Resource("child-3", "Child 3", "FOO", "EAP-2",
             new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    public static final Resource CHILD4 = new Resource("child-4", "Child 4", "BAR", "EAP-2",
+    private static final Resource CHILD4 = new Resource("child-4", "Child 4", "BAR", "EAP-2",
             new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    public static final Map<String, Map<String, String>> RELOAD_PARAMETERS;
+    private static final Map<String, Map<String, String>> RELOAD_PARAMETERS;
     static {
         RELOAD_PARAMETERS = new HashMap<>();
         RELOAD_PARAMETERS.put("param1", new HashMap<>());
@@ -83,7 +92,7 @@ public class InventoryRestTest {
         RELOAD_PARAMETERS.get("param2").put("type", "bool");
         RELOAD_PARAMETERS.get("param2").put("description", "Description of param2 for Reload op");
     }
-    public static final Map<String, Map<String, String>> SHUTDOWN_PARAMETERS;
+    private static final Map<String, Map<String, String>> SHUTDOWN_PARAMETERS;
     static {
         SHUTDOWN_PARAMETERS = new HashMap<>();
         SHUTDOWN_PARAMETERS.put("param1", new HashMap<>());
@@ -93,25 +102,17 @@ public class InventoryRestTest {
         SHUTDOWN_PARAMETERS.get("param2").put("type", "bool");
         SHUTDOWN_PARAMETERS.get("param2").put("description", "Description of param2 for Shutdown op");
     }
-    public static final Collection<Operation> EAP_OPS = Arrays.asList(
+    private static final Collection<Operation> EAP_OPS = Arrays.asList(
             new Operation("Reload", RELOAD_PARAMETERS),
             new Operation("Shutdown", SHUTDOWN_PARAMETERS),
-            new Operation("Start", Collections.EMPTY_MAP));
-    public static final ResourceType TYPE_EAP = new ResourceType("EAP", EAP_OPS, new HashMap<>());
-    public static final Metric METRIC1
-            = new Metric("m-1", "memory", "Memory", MetricUnit.BYTES, 10, new HashMap<>());
-    public static final Metric METRIC2
-            = new Metric("m-2", "gc", "GC", MetricUnit.NONE, 10, new HashMap<>());
-    public static final Metric METRIC3
-            = new Metric("m-3", "memory", "Memory", MetricUnit.BYTES, 10, new HashMap<>());
-    public static final Metric METRIC4
-            = new Metric("m-4", "gc", "GC", MetricUnit.NONE, 10, new HashMap<>());
+            new Operation("Start", Collections.emptyMap()));
+    private static final ResourceType TYPE_EAP = new ResourceType("EAP", EAP_OPS, new HashMap<>());
 
-    public static final Import IMPORT = new Import(Arrays.asList(EAP1, EAP2, CHILD1, CHILD2, CHILD3, CHILD4),
-            Arrays.asList(TYPE_EAP), Arrays.asList(METRIC1, METRIC2, METRIC3, METRIC4));
+    private static final Import IMPORT = new Import(Arrays.asList(EAP1, EAP2, CHILD1, CHILD2, CHILD3, CHILD4),
+            Collections.singletonList(TYPE_EAP));
 
     @ArquillianResource
-    URL baseUrl;
+    private URL baseUrl;
 
     @Deployment
     public static WebArchive createDeployment() {
@@ -211,7 +212,7 @@ public class InventoryRestTest {
     @Test
     public void test005_shouldGetResourceTypes() {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString()).path("resources/types");
+        WebTarget target = client.target(baseUrl.toString()).path("types");
         Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
@@ -302,50 +303,12 @@ public class InventoryRestTest {
     }
 
     @Test
-    public void test012_shouldGetMetrics() {
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString()).path("resource/EAP-1/metrics");
-        Response response = target
-                .request(MediaType.APPLICATION_JSON_TYPE)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .get();
-        assertEquals(200, response.getStatus());
-        assertThat(response.readEntity(new GenericType<Collection<Metric>>() {}))
-                .extracting(Metric::getId)
-                .containsExactly("m-1", "m-2");
-    }
-
-    @Test
-    public void test013_shouldGetEmptyMetrics() {
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString()).path("resource/child-1/metrics");
-        Response response = target
-                .request(MediaType.APPLICATION_JSON_TYPE)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .get();
-        assertEquals(200, response.getStatus());
-        assertThat(response.readEntity(new GenericType<Collection<Metric>>() {}))
-                .isEmpty();
-    }
-
-    @Test
-    public void test014_shouldNotGetMetrics() {
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString()).path("resource/nada/metrics");
-        Response response = target
-                .request(MediaType.APPLICATION_JSON_TYPE)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .get();
-        assertEquals(404, response.getStatus());
-    }
-
-    @Test
     public void test015_shouldFailOnDetectedCycle() {
         Resource corruptedParent = new Resource("CP", "CP", "FOO", "",
-                Arrays.asList("CC"), new ArrayList<>(), new HashMap<>());
+                Collections.singletonList("CC"), new ArrayList<>(), new HashMap<>());
         Resource corruptedChild = new Resource("CC", "CC", "BAR", "CP",
-                Arrays.asList("CP"), new ArrayList<>(), new HashMap<>());
-        Import corruptedImport = new Import(Arrays.asList(corruptedParent, corruptedChild), null, null);
+                Collections.singletonList("CP"), new ArrayList<>(), new HashMap<>());
+        Import corruptedImport = new Import(Arrays.asList(corruptedParent, corruptedChild), null);
 
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("import");
@@ -365,4 +328,37 @@ public class InventoryRestTest {
         assertEquals("java.lang.IllegalStateException: Cycle detected in the tree with id CP; aborting operation. The inventory is invalid.", response.readEntity(Map.class).get("errorMsg"));
     }
 
+    @Test
+    public void test016_shouldGetAgentConfig() {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString()).path("agentconfig/test");
+        Response response = target
+                .request(MediaType.TEXT_PLAIN)
+                .get();
+        assertEquals(200, response.getStatus());
+        assertThat(response.readEntity(new GenericType<String>() {}))
+                .contains("AGENT CONFIG TEST");
+    }
+
+    @Test
+    public void test017_shouldNotGetAgentConfig() {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString()).path("agentconfig/nada");
+        Response response = target
+                .request(MediaType.TEXT_PLAIN)
+                .get();
+        assertEquals(404, response.getStatus());
+    }
+
+    @Test
+    public void zzz_clean() {
+        // FIXME: proper way for "AfterClass" with arquillian given there's non-static stuff needed?
+        // Delete resources
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString());
+        IMPORT.getResources().forEach(r -> target.path("resource/" + r.getId()).request().delete().close());
+        IMPORT.getTypes().forEach(t -> target.path("type/" + t.getId()).request().delete().close());
+        target.path("resource/CP").request().delete().close();
+        target.path("resource/CC").request().delete().close();
+    }
 }

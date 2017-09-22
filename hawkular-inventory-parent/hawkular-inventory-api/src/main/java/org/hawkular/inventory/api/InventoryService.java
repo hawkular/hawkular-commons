@@ -19,7 +19,6 @@ package org.hawkular.inventory.api;
 import java.util.Collection;
 import java.util.Optional;
 
-import org.hawkular.inventory.model.Metric;
 import org.hawkular.inventory.model.Resource;
 import org.hawkular.inventory.model.ResourceType;
 
@@ -28,13 +27,14 @@ import org.hawkular.inventory.model.ResourceType;
  */
 public interface InventoryService {
     void addResource(Resource r);
-    void addMetric(Metric m);
     void addResourceType(ResourceType rt);
+    void deleteResource(String id);
+    void deleteResourceType(String type);
     Optional<Resource> getResourceById(String id);
     Optional<ResourceNode> getTree(String parentId);
     Collection<Resource> getAllTopResources();
     Collection<ResourceType> getAllResourceTypes();
     Collection<Resource> getResourcesByType(String typeId);
-    Optional<Collection<Metric>> getResourceMetrics(String id);
     Optional<ResourceType> getResourceType(String typeId);
+    Optional<String> getAgentConfig(String resourceType);
 }

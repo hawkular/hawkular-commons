@@ -70,15 +70,13 @@ public class ResourceNode {
 
     public static ResourceNode fromResource(Resource r,
                                      Function<String, ResourceType> rtLoader,
-                                     Function<String, Resource> rLoader,
-                                     Function<String, Metric> mLoader) {
-        return fromResource(r, rtLoader, rLoader, mLoader, new HashSet<>());
+                                     Function<String, Resource> rLoader) {
+        return fromResource(r, rtLoader, rLoader, new HashSet<>());
     }
 
     private static ResourceNode fromResource(Resource r,
                                              Function<String, ResourceType> rtLoader,
                                              Function<String, Resource> rLoader,
-                                             Function<String, Metric> mLoader,
                                              Set<String> loaded) {
         if (loaded.contains(r.getId())) {
             throw new IllegalStateException("Cycle detected in the tree with id " + r.getId()
@@ -86,10 +84,10 @@ public class ResourceNode {
         }
         loaded.add(r.getId());
         List<ResourceNode> children = r.getChildren(rLoader).stream()
-                .map(child -> fromResource(child, rtLoader, rLoader, mLoader, loaded))
+                .map(child -> fromResource(child, rtLoader, rLoader, loaded))
                 .collect(Collectors.toList());
         return new ResourceNode(r.getId(), r.getName(), r.getProperties(), r.getType(rtLoader),
-                children, r.getMetrics(mLoader));
+                children, r.getMetrics());
     }
 
     public String getId() {
