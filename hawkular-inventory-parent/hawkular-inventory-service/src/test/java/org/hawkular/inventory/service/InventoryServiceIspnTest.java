@@ -67,7 +67,7 @@ public class InventoryServiceIspnTest {
             new Operation("Shutdown", new HashMap<>()));
     private static final ResourceType TYPE_EAP = new ResourceType("EAP", EAP_OPS, new HashMap<>());
 
-    private static final String ISPN_CONFIG_LOCAL = "/ispn-local-8.2.xml";
+    private static final String ISPN_CONFIG_LOCAL = "/hawkular-inventory-ispn-test.xml";
     private static EmbeddedCacheManager CACHE_MANAGER;
     private final InventoryServiceIspn service;
     private final Cache<String, Object> backend;

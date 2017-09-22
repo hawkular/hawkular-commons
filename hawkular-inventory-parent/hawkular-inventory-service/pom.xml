@@ -181,7 +181,9 @@
             <jboss.home>${project.basedir}/target/wildfly-${version.org.wildfly}/</jboss.home>
           </systemPropertyVariables>
           <redirectTestOutputToFile>false</redirectTestOutputToFile>
+          <excludedGroups>${excluded.groups}</excludedGroups>
         </configuration>
+
       </plugin>
 
       <plugin>
@@ -264,5 +266,9 @@
 
     </plugins>
   </build>
+
+  <properties>
+    <excluded.groups>org.hawkular.inventory.service.Performance</excluded.groups>
+  </properties>
 
 </project>
