@@ -62,13 +62,26 @@ public class InventoryHandlers {
      */
 
     @GET
-    @Path("/agentconfig/{type}")
+    @Path("/get-inventory-config/{templateName}")
     @Produces(TEXT_PLAIN)
-    public Response getAgentConfig(@PathParam("type") final String type) {
+    public Response getAgentConfig(@PathParam("templateName") final String templateName) {
         try {
-            return inventoryService.getAgentConfig(type)
+            return inventoryService.getAgentConfig(templateName)
                     .map(ResponseUtil::ok)
-                    .orElseGet(() -> ResponseUtil.notFound("Agent config [" + type + "] not found"));
+                    .orElseGet(() -> ResponseUtil.notFound("Inventory config [" + templateName + "] not found"));
+        } catch (Exception e) {
+            return ResponseUtil.internalError(e);
+        }
+    }
+
+    @GET
+    @Path("/get-jmx-exporter-config/{templateName}")
+    @Produces(TEXT_PLAIN)
+    public Response getJMXExporterConfig(@PathParam("templateName") final String templateName) {
+        try {
+            return inventoryService.getJMXExporterConfig(templateName)
+                    .map(ResponseUtil::ok)
+                    .orElseGet(() -> ResponseUtil.notFound("JMX Exporter config [" + templateName + "] not found"));
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }
@@ -192,5 +205,4 @@ public class InventoryHandlers {
         status.put("status", "UP");
         return Response.ok(status).build();
     }
-
 }
