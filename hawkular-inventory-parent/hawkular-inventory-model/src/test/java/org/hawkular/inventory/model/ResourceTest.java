@@ -31,8 +31,13 @@ import org.junit.Test;
  */
 public class ResourceTest {
 
+    private static final Metric METRIC1
+            = new Metric("memory", "Memory", MetricUnit.BYTES, 10, new HashMap<>());
+    private static final Metric METRIC2
+            = new Metric("gc", "GC", MetricUnit.NONE, 10, new HashMap<>());
+
     private final Resource r = new Resource("id", "name", "EAP", null,
-            Arrays.asList("child-1", "child-2"), Arrays.asList("m-1", "m-2"), new HashMap<>());
+            Arrays.asList("child-1", "child-2"), Arrays.asList(METRIC1, METRIC2), new HashMap<>());
 
     @Test
     public void shouldLazyLoadResourceType() {
@@ -70,28 +75,6 @@ public class ResourceTest {
         assertThat(numberOfCalls.intValue()).isEqualTo(2);
         // Verify loader is not called again
         r.getChildren(loader);
-        assertThat(numberOfCalls.intValue()).isEqualTo(2);
-    }
-
-    @Test
-    public void shouldLazyLoadMetrics() {
-        Metric m1 = new Metric("m-1", "name-1", "mtype", MetricUnit.BYTES, 10,
-                new HashMap<>());
-        Metric m2 = new Metric("m-2", "name-2", "mtype", MetricUnit.BYTES, 10,
-                new HashMap<>());
-        LongAdder numberOfCalls = new LongAdder();
-        Function<String, Metric> loader = id -> {
-            numberOfCalls.increment();
-            if (id.equals(m1.getId())) {
-                return m1;
-            }
-            return m2;
-        };
-
-        assertThat(r.getMetrics(loader)).extracting(Metric::getName).containsExactly("name-1", "name-2");
-        assertThat(numberOfCalls.intValue()).isEqualTo(2);
-        // Verify loader is not called again
-        r.getMetrics(loader);
         assertThat(numberOfCalls.intValue()).isEqualTo(2);
     }
 }
