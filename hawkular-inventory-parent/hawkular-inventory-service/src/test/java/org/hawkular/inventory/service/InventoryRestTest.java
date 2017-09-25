@@ -39,6 +39,7 @@ import javax.ws.rs.core.Response;
 
 import org.hawkular.inventory.api.Import;
 import org.hawkular.inventory.api.ResourceNode;
+import org.hawkular.inventory.api.ResultSet;
 import org.hawkular.inventory.model.Metric;
 import org.hawkular.inventory.model.MetricUnit;
 import org.hawkular.inventory.model.Operation;
@@ -294,7 +295,7 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertThat(response.readEntity(new GenericType<Collection<Resource>>() {}))
+        assertThat((List<Resource>) response.readEntity(ResultSet.class).getResults())
                 .extracting(Resource::getId)
                 .containsOnly("EAP-1", "EAP-2");
     }
@@ -308,7 +309,7 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertThat(response.readEntity(new GenericType<Collection<ResourceType>>() {}))
+        assertThat((List<ResourceType>) response.readEntity(ResultSet.class).getResults())
                 .extracting(ResourceType::getId)
                 .containsExactly("EAP");
     }
@@ -322,7 +323,7 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertThat(response.readEntity(new GenericType<Collection<Resource>>() {}))
+        assertThat((List<Resource>) response.readEntity(ResultSet.class).getResults())
                 .extracting(Resource::getId)
                 .containsOnly("EAP-1", "EAP-2");
     }
@@ -336,7 +337,7 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertThat(response.readEntity(new GenericType<Collection<Resource>>() {}))
+        assertThat((List<Resource>) response.readEntity(ResultSet.class).getResults())
                 .extracting(Resource::getId)
                 .containsOnly("child-1", "child-3");
     }
@@ -350,7 +351,7 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertThat(response.readEntity(new GenericType<Collection<Resource>>() {})).isEmpty();
+        assertThat(response.readEntity(ResultSet.class).getResults()).isEmpty();
     }
 
     @Test
@@ -442,7 +443,7 @@ public class InventoryRestTest {
 
     @Test
     @Category(Performance.class)
-    public void test016_largeImport() {
+    public void test018_largeImport() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("import");
         Response response = target
@@ -450,7 +451,7 @@ public class InventoryRestTest {
                 .post(Entity.entity(createResourceTypes(), MediaType.APPLICATION_JSON_TYPE));
         assertEquals(200, response.getStatus());
 
-        int maxIterations = 1000;
+        int maxIterations = 50;
         int maxServersPerIteration = 100;
         int childrenPerServer = 100;
         int metricsPerServer = 20;
@@ -464,9 +465,28 @@ public class InventoryRestTest {
                     .request(MediaType.APPLICATION_JSON_TYPE)
                     .post(Entity.entity(createLargeInventory(from, to, childrenPerServer, metricsPerServer), MediaType.APPLICATION_JSON_TYPE));
             assertEquals(200, response.getStatus());
-            int mod = maxIterations > 100 ? 100 : 10;
+            int mod = maxIterations > 500 ? 100 : 10;
             if ( i % mod == 0) {
                 log.infof("Creating [%s] Servers", (i * maxServersPerIteration));
+            }
+        }
+        log.infof("Final - Created [%s] Servers", (maxIterations * maxServersPerIteration));
+
+        log.infof("Fetch top resources");
+        for (int i = 0; i < maxIterations; i++) {
+            client = ClientBuilder.newClient();
+            target = client.target(baseUrl.toString())
+                    .path("resources/top")
+                    .queryParam("maxResults", maxServersPerIteration)
+                    .queryParam("startOffset", i * maxServersPerIteration);
+            response = target
+                    .request(MediaType.APPLICATION_JSON_TYPE)
+                    .accept(MediaType.APPLICATION_JSON_TYPE)
+                    .get();
+            assertEquals(200, response.getStatus());
+            int mod = maxIterations > 500 ? 100 : 10;
+            if ( i % mod == 0) {
+                log.infof("Querying [%s] Servers", (i * maxServersPerIteration));
             }
         }
     }

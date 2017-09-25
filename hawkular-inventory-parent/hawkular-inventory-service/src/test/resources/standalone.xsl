@@ -37,6 +37,9 @@
     <logger category="org.hawkular.inventory">
       <level name="DEBUG"/>
     </logger>
+    <logger category="org.infinispan">
+      <level name="DEBUG"/>
+    </logger>
   </xsl:template>
 
   <!-- copy everything else as-is -->

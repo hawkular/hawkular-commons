@@ -32,12 +32,14 @@ import javax.inject.Inject;
 
 import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.api.ResourceNode;
+import org.hawkular.inventory.api.ResultSet;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
 import org.hawkular.inventory.model.Resource;
 import org.hawkular.inventory.model.ResourceType;
 import org.infinispan.Cache;
 import org.infinispan.query.Search;
+import org.infinispan.query.dsl.Query;
 import org.infinispan.query.dsl.QueryFactory;
 
 /**
@@ -48,6 +50,9 @@ import org.infinispan.query.dsl.QueryFactory;
 public class InventoryServiceIspn implements InventoryService {
 
     private static final MsgLogger log = InventoryLoggers.getLogger(InventoryServiceIspn.class);
+
+    // TODO [lponce] this should be configurable
+    private static final int MAX_RESULTS = 100;
 
     private final Path configPath;
 
@@ -138,23 +143,47 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public Collection<Resource> getAllTopResources() {
-        return queryFactory.from(Resource.class)
+    public ResultSet<Resource> getAllTopResources(long startOffset, int maxResults) {
+        Query query = queryFactory.from(Resource.class)
                 .having("rootId").isNull()
-                .build().list();
+                .maxResults(maxResults)
+                .startOffset(startOffset)
+                .build();
+        return new ResultSet<>(query.list(), (long) query.getResultSize(), startOffset);
     }
 
     @Override
-    public Collection<ResourceType> getAllResourceTypes() {
-        return queryFactory.from(ResourceType.class)
-                .build().list();
+    public ResultSet<Resource> getAllTopResources() {
+        return getAllTopResources(0, MAX_RESULTS);
     }
 
     @Override
-    public Collection<Resource> getResourcesByType(String typeId) {
-        return queryFactory.from(Resource.class)
+    public ResultSet<ResourceType> getAllResourceTypes(long startOffset, int maxResults) {
+        Query query = queryFactory.from(ResourceType.class)
+                .maxResults(maxResults)
+                .startOffset(startOffset)
+                .build();
+        return new ResultSet<>(query.list(), (long) query.getResultSize(), startOffset);
+    }
+
+    @Override
+    public ResultSet<ResourceType> getAllResourceTypes() {
+        return getAllResourceTypes(0, MAX_RESULTS);
+    }
+
+    @Override
+    public ResultSet<Resource> getResourcesByType(String typeId, long startOffset, int maxResults) {
+        Query query = queryFactory.from(Resource.class)
                 .having("typeId").equal(typeId)
-                .build().list();
+                .maxResults(maxResults)
+                .startOffset(startOffset)
+                .build();
+        return new ResultSet<>(query.list(), (long) query.getResultSize(), startOffset);
+    }
+
+    @Override
+    public ResultSet<Resource> getResourcesByType(String typeId) {
+        return getResourcesByType(typeId, 0, MAX_RESULTS);
     }
 
     @Override
@@ -198,18 +227,6 @@ public class InventoryServiceIspn implements InventoryService {
             return null;
         }
         return (ResourceType) backend.get(IspnPK.pkResourceType(id));
-    }
-
-    private void checkBackend() {
-        // FIXME: check if up? make public / return bool / used for readiness?
-    }
-
-    private boolean isEmpty(Resource r) {
-        return r == null || r.getId() == null || r.getId().isEmpty();
-    }
-
-    private boolean isEmpty(ResourceType rt) {
-        return rt == null || rt.getId() == null || rt.getId().isEmpty();
     }
 
     private boolean isEmpty(String s) {

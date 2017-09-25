@@ -19,7 +19,6 @@ package org.hawkular.inventory.handlers;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,21 +26,20 @@ import javax.ejb.EJB;
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
 
 import org.hawkular.inventory.api.Import;
 import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
-import org.hawkular.inventory.model.Resource;
-import org.hawkular.inventory.model.ResourceType;
 
 /**
  * @author Jay Shaughnessy
@@ -142,10 +140,10 @@ public class InventoryHandlers {
     @GET
     @Path("/resources/top")
     @Produces(APPLICATION_JSON)
-    public Response getAllTopResources() {
+    public Response getAllTopResources(@DefaultValue("0") @QueryParam("startOffSet") final Long startOffset,
+                                       @DefaultValue("100") @QueryParam("maxResults") final Integer maxResults) {
         try {
-            GenericEntity<Collection<Resource>> topResources = new GenericEntity<Collection<Resource>>(inventoryService.getAllTopResources()) {};
-            return ResponseUtil.ok(topResources);
+            return ResponseUtil.ok(inventoryService.getAllTopResources(startOffset, maxResults));
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }
@@ -154,10 +152,11 @@ public class InventoryHandlers {
     @GET
     @Path("/resources/type/{typeId}")
     @Produces(APPLICATION_JSON)
-    public Response getResourcesByType(@PathParam("typeId") final String typeId) {
+    public Response getResourcesByType(@PathParam("typeId") final String typeId,
+                                       @DefaultValue("0") @QueryParam("startOffSet") final Long startOffset,
+                                       @DefaultValue("100") @QueryParam("maxResults") final Integer maxResults) {
         try {
-            GenericEntity<Collection<Resource>> resourcesByType = new GenericEntity<Collection<Resource>>(inventoryService.getResourcesByType(typeId)) {};
-            return ResponseUtil.ok(resourcesByType);
+            return ResponseUtil.ok(inventoryService.getResourcesByType(typeId, startOffset, maxResults));
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }
@@ -166,10 +165,10 @@ public class InventoryHandlers {
     @GET
     @Path("/types")
     @Produces(APPLICATION_JSON)
-    public Response getAllResourceTypes() {
+    public Response getAllResourceTypes(@DefaultValue("0") @QueryParam("startOffSet") final Long startOffset,
+                                        @DefaultValue("100") @QueryParam("maxResults") final Integer maxResults) {
         try {
-            GenericEntity<Collection<ResourceType>> resourceTypes = new GenericEntity<Collection<ResourceType>>(inventoryService.getAllResourceTypes()) {};
-            return ResponseUtil.ok(resourceTypes);
+            return ResponseUtil.ok(inventoryService.getAllResourceTypes(startOffset, maxResults));
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }
