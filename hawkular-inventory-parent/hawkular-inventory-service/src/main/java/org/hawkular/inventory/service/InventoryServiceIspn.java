@@ -17,6 +17,8 @@
 package org.hawkular.inventory.service;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import javax.ejb.Local;
@@ -210,8 +213,20 @@ public class InventoryServiceIspn implements InventoryService {
         try {
             byte[] encoded = Files.readAllBytes(configPath.resolve(fileName));
             return Optional.of(new String(encoded, "UTF-8"));
-        } catch (IOException e) {
-            return Optional.empty();
+        } catch (IOException ioe) {
+            try {
+                InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
+                String text = null;
+                try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
+                    text = scanner.useDelimiter("\\A").next();
+                    if (scanner.ioException() != null) {
+                        throw scanner.ioException();
+                    }
+                    return Optional.of(text);
+                }
+            } catch (Exception e) {
+                return Optional.empty();
+            }
         }
     }
 
