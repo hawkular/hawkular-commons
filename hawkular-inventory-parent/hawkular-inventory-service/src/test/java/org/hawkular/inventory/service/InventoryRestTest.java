@@ -224,6 +224,7 @@ public class InventoryRestTest {
                 .addAsLibraries(assertj)
                 .setWebXML(new File("src/main/webapp/WEB-INF/web.xml"))
                 .addAsResource(new File("src/main/resources/hawkular-inventory-ispn.xml"))
+                .addAsResource(new File("src/main/resources/wildfly-10-jmx-exporter.yml"))
                 .addAsWebInfResource(new File("src/main/webapp/WEB-INF/beans.xml"));
     }
 
@@ -429,6 +430,14 @@ public class InventoryRestTest {
         assertEquals(200, response.getStatus());
         assertThat(response.readEntity(new GenericType<String>() {}))
                 .contains("AGENT CONFIG TEST");
+
+        target = client.target(baseUrl.toString()).path("get-jmx-exporter-config/wildfly-10");
+        response = target
+                .request(MediaType.TEXT_PLAIN)
+                .get();
+        assertEquals(200, response.getStatus());
+        assertThat(response.readEntity(new GenericType<String>() {}))
+                .contains("- pattern:");
     }
 
     @Test
