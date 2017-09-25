@@ -26,7 +26,10 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -44,9 +47,11 @@ public class Resource implements Serializable {
     private final String name;
 
     @JsonInclude(Include.NON_NULL)
+    @Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
     private final String typeId;  // Index [Search all resources of type xx]
 
     @JsonInclude(Include.NON_NULL)
+    @Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
     private final String rootId;  // Index [Search all resources under root xx]
 
     @JsonInclude(Include.NON_NULL)

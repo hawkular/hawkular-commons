@@ -16,6 +16,7 @@
  */
 package org.hawkular.inventory.api;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Joel Takvorian
  */
-public class ResourceNode {
+public class ResourceNode implements Serializable {
 
     @JsonInclude(Include.NON_NULL)
     private final String id;
