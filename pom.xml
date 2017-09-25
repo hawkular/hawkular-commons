@@ -145,6 +145,7 @@
         <module>hawkular-nest</module>
         <module>hawkular-tenant-jaxrs-filter</module>
         <module>hawkular-cors-jaxrs-filter</module>
+        <module>utils</module>
       </modules>
     </profile>
 
