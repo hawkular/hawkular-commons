@@ -32,10 +32,13 @@
         </file-store>
       </persistence>
       <memory>
+        <object size="1000" />
         <!--
           <binary eviction="COUNT" size="10000" />
         -->
-        <object size="5000" />
+        <!--
+          <object size="1000" />
+        -->
         <!--
           <off-heap eviction="COUNT" size="100000" />
         -->
@@ -65,7 +68,6 @@
       </indexing>
     </local-cache>
     <local-cache name="LuceneIndexesMetadata_hawkular_inventory">
-      <transaction mode="NON_XA" />
       <persistence passivation="false">
         <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="target/persisted/inventory">
           <write-behind thread-pool-size="5" />
@@ -74,7 +76,6 @@
       <indexing index="NONE"/>
     </local-cache>
     <local-cache name="LuceneIndexesData_hawkular_inventory">
-      <transaction mode="NON_XA" />
       <persistence passivation="false">
         <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="target/persisted/inventory">
           <write-behind thread-pool-size="5" />
@@ -83,7 +84,6 @@
       <indexing index="NONE" />
     </local-cache>
     <local-cache name="LuceneIndexesLocking_hawkular_inventory">
-      <transaction mode="NON_XA" />
       <persistence passivation="false">
         <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="target/persisted/inventory">
           <write-behind thread-pool-size="5" />

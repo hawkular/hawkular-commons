@@ -34,9 +34,12 @@ public interface InventoryService {
     void deleteResourceType(String type);
     Optional<Resource> getResourceById(String id);
     Optional<ResourceNode> getTree(String parentId);
-    Collection<Resource> getAllTopResources();
-    Collection<ResourceType> getAllResourceTypes();
-    Collection<Resource> getResourcesByType(String typeId);
+    ResultSet<Resource> getAllTopResources();
+    ResultSet<Resource> getAllTopResources(long startOffset, int maxResults);
+    ResultSet<ResourceType> getAllResourceTypes();
+    ResultSet<ResourceType> getAllResourceTypes(long startOffset, int maxResults);
+    ResultSet<Resource> getResourcesByType(String typeId);
+    ResultSet<Resource> getResourcesByType(String typeId, long startOffset, int maxResults);
     Optional<ResourceType> getResourceType(String typeId);
     Optional<String> getAgentConfig(String templateName);
     Optional<String> getJMXExporterConfig(String templateName);

@@ -25,8 +25,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.hawkular.inventory.api.ResourceNode;
+import org.hawkular.inventory.api.ResultSet;
 import org.hawkular.inventory.model.Metric;
 import org.hawkular.inventory.model.MetricUnit;
 import org.hawkular.inventory.model.Operation;
@@ -117,35 +119,35 @@ public class InventoryServiceIspnTest {
 
     @Test
     public void shouldGetTopResources() {
-        assertThat(service.getAllTopResources())
+        assertThat(service.getAllTopResources().getResults())
                 .extracting(Resource::getName)
                 .containsOnly("EAP-1", "EAP-2");
     }
 
     @Test
     public void shouldGetResourceTypes() {
-        assertThat(service.getAllResourceTypes())
+        assertThat(service.getAllResourceTypes().getResults())
                 .extracting(ResourceType::getId)
                 .containsExactly("EAP");
     }
 
     @Test
     public void shouldGetAllEAPs() {
-        assertThat(service.getResourcesByType("EAP"))
+        assertThat(service.getResourcesByType("EAP").getResults())
                 .extracting(Resource::getId)
                 .containsOnly("EAP-1", "EAP-2");
     }
 
     @Test
     public void shouldGetAllFOOs() {
-        assertThat(service.getResourcesByType("FOO"))
+        assertThat(service.getResourcesByType("FOO").getResults())
                 .extracting(Resource::getId)
                 .containsOnly("child-1", "child-3");
     }
 
     @Test
     public void shouldGetNoNada() {
-        assertThat(service.getResourcesByType("nada")).isEmpty();
+        assertThat(service.getResourcesByType("nada").getResults()).isEmpty();
     }
 
     @Test
@@ -227,5 +229,28 @@ public class InventoryServiceIspnTest {
         assertThat(service.getResourceType("EAP")).isPresent();
         service.deleteResourceType("EAP");
         assertThat(service.getResourceType("EAP")).isNotPresent();
+    }
+
+    @Test
+    public void createLargeSetAndFetchPagination() {
+        int maxItems = 10000;
+        List<Resource> resources = new ArrayList<>();
+        for (int i = 0; i < maxItems; i++) {
+            Resource resourceX = new Resource("L" + i, "Large" + i, "FOO", null,
+                    new ArrayList<>(), new ArrayList<>(), new HashMap<>());
+            resources.add(resourceX);
+        }
+        service.addResource(resources);
+
+        ResultSet<Resource> results = service.getResourcesByType("FOO");
+        assertThat(results.getResultSize()).isEqualTo(maxItems + 2);
+        assertThat(results.getResults().size()).isEqualTo(100);
+
+        for (int i = 0; i < (maxItems / 100); i++) {
+            results = service.getResourcesByType("FOO",  i * 100, 100);
+            assertThat(results.getResultSize()).isEqualTo(maxItems + 2);
+            assertThat(results.getResults().size()).isEqualTo(100);
+            assertThat(results.getStartOffset()).isEqualTo(i * 100);
+        }
     }
 }

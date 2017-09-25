@@ -25,7 +25,7 @@
   <cache-container name="hawkular-inventory">
 
     <local-cache name="backend">
-      <transaction mode="BATCH"/>
+      <transaction mode="NON_XA"/>
       <persistence>
         <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="${jboss.server.data.dir}/hawkular-inventory">
           <write-behind thread-pool-size="5" modification-queue-size="10000" />
@@ -65,7 +65,6 @@
       </indexing>
     </local-cache>
     <local-cache name="LuceneIndexesMetadata_hawkular_inventory">
-      <transaction mode="NON_XA" />
       <persistence passivation="false">
         <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="${jboss.server.data.dir}/hawkular-inventory">
           <write-behind thread-pool-size="5" />
@@ -74,7 +73,6 @@
       <indexing index="NONE"/>
     </local-cache>
     <local-cache name="LuceneIndexesData_hawkular_inventory">
-      <transaction mode="NON_XA" />
       <persistence passivation="false">
         <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="${jboss.server.data.dir}/hawkular-inventory">
           <write-behind thread-pool-size="5" />
@@ -83,7 +81,6 @@
       <indexing index="NONE" />
     </local-cache>
     <local-cache name="LuceneIndexesLocking_hawkular_inventory">
-      <transaction mode="NON_XA" />
       <persistence passivation="false">
         <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="${jboss.server.data.dir}/hawkular-inventory">
           <write-behind thread-pool-size="5" />
