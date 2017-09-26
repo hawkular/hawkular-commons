@@ -16,14 +16,15 @@
  */
 package org.hawkular.inventory.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import org.hawkular.inventory.model.Resource;
 import org.hawkular.inventory.model.ResourceType;
 import org.junit.Test;
 
@@ -40,26 +41,39 @@ public class JsonTest {
     @Test
     public void deserializeResultSet() throws Exception {
         int maxItems = 10;
-        List<Resource> resources = new ArrayList<>();
+        List<ResourceNode> resources = new ArrayList<>();
+        List<ResourceWithType> resourcesWithType = new ArrayList<>();
         List<ResourceType> resourceTypes = new ArrayList<>();
+        ResourceType fooType = new ResourceType("FOO", new HashSet<>(), new HashMap<>());
         for (int i = 0; i < maxItems; i++) {
-            Resource resourceX = new Resource("L" + i, "Large" + i, "FOO", null,
-                    new ArrayList<>(), new ArrayList<>(), new HashMap<>());
+            ResourceNode resourceX = new ResourceNode("L" + i, "Large" + i, new HashMap<>(), fooType,
+                    new ArrayList<>(), new ArrayList<>());
             resources.add(resourceX);
-            ResourceType resourceTypeX = new ResourceType("EAP", new HashSet<>(), new HashMap<>());
+            ResourceWithType resourceWTX = new ResourceWithType("Lbis" + i, "Largebis" + i, new HashMap<>(),
+                    fooType, new ArrayList<>(), new ArrayList<>());
+            resourcesWithType.add(resourceWTX);
+            ResourceType resourceTypeX = new ResourceType("EAP" + i, new HashSet<>(), new HashMap<>());
             resourceTypes.add(resourceTypeX);
         }
 
-        ResultSet<Resource> rsResource = new ResultSet<>(resources, 10L, 0L);
+        ResultSet<ResourceNode> rsResource = new ResultSet<>(resources, 10L, 0L);
+        ResultSet<ResourceWithType> rsResourceWT = new ResultSet<>(resourcesWithType, 10L, 0L);
         ResultSet<ResourceType> rsResourceType = new ResultSet<>(resourceTypes, 10L, 0L);
 
         String jsonRsResource = objectMapper.writeValueAsString(rsResource);
+        String jsonRsResourceWT = objectMapper.writeValueAsString(rsResourceWT);
         String jsonRsResourceType = objectMapper.writeValueAsString(rsResourceType);
 
-        ResultSet<Resource> dsRsResource = objectMapper.readValue(jsonRsResource, ResultSet.class);
+        ResultSet<ResourceNode> dsRsResource = objectMapper.readValue(jsonRsResource, ResultSet.class);
+        ResultSet<ResourceWithType> dsRsResourceWT = objectMapper.readValue(jsonRsResourceWT, ResultSet.class);
         ResultSet<ResourceType> dsRsResourceType = objectMapper.readValue(jsonRsResourceType, ResultSet.class);
 
-        assertEquals(rsResource.getResults(), dsRsResource.getResults());
+        assertThat(rsResource.getResults())
+                .usingElementComparator(Comparator.comparing(ResourceNode::getId))
+                .isEqualTo(dsRsResource.getResults());
+        assertThat(rsResourceWT.getResults())
+                .usingElementComparator(Comparator.comparing(ResourceWithType::getId))
+                .isEqualTo(dsRsResourceWT.getResults());
         assertEquals(rsResourceType.getResults(), dsRsResourceType.getResults());
     }
 }

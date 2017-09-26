@@ -26,8 +26,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.hawkular.inventory.api.ResourceNode;
+import org.hawkular.inventory.api.ResourceWithType;
 import org.hawkular.inventory.api.ResultSet;
 import org.hawkular.inventory.model.Metric;
 import org.hawkular.inventory.model.MetricUnit;
@@ -68,11 +70,12 @@ public class InventoryServiceIspnTest {
             new Operation("Reload", new HashMap<>()),
             new Operation("Shutdown", new HashMap<>()));
     private static final ResourceType TYPE_EAP = new ResourceType("EAP", EAP_OPS, new HashMap<>());
+    private static final ResourceType TYPE_FOO = new ResourceType("FOO", Collections.emptyList(), new HashMap<>());
+    private static final ResourceType TYPE_BAR = new ResourceType("BAR", Collections.emptyList(), new HashMap<>());
 
     private static final String ISPN_CONFIG_LOCAL = "/hawkular-inventory-ispn-test.xml";
     private static EmbeddedCacheManager CACHE_MANAGER;
     private final InventoryServiceIspn service;
-    private final Cache<String, Object> backend;
 
     static {
         try {
@@ -83,7 +86,7 @@ public class InventoryServiceIspnTest {
     }
 
     public InventoryServiceIspnTest() throws IOException {
-        backend = CACHE_MANAGER.getCache("backend");
+        Cache<String, Object> backend = CACHE_MANAGER.getCache("backend");
         backend.clear();
         service = new InventoryServiceIspn(backend, getClass().getClassLoader().getResource("").getPath());
     }
@@ -97,18 +100,24 @@ public class InventoryServiceIspnTest {
         service.addResource(CHILD3);
         service.addResource(CHILD4);
         service.addResourceType(TYPE_EAP);
+        service.addResourceType(TYPE_FOO);
+        service.addResourceType(TYPE_BAR);
     }
 
     @Test
     public void shouldGetResourcesById() {
-        assertThat(service.getResourceById("EAP-1")).isPresent()
-                .map(Resource::getName)
+        Optional<ResourceWithType> eap1 = service.getResourceById("EAP-1");
+        assertThat(eap1).isPresent()
+                .map(ResourceWithType::getName)
                 .hasValue("EAP-1");
+        assertThat(eap1)
+                .map(ResourceWithType::getType)
+                .hasValueSatisfying(type -> assertThat(type.getId()).isEqualTo("EAP"));
         assertThat(service.getResourceById("EAP-2")).isPresent()
-                .map(Resource::getName)
+                .map(ResourceWithType::getName)
                 .hasValue("EAP-2");
         assertThat(service.getResourceById("child-1")).isPresent()
-                .map(Resource::getName)
+                .map(ResourceWithType::getName)
                 .hasValue("Child 1");
     }
 
@@ -119,29 +128,37 @@ public class InventoryServiceIspnTest {
 
     @Test
     public void shouldGetTopResources() {
-        assertThat(service.getAllTopResources().getResults())
-                .extracting(Resource::getName)
+        Collection<ResourceWithType> top = service.getAllTopResources().getResults();
+        assertThat(top)
+                .extracting(ResourceWithType::getName)
                 .containsOnly("EAP-1", "EAP-2");
+        assertThat(top)
+                .extracting(ResourceWithType::getType)
+                .extracting(ResourceType::getId)
+                .containsOnly("EAP", "EAP");
+        assertThat(top)
+                .flatExtracting(ResourceWithType::getChildrenIds)
+                .containsOnly("child-1", "child-2", "child-3", "child-4");
     }
 
     @Test
     public void shouldGetResourceTypes() {
         assertThat(service.getAllResourceTypes().getResults())
                 .extracting(ResourceType::getId)
-                .containsExactly("EAP");
+                .containsOnly("EAP", "FOO", "BAR");
     }
 
     @Test
     public void shouldGetAllEAPs() {
         assertThat(service.getResourcesByType("EAP").getResults())
-                .extracting(Resource::getId)
+                .extracting(ResourceWithType::getId)
                 .containsOnly("EAP-1", "EAP-2");
     }
 
     @Test
     public void shouldGetAllFOOs() {
         assertThat(service.getResourcesByType("FOO").getResults())
-                .extracting(Resource::getId)
+                .extracting(ResourceWithType::getId)
                 .containsOnly("child-1", "child-3");
     }
 
@@ -244,7 +261,7 @@ public class InventoryServiceIspnTest {
         }
         service.addResource(resources);
 
-        ResultSet<Resource> results = service.getResourcesByType("FOO");
+        ResultSet<ResourceWithType> results = service.getResourcesByType("FOO");
         assertThat(results.getResultSize()).isEqualTo(maxItems + 2);
         assertThat(results.getResults().size()).isEqualTo(100);
 

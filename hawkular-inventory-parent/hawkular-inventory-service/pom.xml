@@ -239,7 +239,6 @@
         </executions>
       </plugin>
       <plugin>
-        <!-- FIXME: this is for arquillian only, there's probably another way to do it -->
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>

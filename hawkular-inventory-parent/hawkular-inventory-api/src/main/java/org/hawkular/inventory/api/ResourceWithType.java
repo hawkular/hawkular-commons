@@ -17,12 +17,10 @@
 package org.hawkular.inventory.api;
 
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.hawkular.inventory.model.Metric;
 import org.hawkular.inventory.model.Resource;
@@ -35,7 +33,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Joel Takvorian
  */
-public class ResourceNode implements Serializable {
+public class ResourceWithType implements Serializable {
 
     @JsonInclude(Include.NON_NULL)
     private final String id;
@@ -50,52 +48,36 @@ public class ResourceNode implements Serializable {
     private final ResourceType type;
 
     @JsonInclude(Include.NON_NULL)
-    private final List<ResourceNode> children;
+    private final List<String> childrenIds;
 
     @JsonInclude(Include.NON_NULL)
     private final List<Metric> metrics;
 
-    public ResourceNode(@JsonProperty("id") String id,
-                        @JsonProperty("name") String name,
-                        @JsonProperty("properties") Map<String, String> properties,
-                        @JsonProperty("type") ResourceType type,
-                        @JsonProperty("children") List<ResourceNode> children,
-                        @JsonProperty("metrics") List<Metric> metrics) {
+    public ResourceWithType(@JsonProperty("id") String id,
+                            @JsonProperty("name") String name,
+                            @JsonProperty("properties") Map<String, String> properties,
+                            @JsonProperty("type") ResourceType type,
+                            @JsonProperty("childrenIds") List<String> childrenIds,
+                            @JsonProperty("metrics") List<Metric> metrics) {
         this.id = id;
         this.name = name;
         this.properties = properties;
         this.type = type;
-        this.children = children;
+        this.childrenIds = childrenIds;
         this.metrics = metrics;
     }
 
     /**
-     * Converts {@link Resource} into {@link ResourceNode} using loaders for {@link ResourceType} and {@code children}.
+     * Converts {@link Resource} into {@link ResourceWithType} using loader for {@link ResourceType}.
+     * The children are not loaded.
      * @param r the resource to convert
      * @param rtLoader loader for {@link ResourceType}
-     * @param rLoader loader for {@link Resource} children
-     * @return the node with its subtree
+     * @return the node without its subtree
      */
-    public static ResourceNode fromResource(Resource r,
-                                     Function<String, ResourceType> rtLoader,
-                                     Function<String, Resource> rLoader) {
-        return fromResource(r, rtLoader, rLoader, new HashSet<>());
-    }
-
-    private static ResourceNode fromResource(Resource r,
-                                             Function<String, ResourceType> rtLoader,
-                                             Function<String, Resource> rLoader,
-                                             Set<String> loaded) {
-        if (loaded.contains(r.getId())) {
-            throw new IllegalStateException("Cycle detected in the tree with id " + r.getId()
-                    + "; aborting operation. The inventory is invalid.");
-        }
-        loaded.add(r.getId());
-        List<ResourceNode> children = r.getChildren(rLoader).stream()
-                .map(child -> fromResource(child, rtLoader, rLoader, loaded))
-                .collect(Collectors.toList());
-        return new ResourceNode(r.getId(), r.getName(), r.getProperties(), r.getType(rtLoader),
-                children, r.getMetrics());
+    public static ResourceWithType fromResource(Resource r,
+                                                Function<String, ResourceType> rtLoader) {
+        return new ResourceWithType(r.getId(), r.getName(), r.getProperties(), r.getType(rtLoader),
+                r.getChildrenIds(), r.getMetrics());
     }
 
     public String getId() {
@@ -114,8 +96,8 @@ public class ResourceNode implements Serializable {
         return type;
     }
 
-    public List<ResourceNode> getChildren() {
-        return children;
+    public List<String> getChildrenIds() {
+        return childrenIds;
     }
 
     public List<Metric> getMetrics() {
