@@ -147,7 +147,7 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public ResultSet<ResourceWithType> getAllTopResources(long startOffset, int maxResults) {
+    public ResultSet<ResourceWithType> getTopResources(long startOffset, int maxResults) {
         Query query = queryFactory.from(Resource.class)
                 .having("rootId").isNull()
                 .maxResults(maxResults)
@@ -160,12 +160,12 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public ResultSet<ResourceWithType> getAllTopResources() {
-        return getAllTopResources(0, MAX_RESULTS);
+    public ResultSet<ResourceWithType> getTopResources() {
+        return getTopResources(0, MAX_RESULTS);
     }
 
     @Override
-    public ResultSet<ResourceType> getAllResourceTypes(long startOffset, int maxResults) {
+    public ResultSet<ResourceType> getResourceTypes(long startOffset, int maxResults) {
         Query query = queryFactory.from(ResourceType.class)
                 .maxResults(maxResults)
                 .startOffset(startOffset)
@@ -174,8 +174,8 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public ResultSet<ResourceType> getAllResourceTypes() {
-        return getAllResourceTypes(0, MAX_RESULTS);
+    public ResultSet<ResourceType> getResourceTypes() {
+        return getResourceTypes(0, MAX_RESULTS);
     }
 
     @Override

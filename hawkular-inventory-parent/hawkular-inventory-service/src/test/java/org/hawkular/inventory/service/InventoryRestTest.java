@@ -507,14 +507,11 @@ public class InventoryRestTest {
                 log.infof("Querying [%s] Servers", (i * maxServersPerIteration));
             }
         }
-    }
 
-    @Test
-    public void test019_shouldGetResourceTypes() {
-        // FIXME Why is this test so slow? (copy of test005_shouldGetResourceTypes)
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString()).path("types");
-        Response response = target
+        log.info("Querying all types");
+        client = ClientBuilder.newClient();
+        target = client.target(baseUrl.toString()).path("types");
+        response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();

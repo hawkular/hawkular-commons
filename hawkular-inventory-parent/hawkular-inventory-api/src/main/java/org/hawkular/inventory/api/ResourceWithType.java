@@ -17,7 +17,6 @@
 package org.hawkular.inventory.api;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -31,6 +30,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
+ * High-level model for {@link Resource} associated with {@link ResourceType}
+ * Unlike {@link ResourceNode}, this class doesn't provide full children subtree,
+ * but just a list of children ids instead.
  * @author Joel Takvorian
  */
 public class ResourceWithType implements Serializable {
