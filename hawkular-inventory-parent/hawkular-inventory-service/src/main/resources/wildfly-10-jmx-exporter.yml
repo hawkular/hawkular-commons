@@ -1,0 +1,125 @@
+#
+# Copyright 2014-2017 Red Hat, Inc. and/or its affiliates
+# and other contributors as indicated by the @author tags.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+---
+startDelaySeconds: 1
+lowercaseOutputName: true
+lowercaseOutputLabelNames: true
+rules:
+
+  # CONFIG
+
+  - pattern: "^jboss.as<path=(.+)><>path:(.+)"
+    attrNameSnakeCase: true
+    name: wildfly_config
+    labels:
+      $1: $2
+    value: 1
+
+  # DEPLOYMENTS
+
+  - pattern: "^jboss.as<deployment=(.+), subdeployment=(.+), subsystem=undertow><>(.+_sessions|session_.+):"
+    attrNameSnakeCase: true
+    name: wildfly_deployment_$3
+    type: GAUGE
+    labels:
+      name: $1
+      subdeployment: $2
+
+  - pattern: "^jboss.as<deployment=(.+), subsystem=undertow><>(.+_sessions|session_.+):"
+    attrNameSnakeCase: true
+    name: wildfly_deployment_$2
+    type: GAUGE
+    labels:
+      name: $1
+
+  # MESSAGING
+
+  - pattern: "^jboss.as<subsystem=messaging-activemq, server=(.+), jms-(queue|topic)=(.+)><>(.+):"
+    attrNameSnakeCase: true
+    name: wildfly_messaging_$4
+    type: GAUGE
+    labels:
+      server: $1
+      $2: $3
+
+  # DATASOURCES
+
+  - pattern: "^jboss.as<subsystem=datasources, (?:xa-)*data-source=(.+), statistics=(.+)><>(.+):"
+    attrNameSnakeCase: true
+    name: wildfly_datasource_$2_$3
+    type: GAUGE
+    labels:
+      name: $1
+
+  # TRANSACTIONS
+
+  - pattern: "^jboss.as<subsystem=transactions><>number_of_(.+):"
+    attrNameSnakeCase: true
+    name: wildfly_transactions_$1
+    type: GAUGE
+
+  # WEB SUBSYSTEM
+
+  - pattern: "^jboss.as<subsystem=undertow, server=(.+), (https?)-listener=(.+)><>(bytes_.+|error_count|processing_time|request_count):"
+    attrNameSnakeCase: true
+    name: wildfly_undertow_$4
+    type: GAUGE
+    labels:
+      server: $1
+      listener: $3
+      protocol: $2
+
+  # SERVLET
+
+  - pattern: "^jboss.as<deployment=(.+), subdeployment=(.+), subsystem=undertow, servlet=(.+)><>(.+_time|.+_count):"
+    attrNameSnakeCase: true
+    name: wildfly_servlet_$4
+    type: GAUGE
+    labels:
+      name: $3
+      deployment: $1
+      subdeployment: $2
+
+  - pattern: "^jboss.as<deployment=(.+), subsystem=undertow, servlet=(.+)><>(.+_time|.+_count):"
+    attrNameSnakeCase: true
+    name: wildfly_servlet_$3
+    type: GAUGE
+    labels:
+      name: $2
+      deployment: $1
+
+  # EJB
+
+  - pattern: "^jboss.as<deployment=(.+), subdeployment=(.+), subsystem=ejb3, (stateless-session|stateful-session|message-driven|singleton)-bean=(.+)><>(.+):"
+    attrNameSnakeCase: true
+    name: wildfly_ejb_$5
+    type: GAUGE
+    labels:
+      name: $4
+      type: $3
+      deployment: $1
+      subdeployment: $2
+
+  - pattern: "^jboss.as<deployment=(.+), subsystem=ejb3, (stateless-session|stateful-session|message-driven|singleton)-bean=(.+)><>(.+):"
+    attrNameSnakeCase: true
+    name: wildfly_ejb_$4
+    type: GAUGE
+    labels:
+      name: $3
+      type: $2
+      deployment: $1
