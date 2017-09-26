@@ -33,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
+ * High-level model for full {@link Resource} with subtree, associated with their {@link ResourceType}
  * @author Joel Takvorian
  */
 public class ResourceNode implements Serializable {
@@ -69,6 +70,13 @@ public class ResourceNode implements Serializable {
         this.metrics = metrics;
     }
 
+    /**
+     * Converts {@link Resource} into {@link ResourceNode} using loaders for {@link ResourceType} and {@code children}.
+     * @param r the resource to convert
+     * @param rtLoader loader for {@link ResourceType}
+     * @param rLoader loader for {@link Resource} children
+     * @return the node with its subtree
+     */
     public static ResourceNode fromResource(Resource r,
                                      Function<String, ResourceType> rtLoader,
                                      Function<String, Resource> rLoader) {

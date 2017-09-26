@@ -21,11 +21,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.hawkular.inventory.model.Resource;
 import org.hawkular.inventory.model.ResourceType;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -39,7 +37,7 @@ public class JacksonDeserializer {
 
     public static class ResultSetDeserializer extends JsonDeserializer<ResultSet> {
         @Override
-        public ResultSet deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+        public ResultSet deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
 
             ObjectCodec objectCodec = jp.getCodec();
             JsonNode node = objectCodec.readTree(jp);
@@ -48,12 +46,15 @@ public class JacksonDeserializer {
             List results = new ArrayList<>();
             if (node.get("results").isArray() && node.get("results").size() > 0) {
                 JsonNode first = node.get("results").get(0);
-                boolean resource = first.get("typeId") != null || first.get("childrenIds") != null ? true : false;
+                boolean resourceNode = first.get("children") != null;
+                boolean resourceWithType = first.get("type") != null;
                 Iterator<JsonNode> elements = node.get("results").elements();
                 while (elements.hasNext()) {
                     JsonNode element = elements.next();
-                    if (resource) {
-                        results.add(objectCodec.treeToValue(element, Resource.class));
+                    if (resourceNode) {
+                        results.add(objectCodec.treeToValue(element, ResourceNode.class));
+                    } else if (resourceWithType) {
+                        results.add(objectCodec.treeToValue(element, ResourceWithType.class));
                     } else {
                         results.add(objectCodec.treeToValue(element, ResourceType.class));
                     }

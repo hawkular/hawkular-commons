@@ -22,8 +22,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
@@ -35,6 +36,7 @@ import javax.inject.Inject;
 
 import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.api.ResourceNode;
+import org.hawkular.inventory.api.ResourceWithType;
 import org.hawkular.inventory.api.ResultSet;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
@@ -79,7 +81,7 @@ public class InventoryServiceIspn implements InventoryService {
 
     @Override
     public void addResource(Resource r) {
-        addResource(Arrays.asList(r));
+        addResource(Collections.singletonList(r));
     }
 
     @Override
@@ -95,7 +97,7 @@ public class InventoryServiceIspn implements InventoryService {
 
     @Override
     public void addResourceType(ResourceType rt) {
-        addResourceType(Arrays.asList(rt));
+        addResourceType(Collections.singletonList(rt));
     }
 
     @Override
@@ -126,8 +128,7 @@ public class InventoryServiceIspn implements InventoryService {
         backend.remove(IspnPK.pkResourceType(type));
     }
 
-    @Override
-    public Optional<Resource> getResourceById(String id) {
+    private Optional<Resource> getRawResource(String id) {
         if (isEmpty(id)) {
             throw new IllegalArgumentException("Resource id must be not null");
         }
@@ -135,33 +136,36 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public Optional<ResourceNode> getTree(String parentId) {
-        // Optimisation, make sure eveything gets in cache; can be removed safely
-        // resourcesByRoot.get(parentId);
-
-        return getResourceById(parentId)
-                .map(r -> ResourceNode.fromResource(r,
-                        this::getNullableResourceType,
-                        this::getNullableResource));
+    public Optional<ResourceWithType> getResourceById(String id) {
+        return getRawResource(id).map(r -> ResourceWithType.fromResource(r, this::getNullableResourceType));
     }
 
     @Override
-    public ResultSet<Resource> getAllTopResources(long startOffset, int maxResults) {
+    public Optional<ResourceNode> getTree(String parentId) {
+        return getRawResource(parentId)
+                .map(r -> ResourceNode.fromResource(r, this::getNullableResourceType, this::getNullableResource));
+    }
+
+    @Override
+    public ResultSet<ResourceWithType> getTopResources(long startOffset, int maxResults) {
         Query query = queryFactory.from(Resource.class)
                 .having("rootId").isNull()
                 .maxResults(maxResults)
                 .startOffset(startOffset)
                 .build();
-        return new ResultSet<>(query.list(), (long) query.getResultSize(), startOffset);
+        List<ResourceWithType> result = query.list().stream()
+                .map(r -> ResourceWithType.fromResource((Resource)r, this::getNullableResourceType))
+                .collect(Collectors.toList());
+        return new ResultSet<>(result, (long) query.getResultSize(), startOffset);
     }
 
     @Override
-    public ResultSet<Resource> getAllTopResources() {
-        return getAllTopResources(0, MAX_RESULTS);
+    public ResultSet<ResourceWithType> getTopResources() {
+        return getTopResources(0, MAX_RESULTS);
     }
 
     @Override
-    public ResultSet<ResourceType> getAllResourceTypes(long startOffset, int maxResults) {
+    public ResultSet<ResourceType> getResourceTypes(long startOffset, int maxResults) {
         Query query = queryFactory.from(ResourceType.class)
                 .maxResults(maxResults)
                 .startOffset(startOffset)
@@ -170,22 +174,25 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public ResultSet<ResourceType> getAllResourceTypes() {
-        return getAllResourceTypes(0, MAX_RESULTS);
+    public ResultSet<ResourceType> getResourceTypes() {
+        return getResourceTypes(0, MAX_RESULTS);
     }
 
     @Override
-    public ResultSet<Resource> getResourcesByType(String typeId, long startOffset, int maxResults) {
+    public ResultSet<ResourceWithType> getResourcesByType(String typeId, long startOffset, int maxResults) {
         Query query = queryFactory.from(Resource.class)
                 .having("typeId").equal(typeId)
                 .maxResults(maxResults)
                 .startOffset(startOffset)
                 .build();
-        return new ResultSet<>(query.list(), (long) query.getResultSize(), startOffset);
+        List<ResourceWithType> result = query.list().stream()
+                .map(r -> ResourceWithType.fromResource((Resource)r, this::getNullableResourceType))
+                .collect(Collectors.toList());
+        return new ResultSet<>(result, (long) query.getResultSize(), startOffset);
     }
 
     @Override
-    public ResultSet<Resource> getResourcesByType(String typeId) {
+    public ResultSet<ResourceWithType> getResourcesByType(String typeId) {
         return getResourcesByType(typeId, 0, MAX_RESULTS);
     }
 
@@ -212,7 +219,7 @@ public class InventoryServiceIspn implements InventoryService {
         //  Or check that "resourceType" is in a whitelist of types?
         try {
             byte[] encoded = Files.readAllBytes(configPath.resolve(fileName));
-            return Optional.of(new String(encoded, "UTF-8"));
+            return Optional.of(new String(encoded, StandardCharsets.UTF_8.name()));
         } catch (IOException ioe) {
             try {
                 InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);

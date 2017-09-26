@@ -39,6 +39,7 @@ import javax.ws.rs.core.Response;
 
 import org.hawkular.inventory.api.Import;
 import org.hawkular.inventory.api.ResourceNode;
+import org.hawkular.inventory.api.ResourceWithType;
 import org.hawkular.inventory.api.ResultSet;
 import org.hawkular.inventory.model.Metric;
 import org.hawkular.inventory.model.MetricUnit;
@@ -113,9 +114,11 @@ public class InventoryRestTest {
             new Operation("Shutdown", SHUTDOWN_PARAMETERS),
             new Operation("Start", Collections.emptyMap()));
     private static final ResourceType TYPE_EAP = new ResourceType("EAP", EAP_OPS, new HashMap<>());
+    private static final ResourceType TYPE_FOO = new ResourceType("FOO", Collections.emptyList(), new HashMap<>());
+    private static final ResourceType TYPE_BAR = new ResourceType("BAR", Collections.emptyList(), new HashMap<>());
 
     private static final Import IMPORT = new Import(Arrays.asList(EAP1, EAP2, CHILD1, CHILD2, CHILD3, CHILD4),
-            Collections.singletonList(TYPE_EAP));
+            Arrays.asList(TYPE_EAP, TYPE_FOO, TYPE_BAR));
 
     public static Import createResourceTypes() {
         Map<String, Map<String, String>> reload;
@@ -138,7 +141,7 @@ public class InventoryRestTest {
         Collection<Operation> eapOps = Arrays.asList(
                 new Operation("Reload", reload),
                 new Operation("Shutdown", shutdown),
-                new Operation("Start", Collections.EMPTY_MAP));
+                new Operation("Start", Collections.emptyMap()));
         ResourceType eapType = new ResourceType("EAP", eapOps, new HashMap<>());
 
         Map<String, Map<String, String>> flush;
@@ -151,7 +154,7 @@ public class InventoryRestTest {
         flush.get("param2").put("description", "Description of param2 for Flush op");
         Collection<Operation> jdgOps = Arrays.asList(
                 new Operation("Flush", flush),
-                new Operation("Delete", Collections.EMPTY_MAP));
+                new Operation("Delete", Collections.emptyMap()));
         ResourceType jdgType = new ResourceType("JDG", jdgOps, new HashMap<>());
 
         List<ResourceType> resourceTypes = Arrays.asList(eapType, jdgType);
@@ -257,7 +260,9 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertEquals("EAP-1", response.readEntity(Resource.class).getId());
+        ResourceWithType resource = response.readEntity(ResourceWithType.class);
+        assertEquals("EAP-1", resource.getId());
+        assertEquals("EAP", resource.getType().getId());
 
         target = client.target(baseUrl.toString()).path("resource/EAP-2");
         response = target
@@ -265,7 +270,7 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertEquals("EAP-2", response.readEntity(Resource.class).getId());
+        assertEquals("EAP-2", response.readEntity(ResourceWithType.class).getId());
 
         target = client.target(baseUrl.toString()).path("resource/child-1");
         response = target
@@ -273,7 +278,7 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertEquals("child-1", response.readEntity(Resource.class).getId());
+        assertEquals("child-1", response.readEntity(ResourceWithType.class).getId());
     }
 
     @Test
@@ -296,9 +301,13 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertThat((List<Resource>) response.readEntity(ResultSet.class).getResults())
-                .extracting(Resource::getId)
+        List<ResourceWithType> resources = (List<ResourceWithType>) response.readEntity(ResultSet.class).getResults();
+        assertThat(resources)
+                .extracting(ResourceWithType::getId)
                 .containsOnly("EAP-1", "EAP-2");
+        assertThat(resources)
+                .flatExtracting(ResourceWithType::getChildrenIds)
+                .containsOnly("child-1", "child-2", "child-3", "child-4");
     }
 
     @Test
@@ -312,7 +321,7 @@ public class InventoryRestTest {
         assertEquals(200, response.getStatus());
         assertThat((List<ResourceType>) response.readEntity(ResultSet.class).getResults())
                 .extracting(ResourceType::getId)
-                .containsExactly("EAP");
+                .containsOnly("EAP", "FOO", "BAR");
     }
 
     @Test
@@ -324,8 +333,8 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertThat((List<Resource>) response.readEntity(ResultSet.class).getResults())
-                .extracting(Resource::getId)
+        assertThat((List<ResourceWithType>) response.readEntity(ResultSet.class).getResults())
+                .extracting(ResourceWithType::getId)
                 .containsOnly("EAP-1", "EAP-2");
     }
 
@@ -338,8 +347,8 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertThat((List<Resource>) response.readEntity(ResultSet.class).getResults())
-                .extracting(Resource::getId)
+        assertThat((List<ResourceWithType>) response.readEntity(ResultSet.class).getResults())
+                .extracting(ResourceWithType::getId)
                 .containsOnly("child-1", "child-3");
     }
 
@@ -498,6 +507,18 @@ public class InventoryRestTest {
                 log.infof("Querying [%s] Servers", (i * maxServersPerIteration));
             }
         }
+
+        log.info("Querying all types");
+        client = ClientBuilder.newClient();
+        target = client.target(baseUrl.toString()).path("types");
+        response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        assertEquals(200, response.getStatus());
+        assertThat((List<ResourceType>) response.readEntity(ResultSet.class).getResults())
+                .extracting(ResourceType::getId)
+                .containsOnly("EAP", "FOO", "BAR", "JDG");
     }
 
     @Test
@@ -506,10 +527,6 @@ public class InventoryRestTest {
         // Delete resources
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString());
-        IMPORT.getResources().forEach(r -> target.path("resource/" + r.getId()).request().delete().close());
-        IMPORT.getTypes().forEach(t -> target.path("type/" + t.getId()).request().delete().close());
-        target.path("resource/CP").request().delete().close();
-        target.path("resource/CC").request().delete().close();
+        target.path("type/JDG").request().delete().close();
     }
-
 }

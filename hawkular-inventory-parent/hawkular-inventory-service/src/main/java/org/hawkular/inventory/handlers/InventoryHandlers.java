@@ -87,7 +87,7 @@ public class InventoryHandlers {
     @Path("/import")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Response createResource(final Import inventory) {
+    public Response importInventory(final Import inventory) {
         try {
             if (inventory != null) {
                 inventoryService.addResource(inventory.getResources());
@@ -143,7 +143,7 @@ public class InventoryHandlers {
     public Response getAllTopResources(@DefaultValue("0") @QueryParam("startOffSet") final Long startOffset,
                                        @DefaultValue("100") @QueryParam("maxResults") final Integer maxResults) {
         try {
-            return ResponseUtil.ok(inventoryService.getAllTopResources(startOffset, maxResults));
+            return ResponseUtil.ok(inventoryService.getTopResources(startOffset, maxResults));
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }
@@ -168,7 +168,7 @@ public class InventoryHandlers {
     public Response getAllResourceTypes(@DefaultValue("0") @QueryParam("startOffSet") final Long startOffset,
                                         @DefaultValue("100") @QueryParam("maxResults") final Integer maxResults) {
         try {
-            return ResponseUtil.ok(inventoryService.getAllResourceTypes(startOffset, maxResults));
+            return ResponseUtil.ok(inventoryService.getResourceTypes(startOffset, maxResults));
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }
