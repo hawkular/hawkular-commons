@@ -23,7 +23,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -35,6 +38,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ResourceType implements Serializable {
 
     @JsonInclude(Include.NON_NULL)
+    @Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
     private final String id;  // Unique index [Search resource type by id]
 
     @JsonInclude(Include.NON_NULL)

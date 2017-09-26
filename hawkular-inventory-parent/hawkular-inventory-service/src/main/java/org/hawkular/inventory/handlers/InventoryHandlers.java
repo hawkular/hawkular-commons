@@ -87,7 +87,7 @@ public class InventoryHandlers {
     @Path("/import")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Response createResource(final Import inventory) {
+    public Response importInventory(final Import inventory) {
         try {
             if (inventory != null) {
                 inventoryService.addResource(inventory.getResources());
