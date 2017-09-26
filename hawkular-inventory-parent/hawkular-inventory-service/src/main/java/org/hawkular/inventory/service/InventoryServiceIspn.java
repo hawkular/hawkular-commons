@@ -62,20 +62,31 @@ public class InventoryServiceIspn implements InventoryService {
     private final Path configPath;
 
     @Inject
-    @Inventory
-    private Cache<String, Object> backend;
+    @InventoryResource
+    private Cache<String, Object> resource;
 
     @Inject
-    @Inventory
-    private QueryFactory queryFactory;
+    @InventoryResource
+    private QueryFactory qResource;
+
+    @Inject
+    @InventoryResourceType
+    private Cache<String, Object> resourceType;
+
+    @Inject
+    @InventoryResourceType
+    private QueryFactory qResourceType;
+
 
     public InventoryServiceIspn() {
         configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
     }
 
-    InventoryServiceIspn(Cache<String, Object> backend, String configPath) {
-        this.backend = backend;
-        queryFactory = Search.getQueryFactory(backend);
+    InventoryServiceIspn(Cache<String, Object> resource, Cache<String, Object> resourceType, String configPath) {
+        this.resource = resource;
+        this.resourceType = resourceType;
+        qResource = Search.getQueryFactory(resource);
+        qResourceType = Search.getQueryFactory(resourceType);
         this.configPath = Paths.get(configPath);
     }
 
@@ -91,8 +102,8 @@ public class InventoryServiceIspn implements InventoryService {
         }
         Map<String, Resource> map = resources.stream()
                 .parallel()
-                .collect(Collectors.toMap(r -> IspnPK.pk(r), r -> r));
-        backend.putAll(map);
+                .collect(Collectors.toMap(r -> r.getId(), r -> r));
+        resource.putAll(map);
     }
 
     @Override
@@ -107,8 +118,8 @@ public class InventoryServiceIspn implements InventoryService {
         }
         Map<String, ResourceType> map = resourceTypes.stream()
                 .parallel()
-                .collect(Collectors.toMap(rt -> IspnPK.pk(rt), rt -> rt));
-        backend.putAll(map);
+                .collect(Collectors.toMap(rt -> rt.getId(), rt -> rt));
+        resourceType.putAll(map);
     }
 
     @Override
@@ -117,22 +128,22 @@ public class InventoryServiceIspn implements InventoryService {
             throw new IllegalArgumentException("Id must be not null");
         }
         // FIXME: remove subtree?
-        backend.remove(IspnPK.pkResource(id));
+        resource.remove(id);
     }
 
     @Override
-    public void deleteResourceType(String type) {
-        if (isEmpty(type)) {
+    public void deleteResourceType(String typeId) {
+        if (isEmpty(typeId)) {
             throw new IllegalArgumentException("Type must be not null");
         }
-        backend.remove(IspnPK.pkResourceType(type));
+        resourceType.remove(typeId);
     }
 
     private Optional<Resource> getRawResource(String id) {
         if (isEmpty(id)) {
             throw new IllegalArgumentException("Resource id must be not null");
         }
-        return Optional.ofNullable((Resource) backend.get(IspnPK.pkResource(id)));
+        return Optional.ofNullable((Resource) resource.get(id));
     }
 
     @Override
@@ -148,7 +159,7 @@ public class InventoryServiceIspn implements InventoryService {
 
     @Override
     public ResultSet<ResourceWithType> getTopResources(long startOffset, int maxResults) {
-        Query query = queryFactory.from(Resource.class)
+        Query query = qResource.from(Resource.class)
                 .having("rootId").isNull()
                 .maxResults(maxResults)
                 .startOffset(startOffset)
@@ -166,7 +177,7 @@ public class InventoryServiceIspn implements InventoryService {
 
     @Override
     public ResultSet<ResourceType> getResourceTypes(long startOffset, int maxResults) {
-        Query query = queryFactory.from(ResourceType.class)
+        Query query = qResourceType.from(ResourceType.class)
                 .maxResults(maxResults)
                 .startOffset(startOffset)
                 .build();
@@ -180,7 +191,7 @@ public class InventoryServiceIspn implements InventoryService {
 
     @Override
     public ResultSet<ResourceWithType> getResourcesByType(String typeId, long startOffset, int maxResults) {
-        Query query = queryFactory.from(Resource.class)
+        Query query = qResource.from(Resource.class)
                 .having("typeId").equal(typeId)
                 .maxResults(maxResults)
                 .startOffset(startOffset)
@@ -201,7 +212,7 @@ public class InventoryServiceIspn implements InventoryService {
         if (isEmpty(typeId)) {
             throw new IllegalArgumentException("ResourceType id must be not null");
         }
-        return Optional.ofNullable((ResourceType) backend.get(IspnPK.pkResourceType(typeId)));
+        return Optional.ofNullable((ResourceType) resourceType.get(typeId));
     }
 
     @Override
@@ -241,14 +252,14 @@ public class InventoryServiceIspn implements InventoryService {
         if (isEmpty(id)) {
             return null;
         }
-        return (Resource) backend.get(IspnPK.pkResource(id));
+        return (Resource) resource.get(id);
     }
 
-    private ResourceType getNullableResourceType(String id) {
-        if (isEmpty(id)) {
+    private ResourceType getNullableResourceType(String typeId) {
+        if (isEmpty(typeId)) {
             return null;
         }
-        return (ResourceType) backend.get(IspnPK.pkResourceType(id));
+        return (ResourceType) resourceType.get(typeId);
     }
 
     private boolean isEmpty(String s) {

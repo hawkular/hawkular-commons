@@ -16,32 +16,23 @@
  */
 package org.hawkular.inventory.service;
 
-import org.hawkular.inventory.model.Resource;
-import org.hawkular.inventory.model.ResourceType;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import javax.inject.Qualifier;
 
 /**
  * @author Jay Shaughnessy
  * @author Lucas Ponce
  */
-public class IspnPK {
-
-    public static String pk(Resource r) {
-        return pkResource(r.getId());
-    }
-
-    public static String pkResource(String id) {
-        return new StringBuilder("Resource-")
-                .append(id)
-                .toString();
-    }
-
-    public static String pk(ResourceType rt) {
-        return pkResourceType(rt.getId());
-    }
-
-    public static String pkResourceType(String id) {
-        return new StringBuilder("ResourceType-")
-                .append(id)
-                .toString();
-    }
+@Qualifier
+@Retention(RUNTIME)
+@Target({TYPE, METHOD, FIELD, PARAMETER})
+public @interface InventoryResourceType {
 }
