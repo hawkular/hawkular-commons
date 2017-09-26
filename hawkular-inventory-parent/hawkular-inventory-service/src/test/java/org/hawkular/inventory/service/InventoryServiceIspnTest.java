@@ -128,7 +128,7 @@ public class InventoryServiceIspnTest {
 
     @Test
     public void shouldGetTopResources() {
-        Collection<ResourceWithType> top = service.getAllTopResources().getResults();
+        Collection<ResourceWithType> top = service.getTopResources().getResults();
         assertThat(top)
                 .extracting(ResourceWithType::getName)
                 .containsOnly("EAP-1", "EAP-2");
@@ -143,7 +143,7 @@ public class InventoryServiceIspnTest {
 
     @Test
     public void shouldGetResourceTypes() {
-        assertThat(service.getAllResourceTypes().getResults())
+        assertThat(service.getResourceTypes().getResults())
                 .extracting(ResourceType::getId)
                 .containsOnly("EAP", "FOO", "BAR");
     }

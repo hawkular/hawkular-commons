@@ -33,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
+ * High-level model for full {@link Resource} with subtree, associated with their {@link ResourceType}
  * @author Joel Takvorian
  */
 public class ResourceNode implements Serializable {
