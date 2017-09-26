@@ -55,7 +55,7 @@ public interface InventoryService {
     /**
      * Delete a single resource type
      */
-    void deleteResourceType(String type);
+    void deleteResourceType(String typeId);
 
     /**
      * Get a resource from its ID. The resulting object includes {@link ResourceType}
@@ -94,7 +94,7 @@ public interface InventoryService {
     ResultSet<ResourceType> getResourceTypes(long startOffset, int maxResults);
 
     /**
-     * Get resources of a given type, with the default pagination options (first 100 results)
+     * Get resources of a given typeId, with the default pagination options (first 100 results)
      * @return list of resources, embedded in page object {@link ResultSet}
      */
     ResultSet<ResourceWithType> getResourcesByType(String typeId);

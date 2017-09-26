@@ -86,9 +86,11 @@ public class InventoryServiceIspnTest {
     }
 
     public InventoryServiceIspnTest() throws IOException {
-        Cache<String, Object> backend = CACHE_MANAGER.getCache("backend");
-        backend.clear();
-        service = new InventoryServiceIspn(backend, getClass().getClassLoader().getResource("").getPath());
+        Cache<String, Object> resource = CACHE_MANAGER.getCache("resource");
+        Cache<String, Object> resourceType = CACHE_MANAGER.getCache("resource_type");
+        resource.clear();
+        resourceType.clear();
+        service = new InventoryServiceIspn(resource, resourceType, getClass().getClassLoader().getResource("").getPath());
     }
 
     @Before

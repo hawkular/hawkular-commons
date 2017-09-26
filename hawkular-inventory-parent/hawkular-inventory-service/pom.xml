@@ -257,6 +257,12 @@
                     <include>test-jmx-exporter.yml</include>
                   </includes>
                 </resource>
+                <resource>
+                  <directory>src/main/resources</directory>
+                  <includes>
+                    <include>hawkular-inventory-ispn.xml</include>
+                  </includes>
+                </resource>
               </resources>
             </configuration>
           </execution>
