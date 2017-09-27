@@ -24,7 +24,7 @@
 
   <cache-container name="hawkular-inventory">
 
-    <local-cache name="backend">
+    <local-cache name="resource">
       <transaction mode="NON_XA"/>
       <persistence>
         <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="${jboss.server.data.dir}/hawkular-inventory">
@@ -42,15 +42,14 @@
       </memory>
       <indexing index="LOCAL">
         <indexed-entities>
-          <indexed-entity>org.hawkular.inventory.model.ResourceType</indexed-entity>
           <indexed-entity>org.hawkular.inventory.model.Resource</indexed-entity>
         </indexed-entities>
         <property name="default.indexmanager">near-real-time</property>
         <property name="default.directory_provider">infinispan</property>
         <property name="default.chunk_size">128000</property>
-        <property name="default.locking_cachename">LuceneIndexesLocking_hawkular_inventory</property>
-        <property name="default.data_cachename">LuceneIndexesData_hawkular_inventory</property>
-        <property name="default.metadata_cachename">LuceneIndexesMetadata_hawkular_inventory</property>
+        <property name="default.locking_cachename">resource_indexes_locking</property>
+        <property name="default.data_cachename">resource_indexes_data</property>
+        <property name="default.metadata_cachename">resource_indexes_metadata</property>
         <!-- The default is 10, but we don't want to waste many cycles in merging
          (tune for writes at cost of reader fragmentation) -->
 
@@ -64,7 +63,7 @@
         <property name="lucene_version">LUCENE_CURRENT</property>
       </indexing>
     </local-cache>
-    <local-cache name="LuceneIndexesMetadata_hawkular_inventory">
+    <local-cache name="resource_indexes_metadata">
       <persistence passivation="false">
         <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="${jboss.server.data.dir}/hawkular-inventory">
           <write-behind thread-pool-size="5" />
@@ -72,7 +71,7 @@
       </persistence>
       <indexing index="NONE"/>
     </local-cache>
-    <local-cache name="LuceneIndexesData_hawkular_inventory">
+    <local-cache name="resource_indexes_data">
       <persistence passivation="false">
         <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="${jboss.server.data.dir}/hawkular-inventory">
           <write-behind thread-pool-size="5" />
@@ -80,7 +79,62 @@
       </persistence>
       <indexing index="NONE" />
     </local-cache>
-    <local-cache name="LuceneIndexesLocking_hawkular_inventory">
+    <local-cache name="resource_indexes_locking">
+      <persistence passivation="false">
+        <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="${jboss.server.data.dir}/hawkular-inventory">
+          <write-behind thread-pool-size="5" />
+        </file-store>
+      </persistence>
+      <indexing index="NONE" />
+    </local-cache>
+
+    <local-cache name="resource_type">
+      <transaction mode="NON_XA"/>
+      <persistence>
+        <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="${jboss.server.data.dir}/hawkular-inventory">
+          <write-behind thread-pool-size="5" modification-queue-size="10000" />
+        </file-store>
+      </persistence>
+      <indexing index="LOCAL">
+        <indexed-entities>
+          <indexed-entity>org.hawkular.inventory.model.ResourceType</indexed-entity>
+        </indexed-entities>
+        <property name="default.indexmanager">near-real-time</property>
+        <property name="default.directory_provider">infinispan</property>
+        <property name="default.chunk_size">128000</property>
+        <property name="default.locking_cachename">resource_type_indexes_locking</property>
+        <property name="default.data_cachename">resource_type_indexes_data</property>
+        <property name="default.metadata_cachename">resource_type_indexes_metadata</property>
+        <!-- The default is 10, but we don't want to waste many cycles in merging
+         (tune for writes at cost of reader fragmentation) -->
+
+        <property name="default.indexwriter.merge_factor">30</property>
+        <!-- Never create segments larger than 1GB -->
+        <property name="default.indexwriter.merge_max_size">1024</property>
+        <!-- IndexWriter flush buffer size in MB -->
+        <property name="default.indexwriter.ram_buffer_size">64</property>
+        <!-- Enable sharding on writers -->
+        <property name="default.sharding_strategy.nbr_of_shards">6</property>
+        <property name="lucene_version">LUCENE_CURRENT</property>
+      </indexing>
+    </local-cache>
+    <local-cache name="resource_type_indexes_metadata">
+      <persistence passivation="false">
+        <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="${jboss.server.data.dir}/hawkular-inventory">
+          <write-behind thread-pool-size="5" />
+        </file-store>
+      </persistence>
+      <indexing index="NONE"/>
+    </local-cache>
+    <local-cache name="resource_type_indexes_data">
+      <persistence passivation="false">
+        <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="${jboss.server.data.dir}/hawkular-inventory">
+          <write-behind thread-pool-size="5" />
+        </file-store>
+      </persistence>
+      <indexing index="NONE" />
+    </local-cache>
+    <local-cache name="resource_type_indexes_locking">
       <persistence passivation="false">
         <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="${jboss.server.data.dir}/hawkular-inventory">
           <write-behind thread-pool-size="5" />

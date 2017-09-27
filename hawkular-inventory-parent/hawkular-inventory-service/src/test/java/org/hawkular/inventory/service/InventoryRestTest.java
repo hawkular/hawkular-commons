@@ -522,6 +522,21 @@ public class InventoryRestTest {
     }
 
     @Test
+    @Category(Performance.class)
+    public void test019_shouldGetResourceTypesAndNotImpactFromResources() {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString()).path("types");
+        Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        assertEquals(200, response.getStatus());
+        assertThat((List<ResourceType>) response.readEntity(ResultSet.class).getResults())
+                .extracting(ResourceType::getId)
+                .containsOnly("EAP", "FOO", "BAR", "JDG");
+    }
+
+    @Test
     public void zzz_clean() {
         // FIXME: proper way for "AfterClass" with arquillian given there's non-static stuff needed?
         // Delete resources
