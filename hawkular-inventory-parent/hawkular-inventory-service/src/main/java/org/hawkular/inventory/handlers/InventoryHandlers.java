@@ -50,6 +50,8 @@ public class InventoryHandlers {
 
     private static final MsgLogger log = InventoryLoggers.getLogger(InventoryHandlers.class);
 
+    ManifestUtil manifestUtil = new ManifestUtil();
+
     @EJB
     private InventoryService inventoryService;
 
@@ -180,6 +182,7 @@ public class InventoryHandlers {
     @Produces(APPLICATION_JSON)
     public Response status(@Context ServletContext servletContext) {
         final Map<String, String> status = new HashMap<>();
+        status.putAll(manifestUtil.getFrom());
         status.put("status", "UP");
         return Response.ok(status).build();
     }
