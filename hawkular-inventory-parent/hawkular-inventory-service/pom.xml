@@ -152,6 +152,12 @@
     <finalName>hawkular-${project.artifactId}-${project.version}</finalName>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <version>${version.org.codehaus.buildnumber-maven-plugin}</version>
+      </plugin>
+
+      <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <version>${version.maven-war-plugin}</version>
         <configuration>
@@ -160,6 +166,12 @@
               <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
+            <manifestEntries>
+              <Implementation-Vendor-Id>org.hawkular.inventory</Implementation-Vendor-Id>
+              <Implementation-Version>${project.version}</Implementation-Version>
+              <Built-From-Git-SHA1>${buildNumber}</Built-From-Git-SHA1>
+              <Built-On>${timestamp}</Built-On>
+            </manifestEntries>
             <!-- <manifestEntries> <Build-Number>${buildNumber}</Build-Number>
               </manifestEntries> -->
           </archive>
