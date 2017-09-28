@@ -32,12 +32,9 @@
 
   <dependencies>
 
-    <!-- TODO this dependency would need to be revisit if this module is used externally -->
     <dependency>
-      <groupId>org.infinispan</groupId>
-      <artifactId>infinispan-embedded-query</artifactId>
-      <version>${version.org.infinispan.community}</version>
-      <scope>provided</scope>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-search-engine</artifactId>
     </dependency>
 
     <dependency>

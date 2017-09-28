@@ -67,16 +67,36 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- Infinispan/Hibernate Search deps -->
     <dependency>
       <groupId>org.infinispan</groupId>
-      <artifactId>infinispan-embedded</artifactId>
-      <version>${version.org.infinispan.community}</version>
+      <artifactId>infinispan-query</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.infinispan</groupId>
+          <artifactId>infinispan-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-search-engine</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.infinispan</groupId>
-      <artifactId>infinispan-embedded-query</artifactId>
-      <version>${version.org.infinispan.community}</version>
+      <artifactId>infinispan-core</artifactId>
+    </dependency>
+
+    <!-- infinispan-query 9.1.1 pulls the wrong version of deps. Override here (below) -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-search-engine</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-search-elasticsearch</artifactId>
     </dependency>
 
     <dependency>
