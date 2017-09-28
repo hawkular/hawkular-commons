@@ -31,9 +31,4 @@ public class InventoryApp extends Application {
     private static final MsgLogger log = InventoryLoggers.getLogger(InventoryApp.class);
 
     public static final String TENANT_HEADER_NAME = "Hawkular-Tenant";
-
-    public InventoryApp() {
-        log.infoInventoryAppStarted();
-    }
-
 }

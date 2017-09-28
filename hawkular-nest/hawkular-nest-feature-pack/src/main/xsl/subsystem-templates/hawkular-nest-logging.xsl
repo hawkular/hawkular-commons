@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2014-2016 Red Hat, Inc. and/or its affiliates
+    Copyright 2014-2017 Red Hat, Inc. and/or its affiliates
     and other contributors as indicated by the @author tags.
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,6 @@
     limitations under the License.
 
 -->
-
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="2.0" exclude-result-prefixes="xalan">
 
   <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" xalan:indent-amount="4" standalone="no" />
@@ -53,6 +52,9 @@
       </logger>
       <logger category="org.hawkular.cmdgw">
         <level name="${{hawkular.log.cmdgw:INFO}}" />
+      </logger>
+      <logger category="org.hawkular.inventory">
+        <level name="${{hawkular.log.inventory:INFO}}" />
       </logger>
       <logger category="org.hawkular.nest">
         <level name="${{hawkular.log.nest:INFO}}" />

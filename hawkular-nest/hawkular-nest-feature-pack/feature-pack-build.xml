@@ -31,5 +31,6 @@
 
   <copy-artifacts>
     <copy-artifact artifact="org.hawkular.commons:hawkular-command-gateway-war" to-location="modules/system/layers/hawkular/org/hawkular/nest/main/deployments/hawkular-command-gateway-war.war" />
+    <copy-artifact artifact="org.hawkular.commons:hawkular-inventory-service" to-location="modules/system/layers/hawkular/org/hawkular/nest/main/deployments/hawkular-inventory-service.war" />
   </copy-artifacts>
 </build>
