@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.AddDatasourceRequest"
+  },
+  "javaType": "org.hawkular.cmdgw.api.UpdateDatasourceRequest",
+  "description": "Updates the Datasource or a XA Datasource given by the inventory path stored in resourcePath field.",
+  "additionalProperties": false
+}

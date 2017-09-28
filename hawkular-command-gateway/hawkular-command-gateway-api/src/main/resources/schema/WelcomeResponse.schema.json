@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.bus.common.AbstractMessage"
+  },
+  "javaType": "org.hawkular.cmdgw.api.WelcomeResponse",
+  "description": "Tells the UI client what is his sessionId",
+  "additionalProperties": false,
+  "properties": {
+    "sessionId": {
+      "description" : "The ID of a WebSocket Session that the receving client just openened.",
+      "type": "string"
+    }
+  },
+  "required": ["sessionId"]
+}

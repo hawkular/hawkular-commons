@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.cmdgw.api.ResourceResponse"
+  },
+  "javaType": "org.hawkular.cmdgw.api.AddDatasourceResponse",
+  "javaInterfaces" : ["org.hawkular.cmdgw.api.EventDestination"],
+  "description": "Results of an Add Datasource request.",
+  "additionalProperties": false,
+  "properties": {
+    "xaDatasource": {
+      "description" : "true if an XA datasource should be added, false otherwise",
+      "javaType": "boolean",
+      "type": "boolean"
+    },
+    "datasourceName": {
+      "description" : "The name for this datasource.",
+      "type": "string"
+    }
+  },
+  "required": ["xaDatasource", "datasourceName"]
+}
