@@ -91,6 +91,7 @@ public class InventoryConfig {
                 log.errorInventoryCacheNotFound();
                 throw new IllegalStateException("Inventory query factory for resource_type cache is not found");
             }
+            log.infoInventoryAppStarted();
         } catch (IOException e) {
             log.errorInventoryCacheConfigurationNotFound(e);
         }

@@ -1,0 +1,30 @@
+{
+  "definitions": {
+    "authentication": {
+      "type": "object",
+      "description": "Provides user credentials or security token. The awkward name of the schema file A0AuthMessage.schema.json is there so that this schema file precedes all other schema files alphabetically. This is required by jsonschema2pojo-maven-plugin that is not resolving the inter-schema dependencies, it just takes files in alphabetical order.",
+      "additionalProperties": false,
+      "properties": {
+        "username": { "type": "string" },
+        "password": { "type": "string" },
+        "token":    { "type": "string" },
+        "persona":  { "type": "string" }
+      }
+    }
+  },
+
+  "type": "object",
+  "extends": {
+    "type": "object",
+    "javaType": "org.hawkular.bus.common.AbstractMessage"
+  },
+  "javaInterfaces" : ["org.hawkular.bus.common.BasicMessage", "org.hawkular.bus.common.msg.features.FailOnUnknownProperties"],
+  "javaType": "org.hawkular.cmdgw.api.AuthMessage",
+  "description": "Message properties that are needed for authentication.",
+  "additionalProperties": false,
+  "properties": {
+    "authentication": {
+      "$ref": "#/definitions/authentication"
+    }
+  }
+}

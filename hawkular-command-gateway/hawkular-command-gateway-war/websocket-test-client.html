@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+  <meta content="utf-8" http-equiv="encoding">
+  <title>WebSockets Client</title>
+  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+</head>
+<body>
+  <div id="send">
+    URL Context (a feed/{feedID} or 'ui/ws')<input type="text" id="urlcontext" size="25"/><br>
+    Message (Hawkular JSON):<input type="text" id="data" size="100"/><br>
+    Extra Data Text:<input type="text" id="extradata" size="100"/><br>
+    or<br>
+    Extra Data File:<input type="file" id="file" name="file"/><br>
+    <input type="button" id="sendtext" value="send text"/>
+  </div>
+  <div id="output"></div>
+</body>
+</html>
+
+<script>
+
+jQuery(function($){
+
+  var fileBinaryContent = null;
+  document.getElementById('file').value = "";
+
+  if (!("WebSocket" in window)) {
+    alert("Your browser does not support web sockets");
+  }else if (!("FileList" in window) || !("FileReader" in window)) {
+    alert("Your browser does not support local file API");
+  }else if (!("Blob" in window)) {
+    alert("Your browser does not support Blob API");
+  }else{
+    setup();
+  }
+
+  function handleFileSelect(evt) {
+    var theFile = evt.target.files[0]; /* files==FileList, files[0]==File */
+    var reader = new FileReader();
+    reader.onloadend = function(readEvent) {
+      if (readEvent.target.readyState == FileReader.DONE) {
+        fileBinaryContent = new Uint8Array(readEvent.target.result);
+      }
+    }
+    reader.readAsArrayBuffer(theFile);
+  }
+
+  function setup(){
+    document.getElementById('file').addEventListener('change', handleFileSelect, false);
+
+    var $urlcontext = $("#urlcontext");
+    var host = "ws://localhost:8080/hawkular/command-gateway/" + $urlcontext.val();
+
+    var socket = new WebSocket(host);
+    socket.binaryType = 'arraybuffer';
+
+    var $txt = $("#data");
+    var $extratxt = $("#extradata");
+    var $btnSend = $("#sendtext");
+
+    $txt.focus();
+
+    /* event handlers for UI */
+    $btnSend.on('click',function(){
+      var text = $txt.val();
+      if(text == ""){
+        alert("Please enter a Hawkular formatted JSON message");
+        return;
+      }
+      var extratxt = $extratxt.val();
+      if (extratxt == "") {
+        if (fileBinaryContent == null  ) {
+          /* just the message needs to be sent */
+          socket.send(text);
+        } else {
+          /* the message plus the uploaded file content needs to be sent */
+          var binaryblob = new Blob([text, fileBinaryContent], {type: 'application/octet-stream'});
+          socket.send(binaryblob);
+        }
+      } else {
+        /* the message plus the extra data text needs to be sent */
+        var binaryblob = new Blob([text + extratxt]);
+        socket.send(binaryblob);
+      }
+    });
+
+    $txt.keypress(function(evt){
+      if(evt.which == 13){
+        $btnSend.click();
+      }
+    });
+
+    /* event handlers for websocket */
+    if(socket){
+
+      socket.onopen = function(){
+        showServerResponse("The connection has been opened.");
+      }
+
+      socket.onmessage = function(msg){
+        if (msg.data instanceof ArrayBuffer) {
+          showServerResponse(String.fromCharCode.apply(null, new Uint8Array(msg.data)));
+        } else {
+          showServerResponse(msg.data);
+        }
+      }
+
+      socket.onclose = function(){
+        showServerResponse("The connection has been closed.");
+      }
+
+    }else{
+      console.log("invalid socket");
+    }
+
+    function showServerResponse(txt){
+      var p = document.createElement('p');
+      p.innerHTML = txt;
+      document.getElementById('output').appendChild(p);
+    }
+  }
+
+});
+
+</script>
