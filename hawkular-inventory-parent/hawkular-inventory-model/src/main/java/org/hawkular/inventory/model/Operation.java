@@ -34,19 +34,19 @@ public class Operation implements Serializable {
     private final String name;    // Ex: "Shutdown"
 
     @JsonInclude(Include.NON_NULL)
-    private final Map<String, Map<String, String>> parameterTypes;  // Ex: "restart" => {"type": "bool", "description": "If true, blablabla", "required": false}
+    private final Map<String, Map<String, String>> parameters;  // Ex: "restart" => {"type": "bool", "description": "If true, blablabla", "required": false}
 
     public Operation(@JsonProperty("name") String name,
-                     @JsonProperty("parameterTypes") Map<String, Map<String, String>> parameterTypes) {
+                     @JsonProperty("parameters") Map<String, Map<String, String>> parameters) {
         this.name = name;
-        this.parameterTypes = parameterTypes;
+        this.parameters = parameters;
     }
 
     public String getName() {
         return name;
     }
 
-    public Map<String, Map<String, String>> getParameterTypes() {
-        return parameterTypes != null ? Collections.unmodifiableMap(parameterTypes) : Collections.EMPTY_MAP;
+    public Map<String, Map<String, String>> getParameters() {
+        return parameters != null ? Collections.unmodifiableMap(parameters) : Collections.EMPTY_MAP;
     }
 }
