@@ -14,21 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.inventory.handlers;
+package org.hawkular.cmdgw.ws.test;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import org.jboss.arquillian.testng.Arquillian;
 
-import org.hawkular.inventory.log.InventoryLoggers;
-import org.hawkular.inventory.log.MsgLogger;
-
-/**
- * @author Jay Shaughnessy
- * @author Lucas Ponce
- */
-@ApplicationPath("/")
-public class InventoryApp extends Application {
-    private static final MsgLogger log = InventoryLoggers.getLogger(InventoryApp.class);
-
-    public static final String TENANT_HEADER_NAME = "Hawkular-Tenant";
+public abstract class AbstractCommandITest extends Arquillian {
 }

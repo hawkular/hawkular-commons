@@ -14,21 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.inventory.handlers;
-
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
-
-import org.hawkular.inventory.log.InventoryLoggers;
-import org.hawkular.inventory.log.MsgLogger;
+package org.hawkular.cmdgw;
 
 /**
- * @author Jay Shaughnessy
- * @author Lucas Ponce
+ * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  */
-@ApplicationPath("/")
-public class InventoryApp extends Application {
-    private static final MsgLogger log = InventoryLoggers.getLogger(InventoryApp.class);
+public class NoCommandForMessageException extends Exception {
+    private static final long serialVersionUID = -9190882295360443385L;
 
-    public static final String TENANT_HEADER_NAME = "Hawkular-Tenant";
+    public NoCommandForMessageException() {
+        super();
+    }
+
+    public NoCommandForMessageException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public NoCommandForMessageException(String message) {
+        super(message);
+    }
+
+    public NoCommandForMessageException(Throwable cause) {
+        super(cause);
+    }
+
 }
