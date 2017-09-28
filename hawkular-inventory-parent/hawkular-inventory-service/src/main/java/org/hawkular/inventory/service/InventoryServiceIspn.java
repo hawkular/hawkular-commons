@@ -45,6 +45,7 @@ import org.hawkular.inventory.model.ResourceType;
 import org.infinispan.Cache;
 import org.infinispan.query.Search;
 import org.infinispan.query.dsl.Query;
+import org.infinispan.query.dsl.QueryBuilder;
 import org.infinispan.query.dsl.QueryFactory;
 
 /**
@@ -158,12 +159,15 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public ResultSet<ResourceWithType> getTopResources(long startOffset, int maxResults) {
-        Query query = qResource.from(Resource.class)
-                .having("rootId").isNull()
-                .maxResults(maxResults)
-                .startOffset(startOffset)
-                .build();
+    public ResultSet<ResourceWithType> getResources(boolean root, String typeId, long startOffset, int maxResults) {
+        QueryBuilder qb = qResource.from(Resource.class);
+        if (root) {
+            qb = qb.having("isRoot").equal(true);
+        }
+        if (typeId != null) {
+            qb = qb.having("typeId").equal(typeId);
+        }
+        Query query = qb.maxResults(maxResults).startOffset(startOffset).build();
         List<ResourceWithType> result = query.list().stream()
                 .map(r -> ResourceWithType.fromResource((Resource)r, this::getNullableResourceType))
                 .collect(Collectors.toList());
@@ -171,8 +175,8 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public ResultSet<ResourceWithType> getTopResources() {
-        return getTopResources(0, MAX_RESULTS);
+    public ResultSet<ResourceWithType> getResources(boolean root, String typeId) {
+        return getResources(root, typeId, 0, MAX_RESULTS);
     }
 
     @Override
@@ -187,24 +191,6 @@ public class InventoryServiceIspn implements InventoryService {
     @Override
     public ResultSet<ResourceType> getResourceTypes() {
         return getResourceTypes(0, MAX_RESULTS);
-    }
-
-    @Override
-    public ResultSet<ResourceWithType> getResourcesByType(String typeId, long startOffset, int maxResults) {
-        Query query = qResource.from(Resource.class)
-                .having("typeId").equal(typeId)
-                .maxResults(maxResults)
-                .startOffset(startOffset)
-                .build();
-        List<ResourceWithType> result = query.list().stream()
-                .map(r -> ResourceWithType.fromResource((Resource)r, this::getNullableResourceType))
-                .collect(Collectors.toList());
-        return new ResultSet<>(result, (long) query.getResultSize(), startOffset);
-    }
-
-    @Override
-    public ResultSet<ResourceWithType> getResourcesByType(String typeId) {
-        return getResourcesByType(typeId, 0, MAX_RESULTS);
     }
 
     @Override

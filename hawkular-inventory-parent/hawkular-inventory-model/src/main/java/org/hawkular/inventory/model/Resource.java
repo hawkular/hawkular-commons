@@ -41,18 +41,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Resource implements Serializable {
 
     @JsonInclude(Include.NON_NULL)
-    private final String id;  // Unique index [Search resource by id]
+    private final String id;
 
     @JsonInclude(Include.NON_NULL)
     private final String name;
 
     @JsonInclude(Include.NON_NULL)
     @Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
-    private final String typeId;  // Index [Search all resources of type xx]
+    private final String typeId;
 
     @JsonInclude(Include.NON_NULL)
     @Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
-    private final String rootId;  // Index [Search all resources under root xx]
+    private final boolean isRoot;
 
     @JsonInclude(Include.NON_NULL)
     private final List<String> childrenIds;
@@ -70,14 +70,14 @@ public class Resource implements Serializable {
     public Resource(@JsonProperty("id") String id,
                     @JsonProperty("name") String name,
                     @JsonProperty("typeId") String typeId,
-                    @JsonProperty("rootId") String rootId,
+                    @JsonProperty("root") boolean isRoot,
                     @JsonProperty("childrenIds") List<String> childrenIds,
                     @JsonProperty("metricIds") List<Metric> metrics,
                     @JsonProperty("properties") Map<String, String> properties) {
         this.id = id;
         this.name = name;
         this.typeId = typeId;
-        this.rootId = rootId;
+        this.isRoot = isRoot;
         this.childrenIds = childrenIds;
         this.metrics = metrics;
         this.properties = properties;
@@ -95,8 +95,8 @@ public class Resource implements Serializable {
         return typeId;
     }
 
-    public String getRootId() {
-        return rootId;
+    public boolean isRoot() {
+        return isRoot;
     }
 
     public List<String> getChildrenIds() {
@@ -151,7 +151,7 @@ public class Resource implements Serializable {
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", typeId='" + typeId + '\'' +
-                ", rootId='" + rootId + '\'' +
+                ", isRoot=" + isRoot +
                 ", childrenIds=" + childrenIds +
                 ", properties=" + properties +
                 ", type=" + type +

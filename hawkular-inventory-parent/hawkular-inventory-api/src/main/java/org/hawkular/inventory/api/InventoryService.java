@@ -70,16 +70,22 @@ public interface InventoryService {
     Optional<ResourceNode> getTree(String parentId);
 
     /**
-     * Get top resources (aka. root resources) with the default pagination options (first 100 results)
-     * @return top resources embedded in page object {@link ResultSet}
+     * Get a list of resources with filters and default pagination options
+     * @param root true to get only root resources
+     * @param typeId filter with that type ID, or null for no type filter
+     * @return resources embedded in page object {@link ResultSet}
      */
-    ResultSet<ResourceWithType> getTopResources();
+    ResultSet<ResourceWithType> getResources(boolean root, String typeId);
 
     /**
-     * Get top resources (aka. root resources) with the provided pagination options
-     * @return top resources embedded in page object {@link ResultSet}
+     * Get a list of resources with filters and the provided pagination options
+     * @param root true to get only root resources
+     * @param typeId filter with that type ID, or null for no type filter
+     * @param startOffset pagination offset
+     * @param maxResults pagination number of results
+     * @return resources embedded in page object {@link ResultSet}
      */
-    ResultSet<ResourceWithType> getTopResources(long startOffset, int maxResults);
+    ResultSet<ResourceWithType> getResources(boolean root, String typeId, long startOffset, int maxResults);
 
     /**
      * Get resource types with the default pagination options (first 100 results)
@@ -92,18 +98,6 @@ public interface InventoryService {
      * @return resource types embedded in page object {@link ResultSet}
      */
     ResultSet<ResourceType> getResourceTypes(long startOffset, int maxResults);
-
-    /**
-     * Get resources of a given typeId, with the default pagination options (first 100 results)
-     * @return list of resources, embedded in page object {@link ResultSet}
-     */
-    ResultSet<ResourceWithType> getResourcesByType(String typeId);
-
-    /**
-     * Get resources of a given type, with the provided pagination options
-     * @return list of resources, embedded in page object {@link ResultSet}
-     */
-    ResultSet<ResourceWithType> getResourcesByType(String typeId, long startOffset, int maxResults);
 
     /**
      * Get resource type by ID
