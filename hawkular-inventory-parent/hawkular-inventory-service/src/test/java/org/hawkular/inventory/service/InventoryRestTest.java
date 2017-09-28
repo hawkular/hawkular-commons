@@ -77,17 +77,17 @@ public class InventoryRestTest {
     private static final Metric METRIC4
             = new Metric("gc2", "GC", MetricUnit.NONE, 10, new HashMap<>());
 
-    private static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "EAP", null,
+    private static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "EAP", true,
             Arrays.asList("child-1", "child-2"), Arrays.asList(METRIC1, METRIC2), new HashMap<>());
-    private static final Resource EAP2 = new Resource("EAP-2", "EAP-2", "EAP", null,
+    private static final Resource EAP2 = new Resource("EAP-2", "EAP-2", "EAP", true,
             Arrays.asList("child-3", "child-4"), Arrays.asList(METRIC3, METRIC4), new HashMap<>());
-    private static final Resource CHILD1 = new Resource("child-1", "Child 1", "FOO", "EAP-1",
+    private static final Resource CHILD1 = new Resource("child-1", "Child 1", "FOO", false,
             new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD2 = new Resource("child-2", "Child 2", "BAR", "EAP-1",
+    private static final Resource CHILD2 = new Resource("child-2", "Child 2", "BAR", false,
             new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD3 = new Resource("child-3", "Child 3", "FOO", "EAP-2",
+    private static final Resource CHILD3 = new Resource("child-3", "Child 3", "FOO", false,
             new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD4 = new Resource("child-4", "Child 4", "BAR", "EAP-2",
+    private static final Resource CHILD4 = new Resource("child-4", "Child 4", "BAR", false,
             new ArrayList<>(), new ArrayList<>(), new HashMap<>());
     private static final Map<String, Map<String, String>> RELOAD_PARAMETERS;
     static {
@@ -176,7 +176,7 @@ public class InventoryRestTest {
                 String childIdX = id + "-child-" + j;
                 String childNameX = "Child "+ j + " from " + id;
                 childrenIds.add(childIdX);
-                Resource childX = new Resource(childIdX, childNameX, childType, id,
+                Resource childX = new Resource(childIdX, childNameX, childType, false,
                         new ArrayList<>(), new ArrayList<>(), new HashMap<>());
 
                 childrenResource.add(childX);
@@ -193,7 +193,7 @@ public class InventoryRestTest {
             Resource serverX = new Resource(id,
                     name,
                     typeId,
-                    null,
+                    true,
                     childrenIds,
                     metricsResource,
                     propsX);
@@ -254,7 +254,7 @@ public class InventoryRestTest {
     @Test
     public void test002_shouldFindResourcesById() {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString()).path("resource/EAP-1");
+        WebTarget target = client.target(baseUrl.toString()).path("resources/EAP-1");
         Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
@@ -264,7 +264,7 @@ public class InventoryRestTest {
         assertEquals("EAP-1", resource.getId());
         assertEquals("EAP", resource.getType().getId());
 
-        target = client.target(baseUrl.toString()).path("resource/EAP-2");
+        target = client.target(baseUrl.toString()).path("resources/EAP-2");
         response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
@@ -272,7 +272,7 @@ public class InventoryRestTest {
         assertEquals(200, response.getStatus());
         assertEquals("EAP-2", response.readEntity(ResourceWithType.class).getId());
 
-        target = client.target(baseUrl.toString()).path("resource/child-1");
+        target = client.target(baseUrl.toString()).path("resources/child-1");
         response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
@@ -284,7 +284,7 @@ public class InventoryRestTest {
     @Test
     public void test003_shouldNotFindResourcesById() {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString()).path("resource/nada");
+        WebTarget target = client.target(baseUrl.toString()).path("resources/nada");
         Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
@@ -295,7 +295,8 @@ public class InventoryRestTest {
     @Test
     public void test004_shouldGetTopResources() {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString()).path("resources/top");
+        WebTarget target = client.target(baseUrl.toString()).path("resources")
+                .queryParam("root", true);
         Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
@@ -327,7 +328,8 @@ public class InventoryRestTest {
     @Test
     public void test006_shouldGetAllEAPs() {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString()).path("resources/type/EAP");
+        WebTarget target = client.target(baseUrl.toString()).path("resources")
+                .queryParam("typeId", "EAP");
         Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
@@ -341,7 +343,8 @@ public class InventoryRestTest {
     @Test
     public void test007_shouldGetAllFOOs() {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString()).path("resources/type/FOO");
+        WebTarget target = client.target(baseUrl.toString()).path("resources")
+                .queryParam("typeId", "FOO");
         Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
@@ -355,7 +358,8 @@ public class InventoryRestTest {
     @Test
     public void test008_shouldGetNoNada() {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString()).path("resources/type/nada");
+        WebTarget target = client.target(baseUrl.toString()).path("resources")
+                .queryParam("typeId", "nada");
         Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
@@ -367,7 +371,7 @@ public class InventoryRestTest {
     @Test
     public void test009_shouldGetChildren() {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString()).path("resource/tree/EAP-1");
+        WebTarget target = client.target(baseUrl.toString()).path("resources/EAP-1/tree");
         Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
@@ -382,7 +386,7 @@ public class InventoryRestTest {
     @Test
     public void test010_shouldGetEmptyChildren() {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString()).path("resource/tree/child-1");
+        WebTarget target = client.target(baseUrl.toString()).path("resources/child-1/tree");
         Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
@@ -395,7 +399,7 @@ public class InventoryRestTest {
     @Test
     public void test011_shouldNotGetTree() {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString()).path("resource/tree/nada");
+        WebTarget target = client.target(baseUrl.toString()).path("resources/nada/tree");
         Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
@@ -405,9 +409,9 @@ public class InventoryRestTest {
 
     @Test
     public void test015_shouldFailOnDetectedCycle() {
-        Resource corruptedParent = new Resource("CP", "CP", "FOO", "",
+        Resource corruptedParent = new Resource("CP", "CP", "FOO", true,
                 Collections.singletonList("CC"), new ArrayList<>(), new HashMap<>());
-        Resource corruptedChild = new Resource("CC", "CC", "BAR", "CP",
+        Resource corruptedChild = new Resource("CC", "CC", "BAR", false,
                 Collections.singletonList("CP"), new ArrayList<>(), new HashMap<>());
         Import corruptedImport = new Import(Arrays.asList(corruptedParent, corruptedChild), null);
 
@@ -420,7 +424,7 @@ public class InventoryRestTest {
         client.close();
 
         client = ClientBuilder.newClient();
-        target = client.target(baseUrl.toString()).path("resource/tree/CP");
+        target = client.target(baseUrl.toString()).path("resources/CP/tree");
         response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .accept(MediaType.APPLICATION_JSON_TYPE)

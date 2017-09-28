@@ -100,7 +100,21 @@ public class InventoryHandlers {
     }
 
     @GET
-    @Path("/resource/{id}")
+    @Path("/resources")
+    @Produces(APPLICATION_JSON)
+    public Response getResources(@QueryParam("root") @DefaultValue("false") final boolean root,
+                                 @QueryParam("typeId") final String typeId,
+                                 @QueryParam("startOffSet") @DefaultValue("0") final Long startOffset,
+                                 @QueryParam("maxResults") @DefaultValue("100") final Integer maxResults) {
+        try {
+            return ResponseUtil.ok(inventoryService.getResources(root, typeId, startOffset, maxResults));
+        } catch (Exception e) {
+            return ResponseUtil.internalError(e);
+        }
+    }
+
+    @GET
+    @Path("/resources/{id}")
     @Produces(APPLICATION_JSON)
     public Response getResourceById(@PathParam("id") final String id) {
         try {
@@ -113,7 +127,7 @@ public class InventoryHandlers {
     }
 
     @DELETE
-    @Path("/resource/{id}")
+    @Path("/resources/{id}")
     @Produces(APPLICATION_JSON)
     public Response deleteResource(@PathParam("id") final String id) {
         try {
@@ -125,38 +139,13 @@ public class InventoryHandlers {
     }
 
     @GET
-    @Path("/resource/tree/{parentId}")
+    @Path("/resources/{id}/tree")
     @Produces(APPLICATION_JSON)
-    public Response getTree(@PathParam("parentId") final String parentId) {
+    public Response getTree(@PathParam("id") final String id) {
         try {
-            return inventoryService.getTree(parentId)
+            return inventoryService.getTree(id)
                     .map(ResponseUtil::ok)
-                    .orElseGet(() -> ResponseUtil.notFound("Resource id [" + parentId + "] not found"));
-        } catch (Exception e) {
-            return ResponseUtil.internalError(e);
-        }
-    }
-
-    @GET
-    @Path("/resources/top")
-    @Produces(APPLICATION_JSON)
-    public Response getAllTopResources(@DefaultValue("0") @QueryParam("startOffSet") final Long startOffset,
-                                       @DefaultValue("100") @QueryParam("maxResults") final Integer maxResults) {
-        try {
-            return ResponseUtil.ok(inventoryService.getTopResources(startOffset, maxResults));
-        } catch (Exception e) {
-            return ResponseUtil.internalError(e);
-        }
-    }
-
-    @GET
-    @Path("/resources/type/{typeId}")
-    @Produces(APPLICATION_JSON)
-    public Response getResourcesByType(@PathParam("typeId") final String typeId,
-                                       @DefaultValue("0") @QueryParam("startOffSet") final Long startOffset,
-                                       @DefaultValue("100") @QueryParam("maxResults") final Integer maxResults) {
-        try {
-            return ResponseUtil.ok(inventoryService.getResourcesByType(typeId, startOffset, maxResults));
+                    .orElseGet(() -> ResponseUtil.notFound("Resource id [" + id + "] not found"));
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }
@@ -175,11 +164,11 @@ public class InventoryHandlers {
     }
 
     @DELETE
-    @Path("/type/{type}")
+    @Path("/type/{typeId}")
     @Produces(APPLICATION_JSON)
-    public Response deleteResourceType(@PathParam("type") final String type) {
+    public Response deleteResourceType(@PathParam("typeId") final String typeId) {
         try {
-            inventoryService.deleteResourceType(type);
+            inventoryService.deleteResourceType(typeId);
             return ResponseUtil.ok();
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
