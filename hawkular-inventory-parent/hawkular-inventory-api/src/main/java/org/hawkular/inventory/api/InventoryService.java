@@ -116,4 +116,9 @@ public interface InventoryService {
      * @return config file content as String, if found
      */
     Optional<String> getJMXExporterConfig(String templateName);
+
+    /**
+     * @return true is InventoryService is Up and Running
+     */
+    boolean isRunning();
 }

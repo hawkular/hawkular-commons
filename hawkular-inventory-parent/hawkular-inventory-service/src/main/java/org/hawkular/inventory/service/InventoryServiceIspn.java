@@ -211,6 +211,19 @@ public class InventoryServiceIspn implements InventoryService {
         return getConfig(templateName + "-jmx-exporter.yml");
     }
 
+    @Override
+    public boolean isRunning() {
+        if (resource != null
+                && resourceType != null
+                && resource.getStatus() != null
+                && resourceType.getStatus() != null
+                && resource.getStatus().allowInvocations()
+                && resourceType.getStatus().allowInvocations()) {
+            return true;
+        }
+        return false;
+    }
+
     private Optional<String> getConfig(String fileName) {
         // TODO: maybe some defensive check against file traversal attack?
         //  Or check that "resourceType" is in a whitelist of types?
