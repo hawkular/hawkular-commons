@@ -183,7 +183,12 @@ public class InventoryHandlers {
     public Response status(@Context ServletContext servletContext) {
         final Map<String, String> status = new HashMap<>();
         status.putAll(manifestUtil.getFrom());
-        status.put("status", "UP");
-        return Response.ok(status).build();
+        if (inventoryService.isRunning()) {
+            status.put("status", "UP");
+            return Response.ok(status).build();
+        } else {
+            status.put("status", "DOWN");
+            return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(status).build();
+        }
     }
 }
