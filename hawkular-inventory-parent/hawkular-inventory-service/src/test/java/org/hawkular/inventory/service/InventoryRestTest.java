@@ -69,13 +69,13 @@ public class InventoryRestTest {
     private final Logger log = Logger.getLogger(InventoryRestTest.class);
 
     private static final Metric METRIC1
-            = new Metric("memory1", "Memory", MetricUnit.BYTES, 10, new HashMap<>());
+            = new Metric("memory1", "Memory", MetricUnit.BYTES, new HashMap<>());
     private static final Metric METRIC2
-            = new Metric("gc1", "GC", MetricUnit.NONE, 10, new HashMap<>());
+            = new Metric("gc1", "GC", MetricUnit.NONE, new HashMap<>());
     private static final Metric METRIC3
-            = new Metric("memory2", "Memory", MetricUnit.BYTES, 10, new HashMap<>());
+            = new Metric("memory2", "Memory", MetricUnit.BYTES, new HashMap<>());
     private static final Metric METRIC4
-            = new Metric("gc2", "GC", MetricUnit.NONE, 10, new HashMap<>());
+            = new Metric("gc2", "GC", MetricUnit.NONE, new HashMap<>());
 
     private static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "EAP", true,
             Arrays.asList("child-1", "child-2"), Arrays.asList(METRIC1, METRIC2), new HashMap<>());
@@ -184,7 +184,7 @@ public class InventoryRestTest {
 
             List<Metric> metricsResource = new ArrayList<>();
             for (int k = 0; k < metrics; k++) {
-                Metric metricX = new Metric("metric-" + k, "Metric " + k, MetricUnit.BYTES, 10, new HashMap<>());
+                Metric metricX = new Metric("metric-" + k, "Metric " + k, MetricUnit.BYTES, new HashMap<>());
                 metricsResource.add(metricX);
             }
 
