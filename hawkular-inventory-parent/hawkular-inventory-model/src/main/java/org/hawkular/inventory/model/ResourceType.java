@@ -16,11 +16,12 @@
  */
 package org.hawkular.inventory.model;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.*;
-
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.annotations.Analyze;
@@ -29,6 +30,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -36,6 +38,40 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @Indexed
 public class ResourceType implements Serializable {
+
+    public static class Builder {
+        private String id;
+        private List<Operation> operations = new ArrayList<>();
+        private Map<String, String> properties = new HashMap<>();
+
+        public ResourceType build() {
+            return new ResourceType(id, operations, properties);
+        }
+
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder operation(Operation op) {
+            this.operations.add(op);
+            return this;
+        }
+
+        public Builder property(String name, String value) {
+            this.properties.put(name, value);
+            return this;
+        }
+
+        public Builder properties(Map<String, String> props) {
+            this.properties.putAll(props);
+            return this;
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
 
     @JsonInclude(Include.NON_NULL)
     @Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)

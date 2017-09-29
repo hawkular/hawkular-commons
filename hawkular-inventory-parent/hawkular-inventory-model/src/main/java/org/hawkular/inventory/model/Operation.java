@@ -16,19 +16,42 @@
  */
 package org.hawkular.inventory.model;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.*;
-
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Joel Takvorian
  */
 public class Operation implements Serializable {
+
+    public static class Builder {
+        private String name;
+        private Map<String, Map<String, String>> parameters = new HashMap<>();
+
+        public Operation build() {
+            return new Operation(name, parameters);
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder parameter(String name, Map<String, String> metadata) {
+            this.parameters.put(name, metadata);
+            return this;
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
 
     @JsonInclude(Include.NON_NULL)
     private final String name;    // Ex: "Shutdown"
