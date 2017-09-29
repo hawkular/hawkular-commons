@@ -20,8 +20,9 @@ package org.hawkular.cmdgw.api;
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  */
 public class MessageUtils {
-    public static void prepareResourcePathResponse(ResourceRequest request, ResourceResponse response) {
+    public static void prepareResourceResponse(ResourceRequest request, ResourceResponse response) {
         prepareUiSessionDestination((UiSessionOrigin) request, (UiSessionDestination) response);
+        response.setFeedId(request.getFeedId());
         response.setResourceId(request.getResourceId());
     }
     public static void prepareUiSessionDestination(UiSessionOrigin request, UiSessionDestination response) {
