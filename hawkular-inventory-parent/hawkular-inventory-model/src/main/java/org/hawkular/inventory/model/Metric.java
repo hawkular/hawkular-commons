@@ -18,6 +18,7 @@ package org.hawkular.inventory.model;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -28,6 +29,46 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Joel Takvorian
  */
 public class Metric implements Serializable {
+
+    public static class Builder {
+        private String name;
+        private String type;
+        private MetricUnit unit;
+        private Map<String, String> properties = new HashMap<>();
+
+        public Metric build() {
+            return new Metric(name, type, unit, null, properties);
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder type(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder unit(MetricUnit unit) {
+            this.unit = unit;
+            return this;
+        }
+
+        public Builder property(String name, String value) {
+            this.properties.put(name, value);
+            return this;
+        }
+
+        public Builder properties(Map<String, String> props) {
+            this.properties.putAll(props);
+            return this;
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
 
     @JsonInclude(Include.NON_NULL)
     private final String name;  // Prometheus short name? This field may not be necessary, name could just be a metadata put in properties
