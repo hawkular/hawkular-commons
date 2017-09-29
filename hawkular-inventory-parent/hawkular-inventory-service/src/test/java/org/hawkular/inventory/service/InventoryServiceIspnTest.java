@@ -47,13 +47,13 @@ import org.junit.Test;
  */
 public class InventoryServiceIspnTest {
     private static final Metric METRIC1
-            = new Metric("memory1", "Memory", MetricUnit.BYTES, 10, new HashMap<>());
+            = new Metric("memory1", "Memory", MetricUnit.BYTES, new HashMap<>());
     private static final Metric METRIC2
-            = new Metric("gc1", "GC", MetricUnit.NONE, 10, new HashMap<>());
+            = new Metric("gc1", "GC", MetricUnit.NONE, new HashMap<>());
     private static final Metric METRIC3
-            = new Metric("memory2", "Memory", MetricUnit.BYTES, 10, new HashMap<>());
+            = new Metric("memory2", "Memory", MetricUnit.BYTES, new HashMap<>());
     private static final Metric METRIC4
-            = new Metric("gc2", "GC", MetricUnit.NONE, 10, new HashMap<>());
+            = new Metric("gc2", "GC", MetricUnit.NONE, new HashMap<>());
     private static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "EAP", true,
             Arrays.asList("child-1", "child-2"), Arrays.asList(METRIC1, METRIC2), new HashMap<>());
     private static final Resource EAP2 = new Resource("EAP-2", "EAP-2", "EAP", true,

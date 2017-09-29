@@ -32,9 +32,9 @@ import org.junit.Test;
 public class ResourceTest {
 
     private static final Metric METRIC1
-            = new Metric("memory", "Memory", MetricUnit.BYTES, 10, new HashMap<>());
+            = new Metric("memory", "Memory", MetricUnit.BYTES, new HashMap<>());
     private static final Metric METRIC2
-            = new Metric("gc", "GC", MetricUnit.NONE, 10, new HashMap<>());
+            = new Metric("gc", "GC", MetricUnit.NONE, new HashMap<>());
 
     private final Resource r = new Resource("id", "name", "EAP", true,
             Arrays.asList("child-1", "child-2"), Arrays.asList(METRIC1, METRIC2), new HashMap<>());

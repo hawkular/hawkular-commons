@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Metric implements Serializable {
 
     @JsonInclude(Include.NON_NULL)
-    private final String name;  // Prometheus short name? This field may not be necessary, name could just be a metadata put in properties
+    private final String name;  // Name (for display?)
 
     @JsonInclude(Include.NON_NULL)
     private final String type;  // Ex: Deployment status, Server availability
@@ -39,20 +39,15 @@ public class Metric implements Serializable {
     private final MetricUnit unit;
 
     @JsonInclude(Include.NON_NULL)
-    private final Integer collectionInterval;   // Not sure if we can get it from prometheus
-
-    @JsonInclude(Include.NON_NULL)
     private final Map<String, String> properties;   // properties may contain, for instance, the full prometheus metric name
 
     public Metric(@JsonProperty("name") String name,
                   @JsonProperty("type") String type,
                   @JsonProperty("unit") MetricUnit unit,
-                  @JsonProperty("collectionInterval") Integer collectionInterval,
                   @JsonProperty("properties") Map<String, String> properties) {
         this.name = name;
         this.type = type;
         this.unit = unit;
-        this.collectionInterval = collectionInterval;
         this.properties = properties;
     }
 
@@ -68,10 +63,6 @@ public class Metric implements Serializable {
         return unit;
     }
 
-    public Integer getCollectionInterval() {
-        return collectionInterval;
-    }
-
     public Map<String, String> getProperties() {
         return Collections.unmodifiableMap(properties);
     }
@@ -82,7 +73,6 @@ public class Metric implements Serializable {
                 "name='" + name + '\'' +
                 ", type='" + type + '\'' +
                 ", unit=" + unit +
-                ", collectionInterval=" + collectionInterval +
                 ", properties=" + properties +
                 '}';
     }
