@@ -37,7 +37,7 @@ public class Metric implements Serializable {
         private Map<String, String> properties = new HashMap<>();
 
         public Metric build() {
-            return new Metric(name, type, unit, null, properties);
+            return new Metric(name, type, unit, properties);
         }
 
         public Builder name(String name) {
