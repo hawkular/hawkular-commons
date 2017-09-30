@@ -16,10 +16,10 @@
  */
 package org.hawkular.inventory.model;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -32,6 +32,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -39,6 +40,64 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @Indexed
 public class Resource implements Serializable {
+
+    public static class Builder {
+        private String id;
+        private String name;
+        private String typeId;
+        private boolean isRoot;
+        private List<String> childrenIds = new ArrayList<>();
+        private List<Metric> metrics = new ArrayList<>();
+        private Map<String, String> properties = new HashMap<>();
+
+        public Resource build() {
+            return new Resource(id, name, typeId, isRoot, childrenIds, metrics, properties);
+        }
+
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder typeId(String typeId) {
+            this.typeId = typeId;
+            return this;
+        }
+
+        public Builder isRoot(boolean isRoot) {
+            this.isRoot = isRoot;
+            return this;
+        }
+
+        public Builder childId(String childId) {
+            this.childrenIds.add(childId);
+            return this;
+        }
+
+        public Builder metric(Metric metric) {
+            this.metrics.add(metric);
+            return this;
+        }
+
+        public Builder property(String name, String value) {
+            this.properties.put(name, value);
+            return this;
+        }
+
+        public Builder properties(Map<String, String> props) {
+            this.properties.putAll(props);
+            return this;
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
 
     @JsonInclude(Include.NON_NULL)
     private final String id;
