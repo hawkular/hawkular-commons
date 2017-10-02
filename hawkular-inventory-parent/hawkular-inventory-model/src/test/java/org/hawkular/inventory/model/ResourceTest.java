@@ -36,7 +36,7 @@ public class ResourceTest {
     private static final Metric METRIC2
             = new Metric("gc", "GC", MetricUnit.NONE, new HashMap<>());
 
-    private final Resource r = new Resource("id", "name", "EAP", true,
+    private final Resource r = new Resource("id", "name", "feedX", "EAP", true,
             Arrays.asList("child-1", "child-2"), Arrays.asList(METRIC1, METRIC2), new HashMap<>());
 
     @Test
@@ -58,9 +58,9 @@ public class ResourceTest {
 
     @Test
     public void shouldLazyLoadChildren() {
-        Resource child1 = new Resource("child-1", "name-1", "t", false,
+        Resource child1 = new Resource("child-1", "name-1", "feedX", "t", false,
                 new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-        Resource child2 = new Resource("child-2", "name-2", "t", false,
+        Resource child2 = new Resource("child-2", "name-2", "feedX", "t", false,
                 new ArrayList<>(), new ArrayList<>(), new HashMap<>());
         LongAdder numberOfCalls = new LongAdder();
         Function<String, Resource> loader = id -> {
