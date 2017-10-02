@@ -77,17 +77,17 @@ public class InventoryRestTest {
     private static final Metric METRIC4
             = new Metric("gc2", "GC", MetricUnit.NONE, new HashMap<>());
 
-    private static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "EAP", true,
+    private static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "feed1", "EAP", true,
             Arrays.asList("child-1", "child-2"), Arrays.asList(METRIC1, METRIC2), new HashMap<>());
-    private static final Resource EAP2 = new Resource("EAP-2", "EAP-2", "EAP", true,
+    private static final Resource EAP2 = new Resource("EAP-2", "EAP-2", "feed2", "EAP", true,
             Arrays.asList("child-3", "child-4"), Arrays.asList(METRIC3, METRIC4), new HashMap<>());
-    private static final Resource CHILD1 = new Resource("child-1", "Child 1", "FOO", false,
+    private static final Resource CHILD1 = new Resource("child-1", "Child 1", "feedX", "FOO", false,
             new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD2 = new Resource("child-2", "Child 2", "BAR", false,
+    private static final Resource CHILD2 = new Resource("child-2", "Child 2", "feedX", "BAR", false,
             new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD3 = new Resource("child-3", "Child 3", "FOO", false,
+    private static final Resource CHILD3 = new Resource("child-3", "Child 3", "feedX", "FOO", false,
             new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD4 = new Resource("child-4", "Child 4", "BAR", false,
+    private static final Resource CHILD4 = new Resource("child-4", "Child 4", "feedX", "BAR", false,
             new ArrayList<>(), new ArrayList<>(), new HashMap<>());
     private static final Map<String, Map<String, String>> RELOAD_PARAMETERS;
     static {
@@ -168,7 +168,7 @@ public class InventoryRestTest {
             String typeId = (i % 2 == 0) ? "EAP" : "JDG";
             String id = "Server-" + i;
             String name = "Server " + typeId + " with Id " + id;
-
+            String feedX = "feedX";
             List<Resource> childrenResource = new ArrayList<>();
             List<String> childrenIds = new ArrayList<>();
             for (int j = 0; j < children; j++) {
@@ -176,7 +176,7 @@ public class InventoryRestTest {
                 String childIdX = id + "-child-" + j;
                 String childNameX = "Child "+ j + " from " + id;
                 childrenIds.add(childIdX);
-                Resource childX = new Resource(childIdX, childNameX, childType, false,
+                Resource childX = new Resource(childIdX, childNameX, feedX, childType, false,
                         new ArrayList<>(), new ArrayList<>(), new HashMap<>());
 
                 childrenResource.add(childX);
@@ -192,6 +192,7 @@ public class InventoryRestTest {
             propsX.put("description", "This is a description for " + id);
             Resource serverX = new Resource(id,
                     name,
+                    feedX,
                     typeId,
                     true,
                     childrenIds,
@@ -409,9 +410,9 @@ public class InventoryRestTest {
 
     @Test
     public void test015_shouldFailOnDetectedCycle() {
-        Resource corruptedParent = new Resource("CP", "CP", "FOO", true,
+        Resource corruptedParent = new Resource("CP", "CP", "feedX", "FOO", true,
                 Collections.singletonList("CC"), new ArrayList<>(), new HashMap<>());
-        Resource corruptedChild = new Resource("CC", "CC", "BAR", false,
+        Resource corruptedChild = new Resource("CC", "CC", "feedX", "BAR", false,
                 Collections.singletonList("CP"), new ArrayList<>(), new HashMap<>());
         Import corruptedImport = new Import(Arrays.asList(corruptedParent, corruptedChild), null);
 
@@ -498,7 +499,8 @@ public class InventoryRestTest {
         for (int i = 0; i < maxIterations; i++) {
             client = ClientBuilder.newClient();
             target = client.target(baseUrl.toString())
-                    .path("resources/top")
+                    .path("resources")
+                    .queryParam("root", true)
                     .queryParam("maxResults", maxServersPerIteration)
                     .queryParam("startOffset", i * maxServersPerIteration);
             response = target
@@ -538,6 +540,35 @@ public class InventoryRestTest {
         assertThat((List<ResourceType>) response.readEntity(ResultSet.class).getResults())
                 .extracting(ResourceType::getId)
                 .containsOnly("EAP", "FOO", "BAR", "JDG");
+    }
+
+    @Test
+    public void test020_shouldGetAllEAPsPerFeed() {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString()).path("resources")
+                .queryParam("feedId", "feed1")
+                .queryParam("typeId", "EAP");
+        Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        assertEquals(200, response.getStatus());
+        assertThat((List<ResourceWithType>) response.readEntity(ResultSet.class).getResults())
+                .extracting(ResourceWithType::getId)
+                .containsOnly("EAP-1");
+
+        client = ClientBuilder.newClient();
+        target = client.target(baseUrl.toString()).path("resources")
+                .queryParam("feedId", "feed2")
+                .queryParam("typeId", "EAP");
+        response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        assertEquals(200, response.getStatus());
+        assertThat((List<ResourceWithType>) response.readEntity(ResultSet.class).getResults())
+                .extracting(ResourceWithType::getId)
+                .containsOnly("EAP-2");
     }
 
     @Test

@@ -72,20 +72,22 @@ public interface InventoryService {
     /**
      * Get a list of resources with filters and default pagination options
      * @param root true to get only root resources
+     * @param feedId filter with that feed ID, or null for no type filter
      * @param typeId filter with that type ID, or null for no type filter
      * @return resources embedded in page object {@link ResultSet}
      */
-    ResultSet<ResourceWithType> getResources(boolean root, String typeId);
+    ResultSet<ResourceWithType> getResources(boolean root, String feedId, String typeId);
 
     /**
      * Get a list of resources with filters and the provided pagination options
      * @param root true to get only root resources
+     * @param feedId filter with that feed ID, or null for no type filter
      * @param typeId filter with that type ID, or null for no type filter
      * @param startOffset pagination offset
      * @param maxResults pagination number of results
      * @return resources embedded in page object {@link ResultSet}
      */
-    ResultSet<ResourceWithType> getResources(boolean root, String typeId, long startOffset, int maxResults);
+    ResultSet<ResourceWithType> getResources(boolean root, String feedId, String typeId, long startOffset, int maxResults);
 
     /**
      * Get resource types with the default pagination options (first 100 results)
