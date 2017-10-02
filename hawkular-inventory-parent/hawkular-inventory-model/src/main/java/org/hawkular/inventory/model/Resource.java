@@ -22,9 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
@@ -46,13 +44,12 @@ public class Resource implements Serializable {
         private String name;
         private String feedId;
         private String typeId;
-        private boolean isRoot;
-        private List<String> childrenIds = new ArrayList<>();
+        private String parentId;
         private List<Metric> metrics = new ArrayList<>();
         private Map<String, String> properties = new HashMap<>();
 
         public Resource build() {
-            return new Resource(id, name, feedId, typeId, isRoot, childrenIds, metrics, properties);
+            return new Resource(id, name, feedId, typeId, parentId, metrics, properties);
         }
 
         public Builder id(String id) {
@@ -75,13 +72,8 @@ public class Resource implements Serializable {
             return this;
         }
 
-        public Builder isRoot(boolean isRoot) {
-            this.isRoot = isRoot;
-            return this;
-        }
-
-        public Builder childId(String childId) {
-            this.childrenIds.add(childId);
+        public Builder parentId(String parentId) {
+            this.parentId = parentId;
             return this;
         }
 
@@ -121,10 +113,7 @@ public class Resource implements Serializable {
 
     @JsonInclude(Include.NON_NULL)
     @Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
-    private final boolean isRoot;
-
-    @JsonInclude(Include.NON_NULL)
-    private final List<String> childrenIds;
+    private final String parentId;
 
     @JsonInclude(Include.NON_NULL)
     private final List<Metric> metrics;
@@ -140,16 +129,14 @@ public class Resource implements Serializable {
                     @JsonProperty("name") String name,
                     @JsonProperty("feedId") String feedId,
                     @JsonProperty("typeId") String typeId,
-                    @JsonProperty("root") boolean isRoot,
-                    @JsonProperty("childrenIds") List<String> childrenIds,
+                    @JsonProperty("parentId") String parentId,
                     @JsonProperty("metricIds") List<Metric> metrics,
                     @JsonProperty("properties") Map<String, String> properties) {
         this.id = id;
         this.name = name;
         this.feedId = feedId;
         this.typeId = typeId;
-        this.isRoot = isRoot;
-        this.childrenIds = childrenIds;
+        this.parentId = parentId;
         this.metrics = metrics;
         this.properties = properties;
     }
@@ -170,12 +157,8 @@ public class Resource implements Serializable {
         return typeId;
     }
 
-    public boolean isRoot() {
-        return isRoot;
-    }
-
-    public List<String> getChildrenIds() {
-        return childrenIds;
+    public String getParentId() {
+        return parentId;
     }
 
     public List<Metric> getMetrics() {
@@ -194,13 +177,10 @@ public class Resource implements Serializable {
         return type;
     }
 
-    public List<Resource> getChildren(Function<String, Resource> loader) {
+    public List<Resource> getChildren(Function<String, List<Resource>> loader) {
         // lazy loading
         if (children == null) {
-            children = childrenIds.stream()
-                    .map(loader)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+            children = loader.apply(id);
         }
         return Collections.unmodifiableList(children);
     }
@@ -227,8 +207,7 @@ public class Resource implements Serializable {
                 ", name='" + name + '\'' +
                 ", feedId='" + feedId + '\'' +
                 ", typeId='" + typeId + '\'' +
-                ", isRoot=" + isRoot +
-                ", childrenIds=" + childrenIds +
+                ", parentId='" + parentId + '\'' +
                 ", properties=" + properties +
                 ", type=" + type +
                 ", children=" + children +

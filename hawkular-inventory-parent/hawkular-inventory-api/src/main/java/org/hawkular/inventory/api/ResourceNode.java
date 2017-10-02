@@ -79,13 +79,13 @@ public class ResourceNode implements Serializable {
      */
     public static ResourceNode fromResource(Resource r,
                                      Function<String, ResourceType> rtLoader,
-                                     Function<String, Resource> rLoader) {
+                                     Function<String, List<Resource>> rLoader) {
         return fromResource(r, rtLoader, rLoader, new HashSet<>());
     }
 
     private static ResourceNode fromResource(Resource r,
                                              Function<String, ResourceType> rtLoader,
-                                             Function<String, Resource> rLoader,
+                                             Function<String, List<Resource>> rLoader,
                                              Set<String> loaded) {
         if (loaded.contains(r.getId())) {
             throw new IllegalStateException("Cycle detected in the tree with id " + r.getId()
