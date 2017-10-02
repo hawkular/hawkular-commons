@@ -66,9 +66,7 @@ public class BuilderTest {
                 .id("res.id")
                 .name("res.name")
                 .typeId("res.typeId")
-                .childId("res.childId1")
-                .childId("res.childId2")
-                .isRoot(true)
+                .parentId("res.parentId")
                 .property("res.prop1", "res.value1")
                 .property("res.prop2", "res.value2")
                 .metric(m)
@@ -85,10 +83,7 @@ public class BuilderTest {
         assertThat(r.getId()).isEqualTo("res.id");
         assertThat(r.getName()).isEqualTo("res.name");
         assertThat(r.getTypeId()).isEqualTo("res.typeId");
-        assertThat(r.getChildrenIds()).contains("res.childId1");
-        assertThat(r.getChildrenIds()).contains("res.childId2");
-        assertThat(r.getChildrenIds()).hasSize(2);
-        assertThat(r.isRoot()).isTrue();
+        assertThat(r.getParentId()).isEqualTo("res.parentId");
         assertThat(r.getProperties()).hasEntrySatisfying("res.prop1", v -> {
             assertThat(v).isEqualTo("res.value1");
         });

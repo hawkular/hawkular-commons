@@ -77,18 +77,18 @@ public class InventoryRestTest {
     private static final Metric METRIC4
             = new Metric("gc2", "GC", MetricUnit.NONE, new HashMap<>());
 
-    private static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "feed1", "EAP", true,
-            Arrays.asList("child-1", "child-2"), Arrays.asList(METRIC1, METRIC2), new HashMap<>());
-    private static final Resource EAP2 = new Resource("EAP-2", "EAP-2", "feed2", "EAP", true,
-            Arrays.asList("child-3", "child-4"), Arrays.asList(METRIC3, METRIC4), new HashMap<>());
-    private static final Resource CHILD1 = new Resource("child-1", "Child 1", "feedX", "FOO", false,
-            new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD2 = new Resource("child-2", "Child 2", "feedX", "BAR", false,
-            new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD3 = new Resource("child-3", "Child 3", "feedX", "FOO", false,
-            new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD4 = new Resource("child-4", "Child 4", "feedX", "BAR", false,
-            new ArrayList<>(), new ArrayList<>(), new HashMap<>());
+    private static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "feed1", "EAP", null,
+            Arrays.asList(METRIC1, METRIC2), new HashMap<>());
+    private static final Resource EAP2 = new Resource("EAP-2", "EAP-2", "feed2", "EAP", null,
+            Arrays.asList(METRIC3, METRIC4), new HashMap<>());
+    private static final Resource CHILD1 = new Resource("child-1", "Child 1", "feedX", "FOO", "EAP-1",
+            new ArrayList<>(), new HashMap<>());
+    private static final Resource CHILD2 = new Resource("child-2", "Child 2", "feedX", "BAR", "EAP-1",
+            new ArrayList<>(), new HashMap<>());
+    private static final Resource CHILD3 = new Resource("child-3", "Child 3", "feedX", "FOO", "EAP-2",
+            new ArrayList<>(), new HashMap<>());
+    private static final Resource CHILD4 = new Resource("child-4", "Child 4", "feedX", "BAR", "EAP-2",
+            new ArrayList<>(), new HashMap<>());
     private static final Map<String, Map<String, String>> RELOAD_PARAMETERS;
     static {
         RELOAD_PARAMETERS = new HashMap<>();
@@ -176,8 +176,8 @@ public class InventoryRestTest {
                 String childIdX = id + "-child-" + j;
                 String childNameX = "Child "+ j + " from " + id;
                 childrenIds.add(childIdX);
-                Resource childX = new Resource(childIdX, childNameX, feedX, childType, false,
-                        new ArrayList<>(), new ArrayList<>(), new HashMap<>());
+                Resource childX = new Resource(childIdX, childNameX, feedX, childType, id,
+                        new ArrayList<>(), new HashMap<>());
 
                 childrenResource.add(childX);
             }
@@ -194,8 +194,7 @@ public class InventoryRestTest {
                     name,
                     feedX,
                     typeId,
-                    true,
-                    childrenIds,
+                    null,
                     metricsResource,
                     propsX);
 
@@ -307,9 +306,6 @@ public class InventoryRestTest {
         assertThat(resources)
                 .extracting(ResourceWithType::getId)
                 .containsOnly("EAP-1", "EAP-2");
-        assertThat(resources)
-                .flatExtracting(ResourceWithType::getChildrenIds)
-                .containsOnly("child-1", "child-2", "child-3", "child-4");
     }
 
     @Test
@@ -410,10 +406,10 @@ public class InventoryRestTest {
 
     @Test
     public void test015_shouldFailOnDetectedCycle() {
-        Resource corruptedParent = new Resource("CP", "CP", "feedX", "FOO", true,
-                Collections.singletonList("CC"), new ArrayList<>(), new HashMap<>());
-        Resource corruptedChild = new Resource("CC", "CC", "feedX", "BAR", false,
-                Collections.singletonList("CP"), new ArrayList<>(), new HashMap<>());
+        Resource corruptedParent = new Resource("CP", "CP", "feedX", "FOO", "CC",
+                new ArrayList<>(), new HashMap<>());
+        Resource corruptedChild = new Resource("CC", "CC", "feedX", "BAR", "CP",
+                new ArrayList<>(), new HashMap<>());
         Import corruptedImport = new Import(Arrays.asList(corruptedParent, corruptedChild), null);
 
         Client client = ClientBuilder.newClient();

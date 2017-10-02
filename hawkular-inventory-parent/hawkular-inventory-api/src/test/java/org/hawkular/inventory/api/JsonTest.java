@@ -50,7 +50,7 @@ public class JsonTest {
                     new ArrayList<>(), new ArrayList<>());
             resources.add(resourceX);
             ResourceWithType resourceWTX = new ResourceWithType("Lbis" + i, "Largebis" + i, new HashMap<>(),
-                    fooType, new ArrayList<>(), new ArrayList<>());
+                    fooType, new ArrayList<>());
             resourcesWithType.add(resourceWTX);
             ResourceType resourceTypeX = new ResourceType("EAP" + i, new HashSet<>(), new HashMap<>());
             resourceTypes.add(resourceTypeX);
