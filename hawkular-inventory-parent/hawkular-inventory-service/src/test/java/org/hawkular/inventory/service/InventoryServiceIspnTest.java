@@ -54,17 +54,17 @@ public class InventoryServiceIspnTest {
             = new Metric("memory2", "Memory", MetricUnit.BYTES, new HashMap<>());
     private static final Metric METRIC4
             = new Metric("gc2", "GC", MetricUnit.NONE, new HashMap<>());
-    private static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "EAP", true,
+    private static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "feed1", "EAP", true,
             Arrays.asList("child-1", "child-2"), Arrays.asList(METRIC1, METRIC2), new HashMap<>());
-    private static final Resource EAP2 = new Resource("EAP-2", "EAP-2", "EAP", true,
+    private static final Resource EAP2 = new Resource("EAP-2", "EAP-2", "feed2", "EAP", true,
             Arrays.asList("child-3", "child-4"), Arrays.asList(METRIC3, METRIC4), new HashMap<>());
-    private static final Resource CHILD1 = new Resource("child-1", "Child 1", "FOO", false,
+    private static final Resource CHILD1 = new Resource("child-1", "Child 1", "feedX", "FOO", false,
             new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD2 = new Resource("child-2", "Child 2", "BAR", false,
+    private static final Resource CHILD2 = new Resource("child-2", "Child 2", "feedX", "BAR", false,
             new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD3 = new Resource("child-3", "Child 3", "FOO", false,
+    private static final Resource CHILD3 = new Resource("child-3", "Child 3", "feedX", "FOO", false,
             new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD4 = new Resource("child-4", "Child 4", "BAR", false,
+    private static final Resource CHILD4 = new Resource("child-4", "Child 4", "feedX", "BAR", false,
             new ArrayList<>(), new ArrayList<>(), new HashMap<>());
     private static final Collection<Operation> EAP_OPS = Arrays.asList(
             new Operation("Reload", new HashMap<>()),
@@ -130,7 +130,7 @@ public class InventoryServiceIspnTest {
 
     @Test
     public void shouldGetTopResources() {
-        Collection<ResourceWithType> top = service.getResources(true, null).getResults();
+        Collection<ResourceWithType> top = service.getResources(true, null, null).getResults();
         assertThat(top)
                 .extracting(ResourceWithType::getName)
                 .containsOnly("EAP-1", "EAP-2");
@@ -152,21 +152,21 @@ public class InventoryServiceIspnTest {
 
     @Test
     public void shouldGetAllEAPs() {
-        assertThat(service.getResources(false, "EAP").getResults())
+        assertThat(service.getResources(false, null, "EAP").getResults())
                 .extracting(ResourceWithType::getId)
                 .containsOnly("EAP-1", "EAP-2");
     }
 
     @Test
     public void shouldGetAllFOOs() {
-        assertThat(service.getResources(false, "FOO").getResults())
+        assertThat(service.getResources(false, null, "FOO").getResults())
                 .extracting(ResourceWithType::getId)
                 .containsOnly("child-1", "child-3");
     }
 
     @Test
     public void shouldGetNoNada() {
-        assertThat(service.getResources(false, "nada").getResults()).isEmpty();
+        assertThat(service.getResources(false, null, "nada").getResults()).isEmpty();
     }
 
     @Test
@@ -202,9 +202,9 @@ public class InventoryServiceIspnTest {
 
     @Test
     public void shouldFailOnDetectedCycle() {
-        Resource corruptedParent = new Resource("CP", "CP", "FOO", true,
+        Resource corruptedParent = new Resource("CP", "CP", "feedX", "FOO", true,
                 Collections.singletonList("CC"), new ArrayList<>(), new HashMap<>());
-        Resource corruptedChild = new Resource("CC", "CC", "BAR", false,
+        Resource corruptedChild = new Resource("CC", "CC", "feedX", "BAR", false,
                 Collections.singletonList("CP"), new ArrayList<>(), new HashMap<>());
         service.addResource(corruptedParent);
         service.addResource(corruptedChild);
@@ -253,25 +253,44 @@ public class InventoryServiceIspnTest {
     }
 
     @Test
-    public void createLargeSetAndFetchPagination() {
-        int maxItems = 10000;
-        List<Resource> resources = new ArrayList<>();
-        for (int i = 0; i < maxItems; i++) {
-            Resource resourceX = new Resource("L" + i, "Large" + i, "FOO", true,
-                    new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-            resources.add(resourceX);
-        }
-        service.addResource(resources);
+    public void shouldGetAllEAPsPerFeed() {
+        assertThat(service.getResources(false, "feed1", "EAP").getResults())
+                .extracting(ResourceWithType::getId)
+                .containsOnly("EAP-1");
 
-        ResultSet<ResourceWithType> results = service.getResources(false, "FOO");
-        assertThat(results.getResultSize()).isEqualTo(maxItems + 2);
+        assertThat(service.getResources(false, "feed2", "EAP").getResults())
+                .extracting(ResourceWithType::getId)
+                .containsOnly("EAP-2");
+    }
+
+    @Test
+    public void createLargeSetAndFetchPagination() {
+        int maxFeeds = 10;
+        int maxItems = 1000;
+        List<Resource> resources = new ArrayList<>();
+        for (int j = 0; j < maxFeeds; j++) {
+            for (int i = 0; i < maxItems; i++) {
+                Resource resourceX = new Resource("F" + j + "L" + i, "Large" + i, "feed" + j, "FOO", true,
+                        new ArrayList<>(), new ArrayList<>(), new HashMap<>());
+                resources.add(resourceX);
+            }
+            service.addResource(resources);
+        }
+
+        ResultSet<ResourceWithType> results = service.getResources(false, null, "FOO");
+        assertThat(results.getResultSize()).isEqualTo(maxFeeds * maxItems + 2);
         assertThat(results.getResults().size()).isEqualTo(100);
 
         for (int i = 0; i < (maxItems / 100); i++) {
-            results = service.getResources(false, "FOO",  i * 100, 100);
-            assertThat(results.getResultSize()).isEqualTo(maxItems + 2);
+            results = service.getResources(false, null, "FOO",  i * 100, 100);
+            assertThat(results.getResultSize()).isEqualTo(maxFeeds * maxItems + 2);
             assertThat(results.getResults().size()).isEqualTo(100);
             assertThat(results.getStartOffset()).isEqualTo(i * 100);
+        }
+
+        for (int j = 0; j < maxFeeds; j++) {
+            results = service.getResources(false, "feed" + j, "FOO",  0, 1000);
+            assertThat(results.getResults().size()).isEqualTo(1000);
         }
     }
 }

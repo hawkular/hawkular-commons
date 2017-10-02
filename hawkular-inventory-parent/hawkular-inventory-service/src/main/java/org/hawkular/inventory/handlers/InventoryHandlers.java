@@ -105,11 +105,12 @@ public class InventoryHandlers {
     @Path("/resources")
     @Produces(APPLICATION_JSON)
     public Response getResources(@QueryParam("root") @DefaultValue("false") final boolean root,
+                                 @QueryParam("feedId") final String feedId,
                                  @QueryParam("typeId") final String typeId,
                                  @QueryParam("startOffSet") @DefaultValue("0") final Long startOffset,
                                  @QueryParam("maxResults") @DefaultValue("100") final Integer maxResults) {
         try {
-            return ResponseUtil.ok(inventoryService.getResources(root, typeId, startOffset, maxResults));
+            return ResponseUtil.ok(inventoryService.getResources(root, feedId, typeId, startOffset, maxResults));
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }

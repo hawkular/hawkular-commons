@@ -44,6 +44,7 @@ public class Resource implements Serializable {
     public static class Builder {
         private String id;
         private String name;
+        private String feedId;
         private String typeId;
         private boolean isRoot;
         private List<String> childrenIds = new ArrayList<>();
@@ -51,7 +52,7 @@ public class Resource implements Serializable {
         private Map<String, String> properties = new HashMap<>();
 
         public Resource build() {
-            return new Resource(id, name, typeId, isRoot, childrenIds, metrics, properties);
+            return new Resource(id, name, feedId, typeId, isRoot, childrenIds, metrics, properties);
         }
 
         public Builder id(String id) {
@@ -61,6 +62,11 @@ public class Resource implements Serializable {
 
         public Builder name(String name) {
             this.name = name;
+            return this;
+        }
+
+        public Builder feedId(String feedId) {
+            this.feedId = feedId;
             return this;
         }
 
@@ -107,6 +113,10 @@ public class Resource implements Serializable {
 
     @JsonInclude(Include.NON_NULL)
     @Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
+    private final String feedId;
+
+    @JsonInclude(Include.NON_NULL)
+    @Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
     private final String typeId;
 
     @JsonInclude(Include.NON_NULL)
@@ -128,6 +138,7 @@ public class Resource implements Serializable {
 
     public Resource(@JsonProperty("id") String id,
                     @JsonProperty("name") String name,
+                    @JsonProperty("feedId") String feedId,
                     @JsonProperty("typeId") String typeId,
                     @JsonProperty("root") boolean isRoot,
                     @JsonProperty("childrenIds") List<String> childrenIds,
@@ -135,6 +146,7 @@ public class Resource implements Serializable {
                     @JsonProperty("properties") Map<String, String> properties) {
         this.id = id;
         this.name = name;
+        this.feedId = feedId;
         this.typeId = typeId;
         this.isRoot = isRoot;
         this.childrenIds = childrenIds;
@@ -148,6 +160,10 @@ public class Resource implements Serializable {
 
     public String getName() {
         return name;
+    }
+
+    public String getFeedId() {
+        return feedId;
     }
 
     public String getTypeId() {
@@ -209,6 +225,7 @@ public class Resource implements Serializable {
         return "Resource{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
+                ", feedId='" + feedId + '\'' +
                 ", typeId='" + typeId + '\'' +
                 ", isRoot=" + isRoot +
                 ", childrenIds=" + childrenIds +

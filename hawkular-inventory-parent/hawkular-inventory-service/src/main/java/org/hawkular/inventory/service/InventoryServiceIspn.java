@@ -44,6 +44,7 @@ import org.hawkular.inventory.model.Resource;
 import org.hawkular.inventory.model.ResourceType;
 import org.infinispan.Cache;
 import org.infinispan.query.Search;
+import org.infinispan.query.dsl.FilterConditionContextQueryBuilder;
 import org.infinispan.query.dsl.Query;
 import org.infinispan.query.dsl.QueryBuilder;
 import org.infinispan.query.dsl.QueryFactory;
@@ -159,13 +160,28 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public ResultSet<ResourceWithType> getResources(boolean root, String typeId, long startOffset, int maxResults) {
+    public ResultSet<ResourceWithType> getResources(boolean root, String feedId, String typeId, long startOffset, int maxResults) {
         QueryBuilder qb = qResource.from(Resource.class);
+        FilterConditionContextQueryBuilder fqb = null;
         if (root) {
-            qb = qb.having("isRoot").equal(true);
+            fqb = qb.having("isRoot").equal(true);
+        }
+        if (feedId != null) {
+            if (fqb != null) {
+                fqb = fqb.and().having("feedId").equal(feedId);
+            } else {
+                fqb = qb.having("feedId").equal(feedId);
+            }
         }
         if (typeId != null) {
-            qb = qb.having("typeId").equal(typeId);
+            if (fqb != null) {
+                fqb = fqb.and().having("typeId").equal(typeId);
+            } else {
+                fqb = qb.having("typeId").equal(typeId);
+            }
+        }
+        if (fqb != null) {
+            qb = fqb;
         }
         Query query = qb.maxResults(maxResults).startOffset(startOffset).build();
         List<ResourceWithType> result = query.list().stream()
@@ -175,8 +191,8 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public ResultSet<ResourceWithType> getResources(boolean root, String typeId) {
-        return getResources(root, typeId, 0, MAX_RESULTS);
+    public ResultSet<ResourceWithType> getResources(boolean root, String feedId, String typeId) {
+        return getResources(root, feedId, typeId, 0, MAX_RESULTS);
     }
 
     @Override
