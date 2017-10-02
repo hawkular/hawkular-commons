@@ -377,7 +377,7 @@ public class InventoryRestTest {
         ResourceNode tree = response.readEntity(ResourceNode.class);
         assertThat(tree.getChildren())
                 .extracting(ResourceNode::getId)
-                .containsExactly("child-1", "child-2");
+                .containsOnly("child-1", "child-2");
     }
 
     @Test
