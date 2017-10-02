@@ -156,7 +156,7 @@ public class InventoryServiceIspn implements InventoryService {
     @Override
     public Optional<ResourceNode> getTree(String parentId) {
         return getRawResource(parentId)
-                .map(r -> ResourceNode.fromResource(r, this::getNullableResourceType, this::getNullableResource));
+                .map(r -> ResourceNode.fromResource(r, this::getNullableResourceType, this::getResourcesForParent));
     }
 
     @Override
@@ -164,7 +164,7 @@ public class InventoryServiceIspn implements InventoryService {
         QueryBuilder qb = qResource.from(Resource.class);
         FilterConditionContextQueryBuilder fqb = null;
         if (root) {
-            fqb = qb.having("isRoot").equal(true);
+            fqb = qb.having("parentId").isNull();
         }
         if (feedId != null) {
             if (fqb != null) {
@@ -263,11 +263,14 @@ public class InventoryServiceIspn implements InventoryService {
         }
     }
 
-    private Resource getNullableResource(String id) {
-        if (isEmpty(id)) {
-            return null;
+    private List<Resource> getResourcesForParent(String parentId) {
+        if (isEmpty(parentId)) {
+            return Collections.emptyList();
         }
-        return (Resource) resource.get(id);
+        return qResource.from(Resource.class)
+                .having("parentId").equal(parentId)
+                .build()
+                .list();
     }
 
     private ResourceType getNullableResourceType(String typeId) {

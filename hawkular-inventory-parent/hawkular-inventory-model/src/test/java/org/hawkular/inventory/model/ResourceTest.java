@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Function;
 
@@ -36,8 +37,8 @@ public class ResourceTest {
     private static final Metric METRIC2
             = new Metric("gc", "GC", MetricUnit.NONE, new HashMap<>());
 
-    private final Resource r = new Resource("id", "name", "feedX", "EAP", true,
-            Arrays.asList("child-1", "child-2"), Arrays.asList(METRIC1, METRIC2), new HashMap<>());
+    private final Resource r = new Resource("id", "name", "feedX", "EAP",
+            null, Arrays.asList(METRIC1, METRIC2), new HashMap<>());
 
     @Test
     public void shouldLazyLoadResourceType() {
@@ -58,23 +59,22 @@ public class ResourceTest {
 
     @Test
     public void shouldLazyLoadChildren() {
-        Resource child1 = new Resource("child-1", "name-1", "feedX", "t", false,
-                new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-        Resource child2 = new Resource("child-2", "name-2", "feedX", "t", false,
-                new ArrayList<>(), new ArrayList<>(), new HashMap<>());
+        Resource child1 = new Resource("child-1", "name-1", "feedX", "t", "id",
+                new ArrayList<>(), new HashMap<>());
+        Resource child2 = new Resource("child-2", "name-2", "feedX", "t", "id",
+                new ArrayList<>(), new HashMap<>());
         LongAdder numberOfCalls = new LongAdder();
-        Function<String, Resource> loader = id -> {
+        Function<String, List<Resource>> loader = id -> {
             numberOfCalls.increment();
-            if (id.equals(child1.getId())) {
-                return child1;
-            }
-            return child2;
+            return Arrays.asList(child1, child2);
         };
 
-        assertThat(r.getChildren(loader)).extracting(Resource::getName).containsExactly("name-1", "name-2");
-        assertThat(numberOfCalls.intValue()).isEqualTo(2);
+        assertThat(r.getChildren(loader))
+                .extracting(Resource::getName)
+                .containsExactly("name-1", "name-2");
+        assertThat(numberOfCalls.intValue()).isEqualTo(1);
         // Verify loader is not called again
         r.getChildren(loader);
-        assertThat(numberOfCalls.intValue()).isEqualTo(2);
+        assertThat(numberOfCalls.intValue()).isEqualTo(1);
     }
 }

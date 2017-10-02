@@ -54,18 +54,18 @@ public class InventoryServiceIspnTest {
             = new Metric("memory2", "Memory", MetricUnit.BYTES, new HashMap<>());
     private static final Metric METRIC4
             = new Metric("gc2", "GC", MetricUnit.NONE, new HashMap<>());
-    private static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "feed1", "EAP", true,
-            Arrays.asList("child-1", "child-2"), Arrays.asList(METRIC1, METRIC2), new HashMap<>());
-    private static final Resource EAP2 = new Resource("EAP-2", "EAP-2", "feed2", "EAP", true,
-            Arrays.asList("child-3", "child-4"), Arrays.asList(METRIC3, METRIC4), new HashMap<>());
-    private static final Resource CHILD1 = new Resource("child-1", "Child 1", "feedX", "FOO", false,
-            new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD2 = new Resource("child-2", "Child 2", "feedX", "BAR", false,
-            new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD3 = new Resource("child-3", "Child 3", "feedX", "FOO", false,
-            new ArrayList<>(), new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD4 = new Resource("child-4", "Child 4", "feedX", "BAR", false,
-            new ArrayList<>(), new ArrayList<>(), new HashMap<>());
+    private static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "feed1", "EAP", null,
+            Arrays.asList(METRIC1, METRIC2), new HashMap<>());
+    private static final Resource EAP2 = new Resource("EAP-2", "EAP-2", "feed2", "EAP", null,
+            Arrays.asList(METRIC3, METRIC4), new HashMap<>());
+    private static final Resource CHILD1 = new Resource("child-1", "Child 1", "feedX", "FOO", "EAP-1",
+            new ArrayList<>(), new HashMap<>());
+    private static final Resource CHILD2 = new Resource("child-2", "Child 2", "feedX", "BAR", "EAP-1",
+            new ArrayList<>(), new HashMap<>());
+    private static final Resource CHILD3 = new Resource("child-3", "Child 3", "feedX", "FOO", "EAP-2",
+            new ArrayList<>(), new HashMap<>());
+    private static final Resource CHILD4 = new Resource("child-4", "Child 4", "feedX", "BAR", "EAP-2",
+            new ArrayList<>(), new HashMap<>());
     private static final Collection<Operation> EAP_OPS = Arrays.asList(
             new Operation("Reload", new HashMap<>()),
             new Operation("Shutdown", new HashMap<>()));
@@ -138,9 +138,6 @@ public class InventoryServiceIspnTest {
                 .extracting(ResourceWithType::getType)
                 .extracting(ResourceType::getId)
                 .containsOnly("EAP", "EAP");
-        assertThat(top)
-                .flatExtracting(ResourceWithType::getChildrenIds)
-                .containsOnly("child-1", "child-2", "child-3", "child-4");
     }
 
     @Test
@@ -174,7 +171,7 @@ public class InventoryServiceIspnTest {
         ResourceNode tree = service.getTree("EAP-1").orElseThrow(AssertionError::new);
         assertThat(tree.getChildren())
                 .extracting(ResourceNode::getId)
-                .containsExactly("child-1", "child-2");
+                .containsOnly("child-1", "child-2");
     }
 
     @Test
@@ -202,10 +199,10 @@ public class InventoryServiceIspnTest {
 
     @Test
     public void shouldFailOnDetectedCycle() {
-        Resource corruptedParent = new Resource("CP", "CP", "feedX", "FOO", true,
-                Collections.singletonList("CC"), new ArrayList<>(), new HashMap<>());
-        Resource corruptedChild = new Resource("CC", "CC", "feedX", "BAR", false,
-                Collections.singletonList("CP"), new ArrayList<>(), new HashMap<>());
+        Resource corruptedParent = new Resource("CP", "CP", "feedX", "FOO", "CC",
+                new ArrayList<>(), new HashMap<>());
+        Resource corruptedChild = new Resource("CC", "CC", "feedX", "BAR", "CP",
+                new ArrayList<>(), new HashMap<>());
         service.addResource(corruptedParent);
         service.addResource(corruptedChild);
 
@@ -270,8 +267,8 @@ public class InventoryServiceIspnTest {
         List<Resource> resources = new ArrayList<>();
         for (int j = 0; j < maxFeeds; j++) {
             for (int i = 0; i < maxItems; i++) {
-                Resource resourceX = new Resource("F" + j + "L" + i, "Large" + i, "feed" + j, "FOO", true,
-                        new ArrayList<>(), new ArrayList<>(), new HashMap<>());
+                Resource resourceX = new Resource("F" + j + "L" + i, "Large" + i, "feed" + j, "FOO", null,
+                        new ArrayList<>(), new HashMap<>());
                 resources.add(resourceX);
             }
             service.addResource(resources);
