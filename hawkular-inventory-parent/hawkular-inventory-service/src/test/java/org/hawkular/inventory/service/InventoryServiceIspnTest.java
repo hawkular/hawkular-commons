@@ -131,7 +131,7 @@ public class InventoryServiceIspnTest {
 
     @Test
     public void shouldGetTopResources() {
-        Collection<ResourceWithType> top = service.getResources(ResourceFilter.rootOnly()).getResults();
+        Collection<ResourceWithType> top = service.getResources(ResourceFilter.rootOnly().build()).getResults();
         assertThat(top)
                 .extracting(ResourceWithType::getName)
                 .containsOnly("EAP-1", "EAP-2");
@@ -150,21 +150,21 @@ public class InventoryServiceIspnTest {
 
     @Test
     public void shouldGetAllEAPs() {
-        assertThat(service.getResources(ResourceFilter.ofType("EAP")).getResults())
+        assertThat(service.getResources(ResourceFilter.ofType("EAP").build()).getResults())
                 .extracting(ResourceWithType::getId)
                 .containsOnly("EAP-1", "EAP-2");
     }
 
     @Test
     public void shouldGetAllFOOs() {
-        assertThat(service.getResources(ResourceFilter.ofType("FOO")).getResults())
+        assertThat(service.getResources(ResourceFilter.ofType("FOO").build()).getResults())
                 .extracting(ResourceWithType::getId)
                 .containsOnly("child-1", "child-3");
     }
 
     @Test
     public void shouldGetNoNada() {
-        assertThat(service.getResources(ResourceFilter.ofType("nada")).getResults()).isEmpty();
+        assertThat(service.getResources(ResourceFilter.ofType("nada").build()).getResults()).isEmpty();
     }
 
     @Test
@@ -252,11 +252,11 @@ public class InventoryServiceIspnTest {
 
     @Test
     public void shouldGetAllEAPsPerFeed() {
-        assertThat(service.getResources(ResourceFilter.ofType("EAP").andFeed("feed1")).getResults())
+        assertThat(service.getResources(ResourceFilter.ofType("EAP").andFeed("feed1").build()).getResults())
                 .extracting(ResourceWithType::getId)
                 .containsOnly("EAP-1");
 
-        assertThat(service.getResources(ResourceFilter.ofType("EAP").andFeed("feed2")).getResults())
+        assertThat(service.getResources(ResourceFilter.ofType("EAP").andFeed("feed2").build()).getResults())
                 .extracting(ResourceWithType::getId)
                 .containsOnly("EAP-2");
     }
@@ -275,19 +275,19 @@ public class InventoryServiceIspnTest {
             service.addResource(resources);
         }
 
-        ResultSet<ResourceWithType> results = service.getResources(ResourceFilter.ofType("FOO"));
+        ResultSet<ResourceWithType> results = service.getResources(ResourceFilter.ofType("FOO").build());
         assertThat(results.getResultSize()).isEqualTo(maxFeeds * maxItems + 2);
         assertThat(results.getResults().size()).isEqualTo(100);
 
         for (int i = 0; i < (maxItems / 100); i++) {
-            results = service.getResources(ResourceFilter.ofType("FOO"),  i * 100, 100);
+            results = service.getResources(ResourceFilter.ofType("FOO").build(),  i * 100, 100);
             assertThat(results.getResultSize()).isEqualTo(maxFeeds * maxItems + 2);
             assertThat(results.getResults().size()).isEqualTo(100);
             assertThat(results.getStartOffset()).isEqualTo(i * 100);
         }
 
         for (int j = 0; j < maxFeeds; j++) {
-            results = service.getResources(ResourceFilter.ofType("FOO").andFeed("feed" + j),  0, 1000);
+            results = service.getResources(ResourceFilter.ofType("FOO").andFeed("feed" + j).build(),  0, 1000);
             assertThat(results.getResults().size()).isEqualTo(1000);
         }
     }

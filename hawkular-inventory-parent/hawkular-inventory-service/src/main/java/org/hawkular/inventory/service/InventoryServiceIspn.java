@@ -80,7 +80,6 @@ public class InventoryServiceIspn implements InventoryService {
     @InventoryResourceType
     private QueryFactory qResourceType;
 
-
     public InventoryServiceIspn() {
         configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
     }

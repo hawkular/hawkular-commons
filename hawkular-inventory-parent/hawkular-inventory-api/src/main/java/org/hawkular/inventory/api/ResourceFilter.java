@@ -20,41 +20,14 @@ package org.hawkular.inventory.api;
  * @author Joel Takvorian
  */
 public class ResourceFilter {
-    private boolean rootOnly;
-    private String typeId;
-    private String feedId;
+    private final boolean rootOnly;
+    private final String typeId;
+    private final String feedId;
 
     public ResourceFilter(boolean rootOnly, String feedId, String typeId) {
         this.rootOnly = rootOnly;
         this.feedId = feedId;
         this.typeId = typeId;
-    }
-
-    public static ResourceFilter rootOnly() {
-        return new ResourceFilter(true, null, null);
-    }
-
-    public static ResourceFilter ofType(String typeId) {
-        return new ResourceFilter(false, null, typeId);
-    }
-
-    public static ResourceFilter forFeed(String feedId) {
-        return new ResourceFilter(false, feedId, null);
-    }
-
-    public ResourceFilter andFeed(String feedId) {
-        this.feedId = feedId;
-        return this;
-    }
-
-    public ResourceFilter andType(String typeId) {
-        this.typeId = typeId;
-        return this;
-    }
-
-    public ResourceFilter andRootOnly() {
-        this.rootOnly = true;
-        return this;
     }
 
     public boolean isRootOnly() {
@@ -67,5 +40,53 @@ public class ResourceFilter {
 
     public String getFeedId() {
         return feedId;
+    }
+
+    public static ResourceFilter.Builder builder() {
+        return new ResourceFilter.Builder(false, null, null);
+    }
+
+    public static ResourceFilter.Builder rootOnly() {
+        return new ResourceFilter.Builder(true, null, null);
+    }
+
+    public static ResourceFilter.Builder ofType(String typeId) {
+        return new ResourceFilter.Builder(false, null, typeId);
+    }
+
+    public static ResourceFilter.Builder forFeed(String feedId) {
+        return new ResourceFilter.Builder(false, feedId, null);
+    }
+
+    public static class Builder {
+
+        private boolean rootOnly;
+        private String typeId;
+        private String feedId;
+
+        private Builder(boolean rootOnly, String feedId, String typeId) {
+            this.rootOnly = rootOnly;
+            this.feedId = feedId;
+            this.typeId = typeId;
+        }
+
+        public Builder andFeed(String feedId) {
+            this.feedId = feedId;
+            return this;
+        }
+
+        public Builder andType(String typeId) {
+            this.typeId = typeId;
+            return this;
+        }
+
+        public Builder andRootOnly() {
+            this.rootOnly = true;
+            return this;
+        }
+
+        public ResourceFilter build() {
+            return new ResourceFilter(rootOnly, feedId, typeId);
+        }
     }
 }
