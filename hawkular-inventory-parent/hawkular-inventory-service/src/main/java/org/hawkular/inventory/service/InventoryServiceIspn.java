@@ -35,6 +35,7 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 import org.hawkular.inventory.api.InventoryService;
+import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.ResourceNode;
 import org.hawkular.inventory.api.ResourceWithType;
 import org.hawkular.inventory.api.ResultSet;
@@ -78,7 +79,6 @@ public class InventoryServiceIspn implements InventoryService {
     @Inject
     @InventoryResourceType
     private QueryFactory qResourceType;
-
 
     public InventoryServiceIspn() {
         configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
@@ -160,30 +160,21 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public ResultSet<ResourceWithType> getResources(boolean root, String feedId, String typeId, long startOffset, int maxResults) {
+    public ResultSet<ResourceWithType> getResources(ResourceFilter filter, long startOffset, int maxResults) {
         QueryBuilder qb = qResource.from(Resource.class);
-        FilterConditionContextQueryBuilder fqb = null;
-        if (root) {
-            fqb = qb.having("parentId").isNull();
+        FilterConditionContextQueryBuilder fccqb = null;
+        if (filter.isRootOnly()) {
+            fccqb = qb.having("parentId").isNull();
         }
-        if (feedId != null) {
-            if (fqb != null) {
-                fqb = fqb.and().having("feedId").equal(feedId);
-            } else {
-                fqb = qb.having("feedId").equal(feedId);
-            }
+        if (filter.getTypeId() != null) {
+            fccqb = (fccqb == null ? qb : fccqb.and()).having("typeId").equal(filter.getTypeId());
         }
-        if (typeId != null) {
-            if (fqb != null) {
-                fqb = fqb.and().having("typeId").equal(typeId);
-            } else {
-                fqb = qb.having("typeId").equal(typeId);
-            }
+        if (filter.getFeedId() != null) {
+            fccqb = (fccqb == null ? qb : fccqb.and()).having("feedId").equal(filter.getFeedId());
         }
-        if (fqb != null) {
-            qb = fqb;
-        }
-        Query query = qb.maxResults(maxResults).startOffset(startOffset).build();
+        Query query = (fccqb == null ? qb : fccqb)
+                .maxResults(maxResults)
+                .startOffset(startOffset).build();
         List<ResourceWithType> result = query.list().stream()
                 .map(r -> ResourceWithType.fromResource((Resource)r, this::getNullableResourceType))
                 .collect(Collectors.toList());
@@ -191,8 +182,8 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public ResultSet<ResourceWithType> getResources(boolean root, String feedId, String typeId) {
-        return getResources(root, feedId, typeId, 0, MAX_RESULTS);
+    public ResultSet<ResourceWithType> getResources(ResourceFilter filter) {
+        return getResources(filter, 0, MAX_RESULTS);
     }
 
     @Override
