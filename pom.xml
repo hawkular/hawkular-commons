@@ -148,6 +148,7 @@
         <module>hawkular-cors-jaxrs-filter</module>
         <module>hawkular-command-gateway</module>
         <module>utils</module>
+        <module>embedded-cassandra</module>
       </modules>
     </profile>
 
