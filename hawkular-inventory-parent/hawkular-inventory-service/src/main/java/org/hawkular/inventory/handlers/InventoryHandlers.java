@@ -38,6 +38,7 @@ import javax.ws.rs.core.Response;
 
 import org.hawkular.inventory.api.Import;
 import org.hawkular.inventory.api.InventoryService;
+import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
 
@@ -110,7 +111,7 @@ public class InventoryHandlers {
                                  @QueryParam("startOffSet") @DefaultValue("0") final Long startOffset,
                                  @QueryParam("maxResults") @DefaultValue("100") final Integer maxResults) {
         try {
-            return ResponseUtil.ok(inventoryService.getResources(root, feedId, typeId, startOffset, maxResults));
+            return ResponseUtil.ok(inventoryService.getResources(new ResourceFilter(root, feedId, typeId), startOffset, maxResults));
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }
