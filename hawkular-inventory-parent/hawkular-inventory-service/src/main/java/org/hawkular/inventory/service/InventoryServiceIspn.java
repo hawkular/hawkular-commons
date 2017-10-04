@@ -34,6 +34,7 @@ import javax.ejb.Local;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import org.hawkular.inventory.api.Import;
 import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.ResourceNode;
@@ -229,6 +230,17 @@ public class InventoryServiceIspn implements InventoryService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Import buildExport() {
+        List<ResourceType> types = qResourceType.from(ResourceType.class)
+                .build()
+                .list();
+        List<Resource> resources = qResource.from(Resource.class)
+                .build()
+                .list();
+        return new Import(resources, types);
     }
 
     private Optional<String> getConfig(String fileName) {

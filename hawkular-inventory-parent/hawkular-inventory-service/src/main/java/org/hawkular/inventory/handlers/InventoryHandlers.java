@@ -61,6 +61,17 @@ public class InventoryHandlers {
      */
 
     @GET
+    @Path("/export")
+    @Produces(APPLICATION_JSON)
+    public Response exportInventory() {
+        try {
+            return ResponseUtil.ok(inventoryService.buildExport());
+        } catch (Exception e) {
+            return ResponseUtil.internalError(e);
+        }
+    }
+
+    @GET
     @Path("/get-inventory-config/{templateName}")
     @Produces(TEXT_PLAIN)
     public Response getAgentConfig(@PathParam("templateName") final String templateName) {
