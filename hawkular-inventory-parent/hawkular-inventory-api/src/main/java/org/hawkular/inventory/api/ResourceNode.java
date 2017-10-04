@@ -45,6 +45,9 @@ public class ResourceNode implements Serializable {
     private final String name;
 
     @JsonInclude(Include.NON_NULL)
+    private final String feedId;
+
+    @JsonInclude(Include.NON_NULL)
     private final Map<String, String> properties;
 
     @JsonInclude(Include.NON_NULL)
@@ -58,12 +61,14 @@ public class ResourceNode implements Serializable {
 
     public ResourceNode(@JsonProperty("id") String id,
                         @JsonProperty("name") String name,
+                        @JsonProperty("feedId") String feedId,
                         @JsonProperty("properties") Map<String, String> properties,
                         @JsonProperty("type") ResourceType type,
                         @JsonProperty("children") List<ResourceNode> children,
                         @JsonProperty("metrics") List<Metric> metrics) {
         this.id = id;
         this.name = name;
+        this.feedId = feedId;
         this.properties = properties;
         this.type = type;
         this.children = children;
@@ -95,7 +100,7 @@ public class ResourceNode implements Serializable {
         List<ResourceNode> children = r.getChildren(rLoader).stream()
                 .map(child -> fromResource(child, rtLoader, rLoader, loaded))
                 .collect(Collectors.toList());
-        return new ResourceNode(r.getId(), r.getName(), r.getProperties(), r.getType(rtLoader),
+        return new ResourceNode(r.getId(), r.getName(), r.getFeedId(), r.getProperties(), r.getType(rtLoader),
                 children, r.getMetrics());
     }
 
@@ -105,6 +110,10 @@ public class ResourceNode implements Serializable {
 
     public String getName() {
         return name;
+    }
+
+    public String getFeedId() {
+        return feedId;
     }
 
     public Map<String, String> getProperties() {
