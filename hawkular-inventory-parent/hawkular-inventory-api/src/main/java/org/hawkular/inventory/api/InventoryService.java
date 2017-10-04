@@ -86,6 +86,22 @@ public interface InventoryService {
     ResultSet<ResourceWithType> getResources(ResourceFilter filter, long startOffset, int maxResults);
 
     /**
+     * Get a list of of child resources for a parent resource, with default pagination
+     * @param parentId resourceId of the parent resource
+     * @return resources embedded in page object {@link ResultSet}
+     */
+    ResultSet<ResourceWithType> getChildren(String parentId);
+
+    /**
+     * Get a list of child resources for a parent resource, with the provided pagination options
+     * @param parentId resourceId of the parent resource
+     * @param startOffset pagination offset
+     * @param maxResults pagination number of results
+     * @return resources embedded in page object {@link ResultSet}
+     */
+    ResultSet<ResourceWithType> getChildren(String parentId, long startOffset, int maxResults);
+
+    /**
      * Get resource types with the default pagination options (first 100 results)
      * @return resource types embedded in page object {@link ResultSet}
      */

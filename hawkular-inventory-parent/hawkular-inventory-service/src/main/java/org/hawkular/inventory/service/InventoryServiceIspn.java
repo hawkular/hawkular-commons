@@ -266,6 +266,23 @@ public class InventoryServiceIspn implements InventoryService {
         }
     }
 
+    @Override
+    public ResultSet<ResourceWithType> getChildren(String parentId) {
+        return getChildren(parentId, 0, MAX_RESULTS);
+    }
+
+    @Override
+    public ResultSet<ResourceWithType> getChildren(String parentId, long startOffset, int maxResults) {
+        Query query = qResource.from(Resource.class)
+                .having("parentId").equal(parentId)
+                .maxResults(maxResults)
+                .startOffset(startOffset).build();
+        List<ResourceWithType> result = query.list().stream()
+                .map(r -> ResourceWithType.fromResource((Resource) r, this::getNullableResourceType))
+                .collect(Collectors.toList());
+        return new ResultSet<>(result, (long) query.getResultSize(), startOffset);
+    }
+
     private List<Resource> getResourcesForParent(String parentId) {
         if (isEmpty(parentId)) {
             return Collections.emptyList();

@@ -260,6 +260,20 @@ public class InventoryRestTest {
     }
 
     @Test
+    public void test012_shouldGetOnlyChildren() {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString()).path("resources/EAP-1/children");
+        Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        assertEquals(200, response.getStatus());
+        assertThat((List<ResourceWithType>) response.readEntity(ResultSet.class).getResults())
+                .extracting(ResourceWithType::getId)
+                .containsOnly("child-1", "child-2");
+    }
+
+    @Test
     public void test015_shouldFailOnDetectedCycle() {
         Resource corruptedParent = new Resource("CP", "CP", "feedX", "FOO", "CC",
                 new ArrayList<>(), new HashMap<>());

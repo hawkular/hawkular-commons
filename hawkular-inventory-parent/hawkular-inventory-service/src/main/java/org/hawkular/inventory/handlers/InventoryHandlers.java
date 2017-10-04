@@ -167,6 +167,19 @@ public class InventoryHandlers {
     }
 
     @GET
+    @Path("/resources/{id}/children")
+    @Produces(APPLICATION_JSON)
+    public Response getChildren(@PathParam("id") final String id,
+                                @DefaultValue("0") @QueryParam("startOffSet") final Long startOffset,
+                                @DefaultValue("100") @QueryParam("maxResults") final Integer maxResults) {
+        try {
+            return ResponseUtil.ok(inventoryService.getChildren(id, startOffset, maxResults));
+        } catch (Exception e) {
+            return ResponseUtil.internalError(e);
+        }
+    }
+
+    @GET
     @Path("/types")
     @Produces(APPLICATION_JSON)
     public Response getAllResourceTypes(@DefaultValue("0") @QueryParam("startOffSet") final Long startOffset,
