@@ -44,6 +44,9 @@ public class ResourceWithType implements Serializable {
     private final String name;
 
     @JsonInclude(Include.NON_NULL)
+    private final String feedId;
+
+    @JsonInclude(Include.NON_NULL)
     private final Map<String, String> properties;
 
     @JsonInclude(Include.NON_NULL)
@@ -54,11 +57,13 @@ public class ResourceWithType implements Serializable {
 
     public ResourceWithType(@JsonProperty("id") String id,
                             @JsonProperty("name") String name,
+                            @JsonProperty("feedId") String feedId,
                             @JsonProperty("properties") Map<String, String> properties,
                             @JsonProperty("type") ResourceType type,
                             @JsonProperty("metrics") List<Metric> metrics) {
         this.id = id;
         this.name = name;
+        this.feedId = feedId;
         this.properties = properties;
         this.type = type;
         this.metrics = metrics;
@@ -73,7 +78,7 @@ public class ResourceWithType implements Serializable {
      */
     public static ResourceWithType fromResource(Resource r,
                                                 Function<String, ResourceType> rtLoader) {
-        return new ResourceWithType(r.getId(), r.getName(), r.getProperties(), r.getType(rtLoader),
+        return new ResourceWithType(r.getId(), r.getName(), r.getFeedId(), r.getProperties(), r.getType(rtLoader),
                 r.getMetrics());
     }
 
@@ -83,6 +88,10 @@ public class ResourceWithType implements Serializable {
 
     public String getName() {
         return name;
+    }
+
+    public String getFeedId() {
+        return feedId;
     }
 
     public Map<String, String> getProperties() {
