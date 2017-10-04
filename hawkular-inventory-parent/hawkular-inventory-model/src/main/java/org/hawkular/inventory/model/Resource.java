@@ -29,6 +29,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -122,7 +123,9 @@ public class Resource implements Serializable {
     private final Map<String, String> properties;
 
     // Lazy-loaded references
+    @JsonIgnore
     private ResourceType type;
+    @JsonIgnore
     private List<Resource> children;
 
     public Resource(@JsonProperty("id") String id,
