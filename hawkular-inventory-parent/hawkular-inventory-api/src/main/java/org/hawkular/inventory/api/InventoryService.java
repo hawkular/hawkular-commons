@@ -119,4 +119,6 @@ public interface InventoryService {
      * @return true is InventoryService is Up and Running
      */
     boolean isRunning();
+
+    Import buildExport();
 }

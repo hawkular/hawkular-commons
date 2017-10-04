@@ -21,20 +21,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import org.hawkular.inventory.api.Import;
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.ResourceNode;
 import org.hawkular.inventory.api.ResourceWithType;
 import org.hawkular.inventory.api.ResultSet;
-import org.hawkular.inventory.model.Metric;
-import org.hawkular.inventory.model.MetricUnit;
-import org.hawkular.inventory.model.Operation;
 import org.hawkular.inventory.model.Resource;
 import org.hawkular.inventory.model.ResourceType;
 import org.infinispan.Cache;
@@ -47,32 +43,6 @@ import org.junit.Test;
  * @author Joel Takvorian
  */
 public class InventoryServiceIspnTest {
-    private static final Metric METRIC1
-            = new Metric("memory1", "Memory", MetricUnit.BYTES, new HashMap<>());
-    private static final Metric METRIC2
-            = new Metric("gc1", "GC", MetricUnit.NONE, new HashMap<>());
-    private static final Metric METRIC3
-            = new Metric("memory2", "Memory", MetricUnit.BYTES, new HashMap<>());
-    private static final Metric METRIC4
-            = new Metric("gc2", "GC", MetricUnit.NONE, new HashMap<>());
-    private static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "feed1", "EAP", null,
-            Arrays.asList(METRIC1, METRIC2), new HashMap<>());
-    private static final Resource EAP2 = new Resource("EAP-2", "EAP-2", "feed2", "EAP", null,
-            Arrays.asList(METRIC3, METRIC4), new HashMap<>());
-    private static final Resource CHILD1 = new Resource("child-1", "Child 1", "feedX", "FOO", "EAP-1",
-            new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD2 = new Resource("child-2", "Child 2", "feedX", "BAR", "EAP-1",
-            new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD3 = new Resource("child-3", "Child 3", "feedX", "FOO", "EAP-2",
-            new ArrayList<>(), new HashMap<>());
-    private static final Resource CHILD4 = new Resource("child-4", "Child 4", "feedX", "BAR", "EAP-2",
-            new ArrayList<>(), new HashMap<>());
-    private static final Collection<Operation> EAP_OPS = Arrays.asList(
-            new Operation("Reload", new HashMap<>()),
-            new Operation("Shutdown", new HashMap<>()));
-    private static final ResourceType TYPE_EAP = new ResourceType("EAP", EAP_OPS, new HashMap<>());
-    private static final ResourceType TYPE_FOO = new ResourceType("FOO", Collections.emptyList(), new HashMap<>());
-    private static final ResourceType TYPE_BAR = new ResourceType("BAR", Collections.emptyList(), new HashMap<>());
 
     private static final String ISPN_CONFIG_LOCAL = "/hawkular-inventory-ispn-test.xml";
     private static EmbeddedCacheManager CACHE_MANAGER;
@@ -96,15 +66,15 @@ public class InventoryServiceIspnTest {
 
     @Before
     public void setUp() {
-        service.addResource(EAP1);
-        service.addResource(EAP2);
-        service.addResource(CHILD1);
-        service.addResource(CHILD2);
-        service.addResource(CHILD3);
-        service.addResource(CHILD4);
-        service.addResourceType(TYPE_EAP);
-        service.addResourceType(TYPE_FOO);
-        service.addResourceType(TYPE_BAR);
+        service.addResource(Resources.EAP1);
+        service.addResource(Resources.EAP2);
+        service.addResource(Resources.CHILD1);
+        service.addResource(Resources.CHILD2);
+        service.addResource(Resources.CHILD3);
+        service.addResource(Resources.CHILD4);
+        service.addResourceType(Resources.TYPE_EAP);
+        service.addResourceType(Resources.TYPE_FOO);
+        service.addResourceType(Resources.TYPE_BAR);
     }
 
     @Test
@@ -290,5 +260,14 @@ public class InventoryServiceIspnTest {
             results = service.getResources(ResourceFilter.ofType("FOO").andFeed("feed" + j).build(),  0, 1000);
             assertThat(results.getResults().size()).isEqualTo(1000);
         }
+    }
+
+    @Test
+    public void shouldGetExport() {
+        Import export = service.buildExport();
+        assertThat(export).isNotNull();
+        assertThat(export.getResources()).extracting(Resource::getId).containsOnly("EAP-1", "EAP-2", "child-1",
+                "child-2", "child-3", "child-4");
+        assertThat(export.getTypes()).extracting(ResourceType::getId).containsOnly("EAP", "FOO", "BAR");
     }
 }
