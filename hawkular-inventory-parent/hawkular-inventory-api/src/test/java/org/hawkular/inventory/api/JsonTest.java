@@ -46,10 +46,10 @@ public class JsonTest {
         List<ResourceType> resourceTypes = new ArrayList<>();
         ResourceType fooType = new ResourceType("FOO", new HashSet<>(), new HashMap<>());
         for (int i = 0; i < maxItems; i++) {
-            ResourceNode resourceX = new ResourceNode("L" + i, "Large" + i, new HashMap<>(), fooType,
+            ResourceNode resourceX = new ResourceNode("L" + i, "Large" + i, "feedX", new HashMap<>(), fooType,
                     new ArrayList<>(), new ArrayList<>());
             resources.add(resourceX);
-            ResourceWithType resourceWTX = new ResourceWithType("Lbis" + i, "Largebis" + i, new HashMap<>(),
+            ResourceWithType resourceWTX = new ResourceWithType("Lbis" + i, "Largebis" + i, "feedX", new HashMap<>(),
                     fooType, new ArrayList<>());
             resourcesWithType.add(resourceWTX);
             ResourceType resourceTypeX = new ResourceType("EAP" + i, new HashSet<>(), new HashMap<>());
