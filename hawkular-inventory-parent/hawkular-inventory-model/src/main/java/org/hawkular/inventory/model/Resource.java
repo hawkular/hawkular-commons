@@ -130,7 +130,7 @@ public class Resource implements Serializable {
                     @JsonProperty("feedId") String feedId,
                     @JsonProperty("typeId") String typeId,
                     @JsonProperty("parentId") String parentId,
-                    @JsonProperty("metricIds") List<Metric> metrics,
+                    @JsonProperty("metrics") List<Metric> metrics,
                     @JsonProperty("properties") Map<String, String> properties) {
         this.id = id;
         this.name = name;
