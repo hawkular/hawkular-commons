@@ -168,6 +168,13 @@ public class InventoryServiceIspnTest {
     }
 
     @Test
+    public void shouldGetOnlyChildren() {
+        assertThat(service.getChildren("EAP-1").getResults())
+                .extracting(ResourceWithType::getId)
+                .containsOnly("child-1", "child-2");
+    }
+
+    @Test
     public void shouldGetChildren() {
         ResourceNode tree = service.getTree("EAP-1").orElseThrow(AssertionError::new);
         assertThat(tree.getChildren())
