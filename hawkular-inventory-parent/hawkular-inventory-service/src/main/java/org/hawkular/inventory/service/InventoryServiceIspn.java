@@ -16,12 +16,9 @@
  */
 package org.hawkular.inventory.service;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,6 +51,8 @@ import org.infinispan.query.dsl.FilterConditionContextQueryBuilder;
 import org.infinispan.query.dsl.Query;
 import org.infinispan.query.dsl.QueryBuilder;
 import org.infinispan.query.dsl.QueryFactory;
+
+import com.fasterxml.jackson.core.JsonGenerator;
 
 /**
  * @author Joel Takvorian
@@ -286,51 +285,46 @@ public class InventoryServiceIspn implements InventoryService {
 
     @Override
     public void buildExport(OutputStream os) throws IOException {
-        try (Writer writer = new BufferedWriter(new OutputStreamWriter(os))) {
-            writer.write("{\"types\":[\n");
-            int offset = 0;
-            boolean hasMore = true;
-            boolean first = true;
-            while (hasMore) {
-                List<ResourceType> batch = qResourceType.from(ResourceType.class)
-                        .maxResults(MAX_RESULTS)
-                        .startOffset(offset)
-                        .build()
-                        .list();
-                for (ResourceType rt : batch) {
-                    if (!first) {
-                        writer.write(",\n");
-                    } else {
-                        first = false;
-                    }
-                    writer.write(JsonUtil.toJson(rt) + "\n");
-                }
-                hasMore = batch.size() == MAX_RESULTS;
-                offset += MAX_RESULTS;
+        JsonGenerator jsonGen = JsonUtil.createJsonGenerator(os);
+        jsonGen.writeStartObject(); // Inventory object
+        jsonGen.writeFieldName("types");
+        jsonGen.writeStartArray();
+
+        int offset = 0;
+        boolean hasMore = true;
+        while (hasMore) {
+            List<ResourceType> batch = qResourceType.from(ResourceType.class)
+                    .maxResults(MAX_RESULTS)
+                    .startOffset(offset)
+                    .build()
+                    .list();
+            for (ResourceType rt : batch) {
+                jsonGen.writeObject(rt);
             }
-            writer.write("],\"resources\":[\n");
-            hasMore = true;
-            first = true;
-            offset = 0;
-            while (hasMore) {
-                List<Resource> batch = qResource.from(Resource.class)
-                        .maxResults(MAX_RESULTS)
-                        .startOffset(offset)
-                        .build()
-                        .list();
-                for (Resource r : batch) {
-                    if (!first) {
-                        writer.write(",\n");
-                    } else {
-                        first = false;
-                    }
-                    writer.write(JsonUtil.toJson(r) + "\n");
-                }
-                hasMore = batch.size() == MAX_RESULTS;
-                offset += MAX_RESULTS;
-            }
-            writer.write("]}\n");
-            writer.flush();
+            jsonGen.flush();
+            hasMore = batch.size() == MAX_RESULTS;
+            offset += MAX_RESULTS;
         }
+        jsonGen.writeEndArray();
+        jsonGen.writeFieldName("resources");
+        jsonGen.writeStartArray();
+        hasMore = true;
+        offset = 0;
+        while (hasMore) {
+            List<Resource> batch = qResource.from(Resource.class)
+                    .maxResults(MAX_RESULTS)
+                    .startOffset(offset)
+                    .build()
+                    .list();
+            for (Resource r : batch) {
+                jsonGen.writeObject(r);
+            }
+            jsonGen.flush();
+            hasMore = batch.size() == MAX_RESULTS;
+            offset += MAX_RESULTS;
+        }
+        jsonGen.writeEndArray();
+        jsonGen.writeEndObject();
+        jsonGen.flush();
     }
 }

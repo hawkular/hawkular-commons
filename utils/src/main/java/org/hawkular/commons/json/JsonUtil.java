@@ -17,9 +17,13 @@
 package org.hawkular.commons.json;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -67,5 +71,11 @@ public final class JsonUtil {
 
     public static ObjectMapper getMapper() {
         return MAPPER;
+    }
+
+    public static JsonGenerator createJsonGenerator(OutputStream os) throws IOException {
+        JsonGenerator jsonGen = new JsonFactory().createGenerator(os, JsonEncoding.UTF8);
+        jsonGen.setCodec(MAPPER);
+        return jsonGen;
     }
 }
