@@ -57,7 +57,7 @@ public class BuilderTest {
                 .property("metric.prop", "metric.value")
                 .unit(MetricUnit.HOURS)
                 .build();
-        Resource r = Resource.builder()
+        RawResource r = RawResource.builder()
                 .id("res.id")
                 .name("res.name")
                 .typeId("res.typeId")

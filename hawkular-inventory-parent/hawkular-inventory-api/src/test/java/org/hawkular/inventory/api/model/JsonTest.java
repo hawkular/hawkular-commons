@@ -43,14 +43,14 @@ public class JsonTest {
     public void deserializeResultSet() throws Exception {
         int maxItems = 10;
         List<ResourceNode> resources = new ArrayList<>();
-        List<ResourceWithType> resourcesWithType = new ArrayList<>();
+        List<Resource> resourcesWithType = new ArrayList<>();
         List<ResourceType> resourceTypes = new ArrayList<>();
         ResourceType fooType = new ResourceType("FOO", new HashSet<>(), new HashMap<>());
         for (int i = 0; i < maxItems; i++) {
             ResourceNode resourceX = new ResourceNode("L" + i, "Large" + i, "feedX", fooType, new ArrayList<>(),
                     new HashMap<>(), new HashMap<>(), new ArrayList<>());
             resources.add(resourceX);
-            ResourceWithType resourceWTX = new ResourceWithType("Lbis" + i, "Largebis" + i, "feedX", fooType, new ArrayList<>(),
+            Resource resourceWTX = new Resource("Lbis" + i, "Largebis" + i, "feedX", fooType, new ArrayList<>(),
                     new HashMap<>(), new HashMap<>());
             resourcesWithType.add(resourceWTX);
             ResourceType resourceTypeX = new ResourceType("EAP" + i, new HashSet<>(), new HashMap<>());
@@ -58,7 +58,7 @@ public class JsonTest {
         }
 
         ResultSet<ResourceNode> rsResource = new ResultSet<>(resources, 10L, 0L);
-        ResultSet<ResourceWithType> rsResourceWT = new ResultSet<>(resourcesWithType, 10L, 0L);
+        ResultSet<Resource> rsResourceWT = new ResultSet<>(resourcesWithType, 10L, 0L);
         ResultSet<ResourceType> rsResourceType = new ResultSet<>(resourceTypes, 10L, 0L);
 
         String jsonRsResource = objectMapper.writeValueAsString(rsResource);
@@ -66,28 +66,28 @@ public class JsonTest {
         String jsonRsResourceType = objectMapper.writeValueAsString(rsResourceType);
 
         ResultSet<ResourceNode> dsRsResource = objectMapper.readValue(jsonRsResource, ResultSet.class);
-        ResultSet<ResourceWithType> dsRsResourceWT = objectMapper.readValue(jsonRsResourceWT, ResultSet.class);
+        ResultSet<Resource> dsRsResourceWT = objectMapper.readValue(jsonRsResourceWT, ResultSet.class);
         ResultSet<ResourceType> dsRsResourceType = objectMapper.readValue(jsonRsResourceType, ResultSet.class);
 
         assertThat(rsResource.getResults())
                 .usingElementComparator(Comparator.comparing(ResourceNode::getId))
                 .isEqualTo(dsRsResource.getResults());
         assertThat(rsResourceWT.getResults())
-                .usingElementComparator(Comparator.comparing(ResourceWithType::getId))
+                .usingElementComparator(Comparator.comparing(Resource::getId))
                 .isEqualTo(dsRsResourceWT.getResults());
         assertEquals(rsResourceType.getResults(), dsRsResourceType.getResults());
     }
 
     @Test
     public void deserializeRawResource() throws Exception {
-        Resource resource = new Resource("ID", "FOO", "FEED", "BAR", null,
+        RawResource resource = new RawResource("ID", "FOO", "FEED", "BAR", null,
                 Collections.singletonList(new Metric("metric", "mtype", MetricUnit.BYTES, new HashMap<>())),
                 Collections.singletonMap("r.prop", "r.val1"),
                 Collections.singletonMap("r.cfg", "r.val2"));
 
         String jsonResource = objectMapper.writeValueAsString(resource);
 
-        Resource deserialized = objectMapper.readValue(jsonResource, Resource.class);
+        RawResource deserialized = objectMapper.readValue(jsonResource, RawResource.class);
 
         assertThat(deserialized).isNotNull();
         assertThat(deserialized.getId()).isEqualTo("ID");

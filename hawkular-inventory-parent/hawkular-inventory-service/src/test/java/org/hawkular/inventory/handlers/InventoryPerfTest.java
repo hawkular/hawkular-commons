@@ -41,7 +41,7 @@ import org.hawkular.inventory.api.model.Inventory;
 import org.hawkular.inventory.api.model.Metric;
 import org.hawkular.inventory.api.model.MetricUnit;
 import org.hawkular.inventory.api.model.Operation;
-import org.hawkular.inventory.api.model.Resource;
+import org.hawkular.inventory.api.model.RawResource;
 import org.hawkular.inventory.api.model.ResourceType;
 import org.hawkular.inventory.api.model.ResultSet;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -110,20 +110,20 @@ public class InventoryPerfTest {
     }
 
     public static Inventory createLargeInventory(int from, int to, int children, int metrics) {
-        List<Resource> resources = new ArrayList<>();
+        List<RawResource> resources = new ArrayList<>();
         for (int i = from; i < to; i++) {
             String typeId = (i % 2 == 0) ? "EAP" : "JDG";
             String id = "Server-" + i;
             String name = "Server " + typeId + " with Id " + id;
             String feedX = "feedX";
-            List<Resource> childrenResource = new ArrayList<>();
+            List<RawResource> childrenResource = new ArrayList<>();
             List<String> childrenIds = new ArrayList<>();
             for (int j = 0; j < children; j++) {
                 String childType = (j % 2 == 0) ? "FOO" : "BAR";
                 String childIdX = id + "-child-" + j;
                 String childNameX = "Child "+ j + " from " + id;
                 childrenIds.add(childIdX);
-                Resource childX = new Resource(childIdX, childNameX, feedX, childType, id,
+                RawResource childX = new RawResource(childIdX, childNameX, feedX, childType, id,
                         new ArrayList<>(), new HashMap<>(), new HashMap<>());
 
                 childrenResource.add(childX);
@@ -137,7 +137,7 @@ public class InventoryPerfTest {
 
             Map<String, String> propsX = new HashMap<>();
             propsX.put("description", "This is a description for " + id);
-            Resource serverX = new Resource(id,
+            RawResource serverX = new RawResource(id,
                     name,
                     feedX,
                     typeId,
@@ -290,14 +290,5 @@ public class InventoryPerfTest {
         assertThat((List<ResourceType>) response.readEntity(ResultSet.class).getResults())
                 .extracting(ResourceType::getId)
                 .containsOnly("EAP", "FOO", "BAR", "JDG");
-    }
-
-    @Test
-    public void zzz_clean() {
-        // FIXME: proper way for "AfterClass" with arquillian given there's non-static stuff needed?
-        // Delete resources
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(baseUrl.toString());
-        target.path("type/JDG").request().delete().close();
     }
 }

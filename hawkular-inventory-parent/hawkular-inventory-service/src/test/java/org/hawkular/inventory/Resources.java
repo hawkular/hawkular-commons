@@ -27,7 +27,7 @@ import org.hawkular.inventory.api.model.Inventory;
 import org.hawkular.inventory.api.model.Metric;
 import org.hawkular.inventory.api.model.MetricUnit;
 import org.hawkular.inventory.api.model.Operation;
-import org.hawkular.inventory.api.model.Resource;
+import org.hawkular.inventory.api.model.RawResource;
 import org.hawkular.inventory.api.model.ResourceType;
 
 /**
@@ -44,17 +44,17 @@ public final class Resources {
     public static final Metric METRIC4
             = new Metric("gc2", "GC", MetricUnit.NONE, new HashMap<>());
 
-    public static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "feed1", "EAP", null,
+    public static final RawResource EAP1 = new RawResource("EAP-1", "EAP-1", "feed1", "EAP", null,
             Arrays.asList(METRIC1, METRIC2), new HashMap<>(), new HashMap<>());
-    public static final Resource EAP2 = new Resource("EAP-2", "EAP-2", "feed2", "EAP", null,
+    public static final RawResource EAP2 = new RawResource("EAP-2", "EAP-2", "feed2", "EAP", null,
             Arrays.asList(METRIC3, METRIC4), new HashMap<>(), new HashMap<>());
-    public static final Resource CHILD1 = new Resource("child-1", "Child 1", "feedX", "FOO", "EAP-1",
+    public static final RawResource CHILD1 = new RawResource("child-1", "Child 1", "feedX", "FOO", "EAP-1",
             new ArrayList<>(), new HashMap<>(), new HashMap<>());
-    public static final Resource CHILD2 = new Resource("child-2", "Child 2", "feedX", "BAR", "EAP-1",
+    public static final RawResource CHILD2 = new RawResource("child-2", "Child 2", "feedX", "BAR", "EAP-1",
             new ArrayList<>(), new HashMap<>(), new HashMap<>());
-    public static final Resource CHILD3 = new Resource("child-3", "Child 3", "feedX", "FOO", "EAP-2",
+    public static final RawResource CHILD3 = new RawResource("child-3", "Child 3", "feedX", "FOO", "EAP-2",
             new ArrayList<>(), new HashMap<>(), new HashMap<>());
-    public static final Resource CHILD4 = new Resource("child-4", "Child 4", "feedX", "BAR", "EAP-2",
+    public static final RawResource CHILD4 = new RawResource("child-4", "Child 4", "feedX", "BAR", "EAP-2",
             new ArrayList<>(), new HashMap<>(), new HashMap<>());
     public static final Map<String, Map<String, String>> RELOAD_PARAMETERS;
     static {
