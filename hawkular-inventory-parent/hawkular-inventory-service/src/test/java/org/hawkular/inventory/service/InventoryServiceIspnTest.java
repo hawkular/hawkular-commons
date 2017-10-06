@@ -19,6 +19,7 @@ package org.hawkular.inventory.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import org.hawkular.inventory.api.Import;
+import org.hawkular.inventory.api.Inventory;
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.ResourceNode;
 import org.hawkular.inventory.api.ResourceWithType;
@@ -38,6 +39,9 @@ import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joel Takvorian
@@ -235,8 +239,8 @@ public class InventoryServiceIspnTest {
     public void createLargeSetAndFetchPagination() {
         int maxFeeds = 10;
         int maxItems = 1000;
-        List<Resource> resources = new ArrayList<>();
         for (int j = 0; j < maxFeeds; j++) {
+            List<Resource> resources = new ArrayList<>();
             for (int i = 0; i < maxItems; i++) {
                 Resource resourceX = new Resource("F" + j + "L" + i, "Large" + i, "feed" + j, "FOO", null,
                         new ArrayList<>(), new HashMap<>());
@@ -263,11 +267,52 @@ public class InventoryServiceIspnTest {
     }
 
     @Test
-    public void shouldGetExport() {
-        Import export = service.buildExport();
+    public void shouldGetExport() throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        service.buildExport(baos);
+        byte[] bytes = baos.toByteArray();
+        String str = new String(bytes);
+        Inventory export = new ObjectMapper(new JsonFactory()).readValue(str, Inventory.class);
         assertThat(export).isNotNull();
         assertThat(export.getResources()).extracting(Resource::getId).containsOnly("EAP-1", "EAP-2", "child-1",
                 "child-2", "child-3", "child-4");
         assertThat(export.getTypes()).extracting(ResourceType::getId).containsOnly("EAP", "FOO", "BAR");
+    }
+
+    @Test
+    public void shouldGetLargeExport() throws IOException {
+        int maxFeeds = 10;
+        int maxItems = 1000;
+        for (int j = 0; j < maxFeeds; j++) {
+            List<Resource> resources = new ArrayList<>();
+            for (int i = 0; i < maxItems; i++) {
+                Resource resourceX = new Resource("F" + j + "L" + i, "Large" + i, "feed" + j, "FOO", null,
+                        new ArrayList<>(), new HashMap<>());
+                resources.add(resourceX);
+            }
+            service.addResource(resources);
+        }
+        int maxTypes = 200;
+        List<ResourceType> resourceTypes = new ArrayList<>();
+        for (int i = 0; i < maxTypes; i++) {
+            ResourceType typeX = new ResourceType("RT" + i, new ArrayList<>(), new HashMap<>());
+            resourceTypes.add(typeX);
+        }
+        service.addResourceType(resourceTypes);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        service.buildExport(baos);
+        byte[] bytes = baos.toByteArray();
+        String str = new String(bytes);
+        Inventory export = new ObjectMapper(new JsonFactory()).readValue(str, Inventory.class);
+        assertThat(export).isNotNull();
+        assertThat(export.getResources())
+                .hasSize(maxFeeds*maxItems + 6)
+                .extracting(Resource::getId)
+                .contains("EAP-1", "F0L0", "F5L500", "F9L999");
+        assertThat(export.getTypes())
+                .hasSize(maxTypes + 3)
+                .extracting(ResourceType::getId)
+                .contains("EAP", "RT0", "RT100", "RT199");
     }
 }

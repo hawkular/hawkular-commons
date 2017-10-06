@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Jay Shaughnessy
  * @author Lucas Ponce
  */
-public class Import implements Serializable {
+public class Inventory implements Serializable {
 
     @JsonInclude(Include.NON_NULL)
     private List<Resource> resources;
@@ -38,8 +38,8 @@ public class Import implements Serializable {
     @JsonInclude(Include.NON_NULL)
     private List<ResourceType> types;
 
-    public Import(@JsonProperty("resources") List<Resource> resources,
-                  @JsonProperty("types") List<ResourceType> types) {
+    public Inventory(@JsonProperty("resources") List<Resource> resources,
+                     @JsonProperty("types") List<ResourceType> types) {
         this.resources = resources;
         this.types = types;
     }
@@ -65,10 +65,10 @@ public class Import implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Import anImport = (Import) o;
+        Inventory anInventory = (Inventory) o;
 
-        if (resources != null ? !resources.equals(anImport.resources) : anImport.resources != null) return false;
-        return types != null ? types.equals(anImport.types) : anImport.types == null;
+        if (resources != null ? !resources.equals(anInventory.resources) : anInventory.resources != null) return false;
+        return types != null ? types.equals(anInventory.types) : anInventory.types == null;
     }
 
     @Override
@@ -80,7 +80,7 @@ public class Import implements Serializable {
 
     @Override
     public String toString() {
-        return "Import{" +
+        return "Inventory{" +
                 "resources=" + resources +
                 ", types=" + types +
                 '}';

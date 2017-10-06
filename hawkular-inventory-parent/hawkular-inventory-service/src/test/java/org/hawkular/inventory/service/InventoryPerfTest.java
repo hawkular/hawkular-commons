@@ -36,7 +36,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.hawkular.inventory.api.Import;
+import org.hawkular.inventory.api.Inventory;
 import org.hawkular.inventory.api.ResultSet;
 import org.hawkular.inventory.model.Metric;
 import org.hawkular.inventory.model.MetricUnit;
@@ -66,7 +66,7 @@ import org.junit.runners.MethodSorters;
 public class InventoryPerfTest {
     private final Logger log = Logger.getLogger(InventoryPerfTest.class);
 
-    public static Import createResourceTypes() {
+    public static Inventory createResourceTypes() {
         Map<String, Map<String, String>> reload;
         reload = new HashMap<>();
         reload.put("param1", new HashMap<>());
@@ -105,10 +105,10 @@ public class InventoryPerfTest {
 
         List<ResourceType> resourceTypes = Arrays.asList(eapType, jdgType);
 
-        return new Import(null, resourceTypes);
+        return new Inventory(null, resourceTypes);
     }
 
-    public static Import createLargeInventory(int from, int to, int children, int metrics) {
+    public static Inventory createLargeInventory(int from, int to, int children, int metrics) {
         List<Resource> resources = new ArrayList<>();
         for (int i = from; i < to; i++) {
             String typeId = (i % 2 == 0) ? "EAP" : "JDG";
@@ -148,7 +148,7 @@ public class InventoryPerfTest {
             resources.addAll(childrenResource);
         }
 
-        return new Import(resources, null);
+        return new Inventory(resources, null);
     }
 
     @ArquillianResource
@@ -193,7 +193,7 @@ public class InventoryPerfTest {
         WebTarget target = client.target(baseUrl.toString()).path("import");
         Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
-                .post(Entity.entity(Resources.IMPORT, MediaType.APPLICATION_JSON_TYPE));
+                .post(Entity.entity(Resources.INVENTORY, MediaType.APPLICATION_JSON_TYPE));
         assertEquals(200, response.getStatus());
     }
 

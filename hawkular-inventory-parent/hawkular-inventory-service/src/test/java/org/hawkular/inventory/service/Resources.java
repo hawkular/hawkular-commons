@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hawkular.inventory.api.Import;
+import org.hawkular.inventory.api.Inventory;
 import org.hawkular.inventory.model.Metric;
 import org.hawkular.inventory.model.MetricUnit;
 import org.hawkular.inventory.model.Operation;
@@ -84,7 +84,7 @@ public final class Resources {
     static final ResourceType TYPE_FOO = new ResourceType("FOO", Collections.emptyList(), new HashMap<>());
     static final ResourceType TYPE_BAR = new ResourceType("BAR", Collections.emptyList(), new HashMap<>());
 
-    static final Import IMPORT = new Import(Arrays.asList(EAP1, EAP2, CHILD1, CHILD2, CHILD3, CHILD4),
+    static final Inventory INVENTORY = new Inventory(Arrays.asList(EAP1, EAP2, CHILD1, CHILD2, CHILD3, CHILD4),
             Arrays.asList(TYPE_EAP, TYPE_FOO, TYPE_BAR));
 
     private Resources() {
