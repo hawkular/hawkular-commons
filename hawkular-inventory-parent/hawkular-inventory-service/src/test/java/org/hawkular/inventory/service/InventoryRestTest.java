@@ -39,7 +39,6 @@ import javax.ws.rs.core.Response;
 
 import org.hawkular.inventory.api.Import;
 import org.hawkular.inventory.api.ResourceNode;
-import org.hawkular.inventory.api.ResourceWithType;
 import org.hawkular.inventory.api.ResultSet;
 import org.hawkular.inventory.model.Metric;
 import org.hawkular.inventory.model.MetricUnit;
@@ -260,7 +259,7 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        ResourceWithType resource = response.readEntity(ResourceWithType.class);
+        Resource resource = response.readEntity(Resource.class);
         assertEquals("EAP-1", resource.getId());
         assertEquals("EAP", resource.getType().getId());
 
@@ -270,7 +269,7 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertEquals("EAP-2", response.readEntity(ResourceWithType.class).getId());
+        assertEquals("EAP-2", response.readEntity(Resource.class).getId());
 
         target = client.target(baseUrl.toString()).path("resources/child-1");
         response = target
@@ -278,7 +277,7 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertEquals("child-1", response.readEntity(ResourceWithType.class).getId());
+        assertEquals("child-1", response.readEntity(Resource.class).getId());
     }
 
     @Test
@@ -302,9 +301,9 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        List<ResourceWithType> resources = (List<ResourceWithType>) response.readEntity(ResultSet.class).getResults();
+        List<Resource> resources = (List<Resource>) response.readEntity(ResultSet.class).getResults();
         assertThat(resources)
-                .extracting(ResourceWithType::getId)
+                .extracting(Resource::getId)
                 .containsOnly("EAP-1", "EAP-2");
     }
 
@@ -332,8 +331,8 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertThat((List<ResourceWithType>) response.readEntity(ResultSet.class).getResults())
-                .extracting(ResourceWithType::getId)
+        assertThat((List<Resource>) response.readEntity(ResultSet.class).getResults())
+                .extracting(Resource::getId)
                 .containsOnly("EAP-1", "EAP-2");
     }
 
@@ -347,8 +346,8 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertThat((List<ResourceWithType>) response.readEntity(ResultSet.class).getResults())
-                .extracting(ResourceWithType::getId)
+        assertThat((List<Resource>) response.readEntity(ResultSet.class).getResults())
+                .extracting(Resource::getId)
                 .containsOnly("child-1", "child-3");
     }
 
@@ -413,8 +412,8 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertThat((List<ResourceWithType>) response.readEntity(ResultSet.class).getResults())
-                .extracting(ResourceWithType::getId)
+        assertThat((List<Resource>) response.readEntity(ResultSet.class).getResults())
+                .extracting(Resource::getId)
                 .containsOnly("child-1", "child-2");
     }
 
@@ -563,8 +562,8 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertThat((List<ResourceWithType>) response.readEntity(ResultSet.class).getResults())
-                .extracting(ResourceWithType::getId)
+        assertThat((List<Resource>) response.readEntity(ResultSet.class).getResults())
+                .extracting(Resource::getId)
                 .containsOnly("EAP-1");
 
         client = ClientBuilder.newClient();
@@ -576,8 +575,8 @@ public class InventoryRestTest {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
         assertEquals(200, response.getStatus());
-        assertThat((List<ResourceWithType>) response.readEntity(ResultSet.class).getResults())
-                .extracting(ResourceWithType::getId)
+        assertThat((List<Resource>) response.readEntity(ResultSet.class).getResults())
+                .extracting(Resource::getId)
                 .containsOnly("EAP-2");
     }
 

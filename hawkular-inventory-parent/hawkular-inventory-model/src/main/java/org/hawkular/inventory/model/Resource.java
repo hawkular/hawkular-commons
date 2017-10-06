@@ -29,7 +29,6 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -123,9 +122,9 @@ public class Resource implements Serializable {
     private final Map<String, String> properties;
 
     // Lazy-loaded references
-    @JsonIgnore
+    @JsonInclude(Include.NON_NULL)
     private ResourceType type;
-    @JsonIgnore
+    @JsonInclude(Include.NON_NULL)
     private List<Resource> children;
 
     public Resource(@JsonProperty("id") String id,
@@ -170,6 +169,22 @@ public class Resource implements Serializable {
 
     public Map<String, String> getProperties() {
         return Collections.unmodifiableMap(properties);
+    }
+
+    /**
+     * Get loaded type
+     * @return may return null if the type was not previously lazy-loaded with {@link #getType(Function)}
+     */
+    public ResourceType getType() {
+        return type;
+    }
+
+    /**
+     * Get loaded children
+     * @return may return null if the children were not previously lazy-loaded with {@link #getChildren(Function)}
+     */
+    public List<Resource> getChildren() {
+        return children;
     }
 
     public ResourceType getType(Function<String, ResourceType> loader) {

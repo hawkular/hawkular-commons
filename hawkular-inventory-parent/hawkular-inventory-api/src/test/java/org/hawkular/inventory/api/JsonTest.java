@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.hawkular.inventory.model.Resource;
 import org.hawkular.inventory.model.ResourceType;
 import org.junit.Test;
 
@@ -42,22 +43,22 @@ public class JsonTest {
     public void deserializeResultSet() throws Exception {
         int maxItems = 10;
         List<ResourceNode> resources = new ArrayList<>();
-        List<ResourceWithType> resourcesWithType = new ArrayList<>();
+        List<Resource> resourcesWithType = new ArrayList<>();
         List<ResourceType> resourceTypes = new ArrayList<>();
         ResourceType fooType = new ResourceType("FOO", new HashSet<>(), new HashMap<>());
         for (int i = 0; i < maxItems; i++) {
             ResourceNode resourceX = new ResourceNode("L" + i, "Large" + i, "feedX", new HashMap<>(), fooType,
                     new ArrayList<>(), new ArrayList<>());
             resources.add(resourceX);
-            ResourceWithType resourceWTX = new ResourceWithType("Lbis" + i, "Largebis" + i, "feedX", new HashMap<>(),
-                    fooType, new ArrayList<>());
+            Resource resourceWTX = new Resource("Lbis" + i, "Largebis" + i, "feedX", fooType.getId(),
+                    null, new ArrayList<>(), new HashMap<>());
             resourcesWithType.add(resourceWTX);
             ResourceType resourceTypeX = new ResourceType("EAP" + i, new HashSet<>(), new HashMap<>());
             resourceTypes.add(resourceTypeX);
         }
 
         ResultSet<ResourceNode> rsResource = new ResultSet<>(resources, 10L, 0L);
-        ResultSet<ResourceWithType> rsResourceWT = new ResultSet<>(resourcesWithType, 10L, 0L);
+        ResultSet<Resource> rsResourceWT = new ResultSet<>(resourcesWithType, 10L, 0L);
         ResultSet<ResourceType> rsResourceType = new ResultSet<>(resourceTypes, 10L, 0L);
 
         String jsonRsResource = objectMapper.writeValueAsString(rsResource);
@@ -65,14 +66,14 @@ public class JsonTest {
         String jsonRsResourceType = objectMapper.writeValueAsString(rsResourceType);
 
         ResultSet<ResourceNode> dsRsResource = objectMapper.readValue(jsonRsResource, ResultSet.class);
-        ResultSet<ResourceWithType> dsRsResourceWT = objectMapper.readValue(jsonRsResourceWT, ResultSet.class);
+        ResultSet<Resource> dsRsResourceWT = objectMapper.readValue(jsonRsResourceWT, ResultSet.class);
         ResultSet<ResourceType> dsRsResourceType = objectMapper.readValue(jsonRsResourceType, ResultSet.class);
 
         assertThat(rsResource.getResults())
                 .usingElementComparator(Comparator.comparing(ResourceNode::getId))
                 .isEqualTo(dsRsResource.getResults());
         assertThat(rsResourceWT.getResults())
-                .usingElementComparator(Comparator.comparing(ResourceWithType::getId))
+                .usingElementComparator(Comparator.comparing(Resource::getId))
                 .isEqualTo(dsRsResourceWT.getResults());
         assertEquals(rsResourceType.getResults(), dsRsResourceType.getResults());
     }
