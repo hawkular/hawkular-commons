@@ -16,6 +16,8 @@
  */
 package org.hawkular.inventory.api;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -136,5 +138,5 @@ public interface InventoryService {
      */
     boolean isRunning();
 
-    Import buildExport();
+    void buildExport(OutputStream os) throws IOException;
 }

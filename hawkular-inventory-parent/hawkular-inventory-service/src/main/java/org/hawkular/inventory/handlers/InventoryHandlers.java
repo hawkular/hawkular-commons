@@ -35,8 +35,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
-import org.hawkular.inventory.api.Import;
+import org.hawkular.inventory.api.Inventory;
 import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.log.InventoryLoggers;
@@ -65,7 +66,8 @@ public class InventoryHandlers {
     @Produces(APPLICATION_JSON)
     public Response exportInventory() {
         try {
-            return ResponseUtil.ok(inventoryService.buildExport());
+            StreamingOutput streamingOutput = inventoryService::buildExport;
+            return ResponseUtil.ok(streamingOutput);
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }
@@ -101,7 +103,7 @@ public class InventoryHandlers {
     @Path("/import")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Response importInventory(final Import inventory) {
+    public Response importInventory(final Inventory inventory) {
         try {
             if (inventory != null) {
                 inventoryService.addResource(inventory.getResources());

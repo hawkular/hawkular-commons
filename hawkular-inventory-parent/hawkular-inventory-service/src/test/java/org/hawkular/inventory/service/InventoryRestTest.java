@@ -35,7 +35,7 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.hawkular.inventory.api.Import;
+import org.hawkular.inventory.api.Inventory;
 import org.hawkular.inventory.api.ResourceNode;
 import org.hawkular.inventory.api.ResourceWithType;
 import org.hawkular.inventory.api.ResultSet;
@@ -102,7 +102,7 @@ public class InventoryRestTest {
         WebTarget target = client.target(baseUrl.toString()).path("import");
         Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
-                .post(Entity.entity(Resources.IMPORT, MediaType.APPLICATION_JSON_TYPE));
+                .post(Entity.entity(Resources.INVENTORY, MediaType.APPLICATION_JSON_TYPE));
         assertEquals(200, response.getStatus());
     }
 
@@ -279,13 +279,13 @@ public class InventoryRestTest {
                 new ArrayList<>(), new HashMap<>());
         Resource corruptedChild = new Resource("CC", "CC", "feedX", "BAR", "CP",
                 new ArrayList<>(), new HashMap<>());
-        Import corruptedImport = new Import(Arrays.asList(corruptedParent, corruptedChild), null);
+        Inventory corruptedInventory = new Inventory(Arrays.asList(corruptedParent, corruptedChild), null);
 
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("import");
         Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
-                .post(Entity.entity(corruptedImport, MediaType.APPLICATION_JSON_TYPE));
+                .post(Entity.entity(corruptedInventory, MediaType.APPLICATION_JSON_TYPE));
         assertEquals(200, response.getStatus());
         client.close();
 
@@ -366,7 +366,7 @@ public class InventoryRestTest {
                 .request(MediaType.APPLICATION_JSON)
                 .get();
         assertThat(response.getStatus()).isEqualTo(200);
-        Import imp = response.readEntity(Import.class);
+        Inventory imp = response.readEntity(Inventory.class);
         assertThat(imp).isNotNull();
         assertThat(imp.getResources()).extracting(Resource::getId).containsOnly("EAP-1", "EAP-2", "child-1",
                 "child-2", "child-3", "child-4", "CC", "CP");

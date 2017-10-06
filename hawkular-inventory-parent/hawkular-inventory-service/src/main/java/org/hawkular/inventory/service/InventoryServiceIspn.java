@@ -16,8 +16,12 @@
  */
 package org.hawkular.inventory.service;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,7 +38,7 @@ import javax.ejb.Local;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
-import org.hawkular.inventory.api.Import;
+import org.hawkular.commons.json.JsonUtil;
 import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.ResourceNode;
@@ -232,17 +236,6 @@ public class InventoryServiceIspn implements InventoryService {
         return false;
     }
 
-    @Override
-    public Import buildExport() {
-        List<ResourceType> types = qResourceType.from(ResourceType.class)
-                .build()
-                .list();
-        List<Resource> resources = qResource.from(Resource.class)
-                .build()
-                .list();
-        return new Import(resources, types);
-    }
-
     private Optional<String> getConfig(String fileName) {
         // TODO: maybe some defensive check against file traversal attack?
         //  Or check that "resourceType" is in a whitelist of types?
@@ -308,4 +301,53 @@ public class InventoryServiceIspn implements InventoryService {
         return c == null || c.isEmpty();
     }
 
+    @Override
+    public void buildExport(OutputStream os) throws IOException {
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(os))) {
+            writer.write("{\"types\":[\n");
+            int offset = 0;
+            boolean hasMore = true;
+            boolean first = true;
+            while (hasMore) {
+                List<ResourceType> batch = qResourceType.from(ResourceType.class)
+                        .maxResults(MAX_RESULTS)
+                        .startOffset(offset)
+                        .build()
+                        .list();
+                for (ResourceType rt : batch) {
+                    if (!first) {
+                        writer.write(",\n");
+                    } else {
+                        first = false;
+                    }
+                    writer.write(JsonUtil.toJson(rt) + "\n");
+                }
+                hasMore = batch.size() == MAX_RESULTS;
+                offset += MAX_RESULTS;
+            }
+            writer.write("],\"resources\":[\n");
+            hasMore = true;
+            first = true;
+            offset = 0;
+            while (hasMore) {
+                List<Resource> batch = qResource.from(Resource.class)
+                        .maxResults(MAX_RESULTS)
+                        .startOffset(offset)
+                        .build()
+                        .list();
+                for (Resource r : batch) {
+                    if (!first) {
+                        writer.write(",\n");
+                    } else {
+                        first = false;
+                    }
+                    writer.write(JsonUtil.toJson(r) + "\n");
+                }
+                hasMore = batch.size() == MAX_RESULTS;
+                offset += MAX_RESULTS;
+            }
+            writer.write("]}\n");
+            writer.flush();
+        }
+    }
 }
