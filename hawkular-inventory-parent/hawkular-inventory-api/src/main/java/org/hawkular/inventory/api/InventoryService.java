@@ -21,10 +21,10 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Optional;
 
+import org.hawkular.inventory.api.model.RawResource;
 import org.hawkular.inventory.api.model.Resource;
 import org.hawkular.inventory.api.model.ResourceNode;
 import org.hawkular.inventory.api.model.ResourceType;
-import org.hawkular.inventory.api.model.ResourceWithType;
 import org.hawkular.inventory.api.model.ResultSet;
 
 /**
@@ -35,12 +35,12 @@ public interface InventoryService {
     /**
      * Add or replace a single resource
      */
-    void addResource(Resource r);
+    void addResource(RawResource r);
 
     /**
      * Add or replace multiple resources
      */
-    void addResource(Collection<Resource> r);
+    void addResource(Collection<RawResource> r);
 
     /**
      * Add or replace a single resource type
@@ -74,9 +74,9 @@ public interface InventoryService {
 
     /**
      * Get a resource from its ID. The resulting object includes {@link ResourceType}
-     * @return the {@link ResourceWithType} if found
+     * @return the {@link Resource} if found
      */
-    Optional<ResourceWithType> getResourceById(String id);
+    Optional<Resource> getResourceById(String id);
 
     /**
      * Get a resource from its ID, and load all its child subtree. The resulting objects include {@link ResourceType}
@@ -89,7 +89,7 @@ public interface InventoryService {
      * @param filter filter object (only root, typeId, ...)
      * @return resources embedded in page object {@link ResultSet}
      */
-    ResultSet<ResourceWithType> getResources(ResourceFilter filter);
+    ResultSet<Resource> getResources(ResourceFilter filter);
 
     /**
      * Get a list of resources with filters and the provided pagination options
@@ -98,14 +98,14 @@ public interface InventoryService {
      * @param maxResults pagination number of results
      * @return resources embedded in page object {@link ResultSet}
      */
-    ResultSet<ResourceWithType> getResources(ResourceFilter filter, long startOffset, int maxResults);
+    ResultSet<Resource> getResources(ResourceFilter filter, long startOffset, int maxResults);
 
     /**
      * Get a list of of child resources for a parent resource, with default pagination
      * @param parentId resourceId of the parent resource
      * @return resources embedded in page object {@link ResultSet}
      */
-    ResultSet<ResourceWithType> getChildren(String parentId);
+    ResultSet<Resource> getChildren(String parentId);
 
     /**
      * Get a list of child resources for a parent resource, with the provided pagination options
@@ -114,7 +114,7 @@ public interface InventoryService {
      * @param maxResults pagination number of results
      * @return resources embedded in page object {@link ResultSet}
      */
-    ResultSet<ResourceWithType> getChildren(String parentId, long startOffset, int maxResults);
+    ResultSet<Resource> getChildren(String parentId, long startOffset, int maxResults);
 
     /**
      * Get resource types with the default pagination options (first 100 results)

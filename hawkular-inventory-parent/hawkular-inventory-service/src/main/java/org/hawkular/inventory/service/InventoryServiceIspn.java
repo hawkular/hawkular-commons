@@ -38,10 +38,10 @@ import javax.inject.Inject;
 import org.hawkular.commons.json.JsonUtil;
 import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.api.ResourceFilter;
+import org.hawkular.inventory.api.model.RawResource;
 import org.hawkular.inventory.api.model.Resource;
 import org.hawkular.inventory.api.model.ResourceNode;
 import org.hawkular.inventory.api.model.ResourceType;
-import org.hawkular.inventory.api.model.ResourceWithType;
 import org.hawkular.inventory.api.model.ResultSet;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
@@ -99,12 +99,12 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public void addResource(Resource r) {
+    public void addResource(RawResource r) {
         addResource(Collections.singletonList(r));
     }
 
     @Override
-    public void addResource(Collection<Resource> resources) {
+    public void addResource(Collection<RawResource> resources) {
         if (isEmpty(resources)) {
             return;
         }
@@ -156,26 +156,26 @@ public class InventoryServiceIspn implements InventoryService {
         resourceType.clear();
     }
 
-    private Optional<Resource> getRawResource(String id) {
+    private Optional<RawResource> getRawResource(String id) {
         if (isEmpty(id)) {
             throw new IllegalArgumentException("Resource id must be not null");
         }
-        return Optional.ofNullable((IspnResource) resource.get(id)).map(IspnResource::getResource);
+        return Optional.ofNullable((IspnResource) resource.get(id)).map(IspnResource::getRawResource);
     }
 
     @Override
-    public Optional<ResourceWithType> getResourceById(String id) {
-        return getRawResource(id).map(r -> ResourceWithType.fromResource(r, this::getNullableResourceType));
+    public Optional<Resource> getResourceById(String id) {
+        return getRawResource(id).map(r -> Resource.fromRaw(r, this::getResourceType));
     }
 
     @Override
     public Optional<ResourceNode> getTree(String parentId) {
         return getRawResource(parentId)
-                .map(r -> ResourceNode.fromResource(r, this::getNullableResourceType, this::getResourcesForParent));
+                .map(r -> ResourceNode.fromRaw(r, this::getResourceType, this::getResourcesForParent));
     }
 
     @Override
-    public ResultSet<ResourceWithType> getResources(ResourceFilter filter, long startOffset, int maxResults) {
+    public ResultSet<Resource> getResources(ResourceFilter filter, long startOffset, int maxResults) {
         QueryBuilder qb = qResource.from(IspnResource.class);
         FilterConditionContextQueryBuilder fccqb = null;
         if (filter.isRootOnly()) {
@@ -190,15 +190,16 @@ public class InventoryServiceIspn implements InventoryService {
         Query query = (fccqb == null ? qb : fccqb)
                 .maxResults(maxResults)
                 .startOffset(startOffset).build();
-        List<ResourceWithType> result = query.list()
+        List<IspnResource> ispnResources = query.list();
+        List<Resource> result = ispnResources
                 .stream()
-                .map(r -> ResourceWithType.fromResource(((IspnResource) r).getResource(), this::getNullableResourceType))
+                .map(r -> r.toResource(this::getResourceType))
                 .collect(Collectors.toList());
         return new ResultSet<>(result, (long) query.getResultSize(), startOffset);
     }
 
     @Override
-    public ResultSet<ResourceWithType> getResources(ResourceFilter filter) {
+    public ResultSet<Resource> getResources(ResourceFilter filter) {
         return getResources(filter, 0, MAX_RESULTS);
     }
 
@@ -276,25 +277,25 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public ResultSet<ResourceWithType> getChildren(String parentId) {
+    public ResultSet<Resource> getChildren(String parentId) {
         return getChildren(parentId, 0, MAX_RESULTS);
     }
 
     @Override
-    public ResultSet<ResourceWithType> getChildren(String parentId, long startOffset, int maxResults) {
+    public ResultSet<Resource> getChildren(String parentId, long startOffset, int maxResults) {
         Query query = qResource.from(IspnResource.class)
                 .having("parentId").equal(parentId)
                 .maxResults(maxResults)
                 .startOffset(startOffset).build();
-        List<ResourceWithType> result = query.list()
+        List<IspnResource> ispnResources = query.list();
+        List<Resource> result = ispnResources
                 .stream()
-                .map(r -> ((IspnResource) r).getResource())
-                .map(r -> ResourceWithType.fromResource(r, this::getNullableResourceType))
+                .map(r -> r.toResource(this::getResourceType))
                 .collect(Collectors.toList());
         return new ResultSet<>(result, (long) query.getResultSize(), startOffset);
     }
 
-    private List<Resource> getResourcesForParent(String parentId) {
+    private List<RawResource> getResourcesForParent(String parentId) {
         if (isEmpty(parentId)) {
             return Collections.emptyList();
         }
@@ -303,16 +304,8 @@ public class InventoryServiceIspn implements InventoryService {
                 .build()
                 .list()
                 .stream()
-                .map(r -> ((IspnResource) r).getResource())
+                .map(r -> ((IspnResource) r).getRawResource())
                 .collect(Collectors.toList());
-    }
-
-    private ResourceType getNullableResourceType(String typeId) {
-        if (isEmpty(typeId)) {
-            return null;
-        }
-        Optional<ResourceType> oResourceType = Optional.ofNullable((IspnResourceType) resourceType.get(typeId)).map(IspnResourceType::getResourceType);
-        return oResourceType.isPresent() ? oResourceType.get() : null;
     }
 
     private boolean isEmpty(String s) {
@@ -357,7 +350,7 @@ public class InventoryServiceIspn implements InventoryService {
                     .build()
                     .list();
             for (IspnResource r : batch) {
-                jsonGen.writeObject(r.getResource());
+                jsonGen.writeObject(r.getRawResource());
             }
             jsonGen.flush();
             hasMore = batch.size() == MAX_RESULTS;
