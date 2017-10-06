@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.hawkular.inventory.model.Resource;
 import org.hawkular.inventory.model.ResourceType;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -46,17 +47,17 @@ public class JacksonDeserializer {
             List results = new ArrayList<>();
             if (node.get("results").isArray() && node.get("results").size() > 0) {
                 JsonNode first = node.get("results").get(0);
-                boolean resourceNode = first.get("children") != null;
-                boolean resourceWithType = first.get("type") != null;
+                boolean resourceType = first.get("operations") != null;
+                boolean resourceNode = first.get("typeId") == null;
                 Iterator<JsonNode> elements = node.get("results").elements();
                 while (elements.hasNext()) {
                     JsonNode element = elements.next();
-                    if (resourceNode) {
-                        results.add(objectCodec.treeToValue(element, ResourceNode.class));
-                    } else if (resourceWithType) {
-                        results.add(objectCodec.treeToValue(element, ResourceWithType.class));
-                    } else {
+                    if (resourceType) {
                         results.add(objectCodec.treeToValue(element, ResourceType.class));
+                    } else if (resourceNode) {
+                        results.add(objectCodec.treeToValue(element, ResourceNode.class));
+                    } else {
+                        results.add(objectCodec.treeToValue(element, Resource.class));
                     }
                 }
             }

@@ -37,7 +37,6 @@ import javax.inject.Inject;
 import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.ResourceNode;
-import org.hawkular.inventory.api.ResourceWithType;
 import org.hawkular.inventory.api.ResultSet;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
@@ -149,8 +148,11 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public Optional<ResourceWithType> getResourceById(String id) {
-        return getRawResource(id).map(r -> ResourceWithType.fromResource(r, this::getNullableResourceType));
+    public Optional<Resource> getResourceById(String id) {
+        Optional<Resource> resource = getRawResource(id);
+        // Load type
+        resource.ifPresent(r -> r.getType(this::getNullableResourceType));
+        return resource;
     }
 
     @Override
@@ -160,7 +162,7 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public ResultSet<ResourceWithType> getResources(ResourceFilter filter, long startOffset, int maxResults) {
+    public ResultSet<Resource> getResources(ResourceFilter filter, long startOffset, int maxResults) {
         QueryBuilder qb = qResource.from(Resource.class);
         FilterConditionContextQueryBuilder fccqb = null;
         if (filter.isRootOnly()) {
@@ -174,15 +176,16 @@ public class InventoryServiceIspn implements InventoryService {
         }
         Query query = (fccqb == null ? qb : fccqb)
                 .maxResults(maxResults)
-                .startOffset(startOffset).build();
-        List<ResourceWithType> result = query.list().stream()
-                .map(r -> ResourceWithType.fromResource((Resource)r, this::getNullableResourceType))
-                .collect(Collectors.toList());
+                .startOffset(startOffset)
+                .build();
+        List<Resource> result = query.list();
+        // Load types
+        result.forEach(r -> r.getType(this::getNullableResourceType));
         return new ResultSet<>(result, (long) query.getResultSize(), startOffset);
     }
 
     @Override
-    public ResultSet<ResourceWithType> getResources(ResourceFilter filter) {
+    public ResultSet<Resource> getResources(ResourceFilter filter) {
         return getResources(filter, 0, MAX_RESULTS);
     }
 
@@ -255,19 +258,20 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public ResultSet<ResourceWithType> getChildren(String parentId) {
+    public ResultSet<Resource> getChildren(String parentId) {
         return getChildren(parentId, 0, MAX_RESULTS);
     }
 
     @Override
-    public ResultSet<ResourceWithType> getChildren(String parentId, long startOffset, int maxResults) {
+    public ResultSet<Resource> getChildren(String parentId, long startOffset, int maxResults) {
         Query query = qResource.from(Resource.class)
                 .having("parentId").equal(parentId)
                 .maxResults(maxResults)
-                .startOffset(startOffset).build();
-        List<ResourceWithType> result = query.list().stream()
-                .map(r -> ResourceWithType.fromResource((Resource) r, this::getNullableResourceType))
-                .collect(Collectors.toList());
+                .startOffset(startOffset)
+                .build();
+        List<Resource> result = query.list();
+        // Load types
+        result.forEach(r -> r.getType(this::getNullableResourceType));
         return new ResultSet<>(result, (long) query.getResultSize(), startOffset);
     }
 
@@ -295,5 +299,4 @@ public class InventoryServiceIspn implements InventoryService {
     private boolean isEmpty(Collection c) {
         return c == null || c.isEmpty();
     }
-
 }

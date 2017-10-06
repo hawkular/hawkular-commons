@@ -30,7 +30,6 @@ import java.util.Optional;
 
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.ResourceNode;
-import org.hawkular.inventory.api.ResourceWithType;
 import org.hawkular.inventory.api.ResultSet;
 import org.hawkular.inventory.model.Metric;
 import org.hawkular.inventory.model.MetricUnit;
@@ -109,18 +108,18 @@ public class InventoryServiceIspnTest {
 
     @Test
     public void shouldGetResourcesById() {
-        Optional<ResourceWithType> eap1 = service.getResourceById("EAP-1");
+        Optional<Resource> eap1 = service.getResourceById("EAP-1");
         assertThat(eap1).isPresent()
-                .map(ResourceWithType::getName)
+                .map(Resource::getName)
                 .hasValue("EAP-1");
         assertThat(eap1)
-                .map(ResourceWithType::getType)
+                .map(Resource::getType)
                 .hasValueSatisfying(type -> assertThat(type.getId()).isEqualTo("EAP"));
         assertThat(service.getResourceById("EAP-2")).isPresent()
-                .map(ResourceWithType::getName)
+                .map(Resource::getName)
                 .hasValue("EAP-2");
         assertThat(service.getResourceById("child-1")).isPresent()
-                .map(ResourceWithType::getName)
+                .map(Resource::getName)
                 .hasValue("Child 1");
     }
 
@@ -131,12 +130,12 @@ public class InventoryServiceIspnTest {
 
     @Test
     public void shouldGetTopResources() {
-        Collection<ResourceWithType> top = service.getResources(ResourceFilter.rootOnly().build()).getResults();
+        Collection<Resource> top = service.getResources(ResourceFilter.rootOnly().build()).getResults();
         assertThat(top)
-                .extracting(ResourceWithType::getName)
+                .extracting(Resource::getName)
                 .containsOnly("EAP-1", "EAP-2");
         assertThat(top)
-                .extracting(ResourceWithType::getType)
+                .extracting(Resource::getType)
                 .extracting(ResourceType::getId)
                 .containsOnly("EAP", "EAP");
     }
@@ -151,14 +150,14 @@ public class InventoryServiceIspnTest {
     @Test
     public void shouldGetAllEAPs() {
         assertThat(service.getResources(ResourceFilter.ofType("EAP").build()).getResults())
-                .extracting(ResourceWithType::getId)
+                .extracting(Resource::getId)
                 .containsOnly("EAP-1", "EAP-2");
     }
 
     @Test
     public void shouldGetAllFOOs() {
         assertThat(service.getResources(ResourceFilter.ofType("FOO").build()).getResults())
-                .extracting(ResourceWithType::getId)
+                .extracting(Resource::getId)
                 .containsOnly("child-1", "child-3");
     }
 
@@ -170,7 +169,7 @@ public class InventoryServiceIspnTest {
     @Test
     public void shouldGetOnlyChildren() {
         assertThat(service.getChildren("EAP-1").getResults())
-                .extracting(ResourceWithType::getId)
+                .extracting(Resource::getId)
                 .containsOnly("child-1", "child-2");
     }
 
@@ -260,11 +259,11 @@ public class InventoryServiceIspnTest {
     @Test
     public void shouldGetAllEAPsPerFeed() {
         assertThat(service.getResources(ResourceFilter.ofType("EAP").andFeed("feed1").build()).getResults())
-                .extracting(ResourceWithType::getId)
+                .extracting(Resource::getId)
                 .containsOnly("EAP-1");
 
         assertThat(service.getResources(ResourceFilter.ofType("EAP").andFeed("feed2").build()).getResults())
-                .extracting(ResourceWithType::getId)
+                .extracting(Resource::getId)
                 .containsOnly("EAP-2");
     }
 
@@ -272,8 +271,8 @@ public class InventoryServiceIspnTest {
     public void createLargeSetAndFetchPagination() {
         int maxFeeds = 10;
         int maxItems = 1000;
-        List<Resource> resources = new ArrayList<>();
         for (int j = 0; j < maxFeeds; j++) {
+            List<Resource> resources = new ArrayList<>();
             for (int i = 0; i < maxItems; i++) {
                 Resource resourceX = new Resource("F" + j + "L" + i, "Large" + i, "feed" + j, "FOO", null,
                         new ArrayList<>(), new HashMap<>());
@@ -282,7 +281,7 @@ public class InventoryServiceIspnTest {
             service.addResource(resources);
         }
 
-        ResultSet<ResourceWithType> results = service.getResources(ResourceFilter.ofType("FOO").build());
+        ResultSet<Resource> results = service.getResources(ResourceFilter.ofType("FOO").build());
         assertThat(results.getResultSize()).isEqualTo(maxFeeds * maxItems + 2);
         assertThat(results.getResults().size()).isEqualTo(100);
 
