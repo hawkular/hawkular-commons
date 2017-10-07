@@ -24,11 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.hibernate.search.annotations.Analyze;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Store;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -37,7 +32,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Joel Takvorian
  */
-@Indexed
 public class Resource implements Serializable {
 
     public static class Builder {
@@ -105,15 +99,12 @@ public class Resource implements Serializable {
     private final String name;
 
     @JsonInclude(Include.NON_NULL)
-    @Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
     private final String feedId;
 
     @JsonInclude(Include.NON_NULL)
-    @Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
     private final String typeId;
 
     @JsonInclude(Include.NON_NULL)
-    @Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
     private final String parentId;
 
     @JsonInclude(Include.NON_NULL)
