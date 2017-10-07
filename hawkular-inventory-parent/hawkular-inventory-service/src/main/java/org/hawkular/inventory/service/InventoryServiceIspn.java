@@ -45,6 +45,8 @@ import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
 import org.hawkular.inventory.model.Resource;
 import org.hawkular.inventory.model.ResourceType;
+import org.hawkular.inventory.service.ispn.IspnResource;
+import org.hawkular.inventory.service.ispn.IspnResourceType;
 import org.infinispan.Cache;
 import org.infinispan.query.Search;
 import org.infinispan.query.dsl.FilterConditionContextQueryBuilder;
@@ -106,9 +108,9 @@ public class InventoryServiceIspn implements InventoryService {
         if (isEmpty(resources)) {
             return;
         }
-        Map<String, Resource> map = resources.stream()
+        Map<String, IspnResource> map = resources.stream()
                 .parallel()
-                .collect(Collectors.toMap(r -> r.getId(), r -> r));
+                .collect(Collectors.toMap(r -> r.getId(), r -> new IspnResource(r)));
         resource.putAll(map);
     }
 
@@ -122,9 +124,9 @@ public class InventoryServiceIspn implements InventoryService {
         if (isEmpty(resourceTypes)) {
             return;
         }
-        Map<String, ResourceType> map = resourceTypes.stream()
+        Map<String, IspnResourceType> map = resourceTypes.stream()
                 .parallel()
-                .collect(Collectors.toMap(rt -> rt.getId(), rt -> rt));
+                .collect(Collectors.toMap(rt -> rt.getId(), rt -> new IspnResourceType(rt)));
         resourceType.putAll(map);
     }
 
@@ -149,7 +151,7 @@ public class InventoryServiceIspn implements InventoryService {
         if (isEmpty(id)) {
             throw new IllegalArgumentException("Resource id must be not null");
         }
-        return Optional.ofNullable((Resource) resource.get(id));
+        return Optional.ofNullable((IspnResource) resource.get(id)).map(IspnResource::getResource);
     }
 
     @Override
@@ -165,7 +167,7 @@ public class InventoryServiceIspn implements InventoryService {
 
     @Override
     public ResultSet<ResourceWithType> getResources(ResourceFilter filter, long startOffset, int maxResults) {
-        QueryBuilder qb = qResource.from(Resource.class);
+        QueryBuilder qb = qResource.from(IspnResource.class);
         FilterConditionContextQueryBuilder fccqb = null;
         if (filter.isRootOnly()) {
             fccqb = qb.having("parentId").isNull();
@@ -179,8 +181,9 @@ public class InventoryServiceIspn implements InventoryService {
         Query query = (fccqb == null ? qb : fccqb)
                 .maxResults(maxResults)
                 .startOffset(startOffset).build();
-        List<ResourceWithType> result = query.list().stream()
-                .map(r -> ResourceWithType.fromResource((Resource)r, this::getNullableResourceType))
+        List<ResourceWithType> result = query.list()
+                .stream()
+                .map(r -> ResourceWithType.fromResource(((IspnResource) r).getResource(), this::getNullableResourceType))
                 .collect(Collectors.toList());
         return new ResultSet<>(result, (long) query.getResultSize(), startOffset);
     }
@@ -192,11 +195,16 @@ public class InventoryServiceIspn implements InventoryService {
 
     @Override
     public ResultSet<ResourceType> getResourceTypes(long startOffset, int maxResults) {
-        Query query = qResourceType.from(ResourceType.class)
+        Query query = qResourceType.from(IspnResourceType.class)
                 .maxResults(maxResults)
                 .startOffset(startOffset)
                 .build();
-        return new ResultSet<>(query.list(), (long) query.getResultSize(), startOffset);
+        return new ResultSet<>(query.list()
+                .stream()
+                .map(r -> ((IspnResourceType) r).getResourceType())
+                .collect(Collectors.toList()),
+                (long) query.getResultSize(),
+                startOffset);
     }
 
     @Override
@@ -209,7 +217,7 @@ public class InventoryServiceIspn implements InventoryService {
         if (isEmpty(typeId)) {
             throw new IllegalArgumentException("ResourceType id must be not null");
         }
-        return Optional.ofNullable((ResourceType) resourceType.get(typeId));
+        return Optional.ofNullable((IspnResourceType) resourceType.get(typeId)).map(IspnResourceType::getResourceType);
     }
 
     @Override
@@ -265,12 +273,14 @@ public class InventoryServiceIspn implements InventoryService {
 
     @Override
     public ResultSet<ResourceWithType> getChildren(String parentId, long startOffset, int maxResults) {
-        Query query = qResource.from(Resource.class)
+        Query query = qResource.from(IspnResource.class)
                 .having("parentId").equal(parentId)
                 .maxResults(maxResults)
                 .startOffset(startOffset).build();
-        List<ResourceWithType> result = query.list().stream()
-                .map(r -> ResourceWithType.fromResource((Resource) r, this::getNullableResourceType))
+        List<ResourceWithType> result = query.list()
+                .stream()
+                .map(r -> ((IspnResource) r).getResource())
+                .map(r -> ResourceWithType.fromResource(r, this::getNullableResourceType))
                 .collect(Collectors.toList());
         return new ResultSet<>(result, (long) query.getResultSize(), startOffset);
     }
@@ -279,17 +289,21 @@ public class InventoryServiceIspn implements InventoryService {
         if (isEmpty(parentId)) {
             return Collections.emptyList();
         }
-        return qResource.from(Resource.class)
+        return qResource.from(IspnResource.class)
                 .having("parentId").equal(parentId)
                 .build()
-                .list();
+                .list()
+                .stream()
+                .map(r -> ((IspnResource) r).getResource())
+                .collect(Collectors.toList());
     }
 
     private ResourceType getNullableResourceType(String typeId) {
         if (isEmpty(typeId)) {
             return null;
         }
-        return (ResourceType) resourceType.get(typeId);
+        Optional<ResourceType> oResourceType = Optional.ofNullable((IspnResourceType) resourceType.get(typeId)).map(IspnResourceType::getResourceType);
+        return oResourceType.isPresent() ? oResourceType.get() : null;
     }
 
     private boolean isEmpty(String s) {
@@ -310,13 +324,13 @@ public class InventoryServiceIspn implements InventoryService {
         int offset = 0;
         boolean hasMore = true;
         while (hasMore) {
-            List<ResourceType> batch = qResourceType.from(ResourceType.class)
+            List<IspnResourceType> batch = qResourceType.from(IspnResourceType.class)
                     .maxResults(MAX_RESULTS)
                     .startOffset(offset)
                     .build()
                     .list();
-            for (ResourceType rt : batch) {
-                jsonGen.writeObject(rt);
+            for (IspnResourceType rt : batch) {
+                jsonGen.writeObject(rt.getResourceType());
             }
             jsonGen.flush();
             hasMore = batch.size() == MAX_RESULTS;
@@ -328,13 +342,13 @@ public class InventoryServiceIspn implements InventoryService {
         hasMore = true;
         offset = 0;
         while (hasMore) {
-            List<Resource> batch = qResource.from(Resource.class)
+            List<IspnResource> batch = qResource.from(IspnResource.class)
                     .maxResults(MAX_RESULTS)
                     .startOffset(offset)
                     .build()
                     .list();
-            for (Resource r : batch) {
-                jsonGen.writeObject(r);
+            for (IspnResource r : batch) {
+                jsonGen.writeObject(r.getResource());
             }
             jsonGen.flush();
             hasMore = batch.size() == MAX_RESULTS;

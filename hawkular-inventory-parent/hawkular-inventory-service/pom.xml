@@ -311,7 +311,10 @@
   </build>
 
   <properties>
-    <excluded.groups>org.hawkular.inventory.service.Performance</excluded.groups>
+    <!--
+      [lponce] making perf tests optional is prone to errors
+      <excluded.groups>org.hawkular.inventory.service.Performance</excluded.groups>
+    -->
   </properties>
 
 </project>
