@@ -18,6 +18,7 @@ package org.hawkular.inventory.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,6 +35,7 @@ import javax.ejb.Local;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import org.hawkular.commons.json.JsonUtil;
 import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.ResourceNode;
@@ -49,6 +51,8 @@ import org.infinispan.query.dsl.FilterConditionContextQueryBuilder;
 import org.infinispan.query.dsl.Query;
 import org.infinispan.query.dsl.QueryBuilder;
 import org.infinispan.query.dsl.QueryFactory;
+
+import com.fasterxml.jackson.core.JsonGenerator;
 
 /**
  * @author Joel Takvorian
@@ -296,4 +300,48 @@ public class InventoryServiceIspn implements InventoryService {
         return c == null || c.isEmpty();
     }
 
+    @Override
+    public void buildExport(OutputStream os) throws IOException {
+        JsonGenerator jsonGen = JsonUtil.createJsonGenerator(os);
+        jsonGen.writeStartObject(); // Inventory object
+        jsonGen.writeFieldName("types");
+        jsonGen.writeStartArray();
+
+        int offset = 0;
+        boolean hasMore = true;
+        while (hasMore) {
+            List<ResourceType> batch = qResourceType.from(ResourceType.class)
+                    .maxResults(MAX_RESULTS)
+                    .startOffset(offset)
+                    .build()
+                    .list();
+            for (ResourceType rt : batch) {
+                jsonGen.writeObject(rt);
+            }
+            jsonGen.flush();
+            hasMore = batch.size() == MAX_RESULTS;
+            offset += MAX_RESULTS;
+        }
+        jsonGen.writeEndArray();
+        jsonGen.writeFieldName("resources");
+        jsonGen.writeStartArray();
+        hasMore = true;
+        offset = 0;
+        while (hasMore) {
+            List<Resource> batch = qResource.from(Resource.class)
+                    .maxResults(MAX_RESULTS)
+                    .startOffset(offset)
+                    .build()
+                    .list();
+            for (Resource r : batch) {
+                jsonGen.writeObject(r);
+            }
+            jsonGen.flush();
+            hasMore = batch.size() == MAX_RESULTS;
+            offset += MAX_RESULTS;
+        }
+        jsonGen.writeEndArray();
+        jsonGen.writeEndObject();
+        jsonGen.flush();
+    }
 }

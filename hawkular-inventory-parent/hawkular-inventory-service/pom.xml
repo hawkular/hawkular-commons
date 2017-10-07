@@ -67,6 +67,12 @@
       <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-commons-utils</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Infinispan/Hibernate Search deps -->
     <dependency>
       <groupId>org.infinispan</groupId>
