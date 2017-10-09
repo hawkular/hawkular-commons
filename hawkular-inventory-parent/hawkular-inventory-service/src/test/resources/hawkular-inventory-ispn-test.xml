@@ -23,7 +23,7 @@
     xmlns="urn:infinispan:config:9.1">
 
   <cache-container name="hawkular-inventory">
-
+    <jmx duplicate-domains="true" />
     <local-cache name="resource">
       <transaction mode="NON_XA"/>
       <persistence>
@@ -42,7 +42,7 @@
       </memory>
       <indexing index="LOCAL">
         <indexed-entities>
-          <indexed-entity>org.hawkular.inventory.model.Resource</indexed-entity>
+          <indexed-entity>org.hawkular.inventory.service.ispn.IspnResource</indexed-entity>
         </indexed-entities>
         <property name="default.indexmanager">near-real-time</property>
         <property name="default.directory_provider">infinispan</property>
@@ -97,7 +97,7 @@
       </persistence>
       <indexing index="LOCAL">
         <indexed-entities>
-          <indexed-entity>org.hawkular.inventory.model.ResourceType</indexed-entity>
+          <indexed-entity>org.hawkular.inventory.service.ispn.IspnResourceType</indexed-entity>
         </indexed-entities>
         <property name="default.indexmanager">near-real-time</property>
         <property name="default.directory_provider">infinispan</property>
