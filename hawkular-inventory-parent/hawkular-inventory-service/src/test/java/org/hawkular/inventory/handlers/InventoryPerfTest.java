@@ -124,7 +124,7 @@ public class InventoryPerfTest {
                 String childNameX = "Child "+ j + " from " + id;
                 childrenIds.add(childIdX);
                 Resource childX = new Resource(childIdX, childNameX, feedX, childType, id,
-                        new ArrayList<>(), new HashMap<>());
+                        new ArrayList<>(), new HashMap<>(), new HashMap<>());
 
                 childrenResource.add(childX);
             }
@@ -143,7 +143,8 @@ public class InventoryPerfTest {
                     typeId,
                     null,
                     metricsResource,
-                    propsX);
+                    propsX,
+                    new HashMap<>());
 
             resources.add(serverX);
             resources.addAll(childrenResource);

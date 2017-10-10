@@ -43,26 +43,31 @@ public class ResourceWithType implements Serializable {
     private final String feedId;
 
     @JsonInclude(Include.NON_NULL)
-    private final Map<String, String> properties;
-
-    @JsonInclude(Include.NON_NULL)
     private final ResourceType type;
 
     @JsonInclude(Include.NON_NULL)
     private final List<Metric> metrics;
 
+    @JsonInclude(Include.NON_NULL)
+    private final Map<String, String> properties;
+
+    @JsonInclude(Include.NON_NULL)
+    private final Map<String, String> config;
+
     public ResourceWithType(@JsonProperty("id") String id,
                             @JsonProperty("name") String name,
                             @JsonProperty("feedId") String feedId,
-                            @JsonProperty("properties") Map<String, String> properties,
                             @JsonProperty("type") ResourceType type,
-                            @JsonProperty("metrics") List<Metric> metrics) {
+                            @JsonProperty("metrics") List<Metric> metrics,
+                            @JsonProperty("properties") Map<String, String> properties,
+                            @JsonProperty("config") Map<String, String> config) {
         this.id = id;
         this.name = name;
         this.feedId = feedId;
-        this.properties = properties;
         this.type = type;
         this.metrics = metrics;
+        this.properties = properties;
+        this.config = config;
     }
 
     /**
@@ -74,8 +79,8 @@ public class ResourceWithType implements Serializable {
      */
     public static ResourceWithType fromResource(Resource r,
                                                 Function<String, ResourceType> rtLoader) {
-        return new ResourceWithType(r.getId(), r.getName(), r.getFeedId(), r.getProperties(), r.getType(rtLoader),
-                r.getMetrics());
+        return new ResourceWithType(r.getId(), r.getName(), r.getFeedId(), r.getType(rtLoader),
+                r.getMetrics(), r.getProperties(), r.getConfig());
     }
 
     public String getId() {
@@ -92,6 +97,10 @@ public class ResourceWithType implements Serializable {
 
     public Map<String, String> getProperties() {
         return properties;
+    }
+
+    public Map<String, String> getConfig() {
+        return config;
     }
 
     public ResourceType getType() {

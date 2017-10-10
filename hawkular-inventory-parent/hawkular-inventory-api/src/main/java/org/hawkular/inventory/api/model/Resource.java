@@ -42,9 +42,10 @@ public class Resource implements Serializable {
         private String parentId;
         private List<Metric> metrics = new ArrayList<>();
         private Map<String, String> properties = new HashMap<>();
+        private Map<String, String> config = new HashMap<>();
 
         public Resource build() {
-            return new Resource(id, name, feedId, typeId, parentId, metrics, properties);
+            return new Resource(id, name, feedId, typeId, parentId, metrics, properties, config);
         }
 
         public Builder id(String id) {
@@ -86,6 +87,16 @@ public class Resource implements Serializable {
             this.properties.putAll(props);
             return this;
         }
+
+        public Builder config(String name, String value) {
+            this.config.put(name, value);
+            return this;
+        }
+
+        public Builder config(Map<String, String> cfg) {
+            this.config.putAll(cfg);
+            return this;
+        }
     }
 
     public static Builder builder() {
@@ -113,6 +124,9 @@ public class Resource implements Serializable {
     @JsonInclude(Include.NON_NULL)
     private final Map<String, String> properties;
 
+    @JsonInclude(Include.NON_NULL)
+    private final Map<String, String> config;
+
     // Lazy-loaded references
     @JsonIgnore
     private ResourceType type;
@@ -125,7 +139,8 @@ public class Resource implements Serializable {
                     @JsonProperty("typeId") String typeId,
                     @JsonProperty("parentId") String parentId,
                     @JsonProperty("metrics") List<Metric> metrics,
-                    @JsonProperty("properties") Map<String, String> properties) {
+                    @JsonProperty("properties") Map<String, String> properties,
+                    @JsonProperty("config") Map<String, String> config) {
         this.id = id;
         this.name = name;
         this.feedId = feedId;
@@ -133,6 +148,7 @@ public class Resource implements Serializable {
         this.parentId = parentId;
         this.metrics = metrics;
         this.properties = properties;
+        this.config = config;
     }
 
     public String getId() {
@@ -161,6 +177,10 @@ public class Resource implements Serializable {
 
     public Map<String, String> getProperties() {
         return Collections.unmodifiableMap(properties);
+    }
+
+    public Map<String, String> getConfig() {
+        return Collections.unmodifiableMap(config);
     }
 
     public ResourceType getType(Function<String, ResourceType> loader) {
@@ -203,6 +223,7 @@ public class Resource implements Serializable {
                 ", typeId='" + typeId + '\'' +
                 ", parentId='" + parentId + '\'' +
                 ", properties=" + properties +
+                ", config=" + config +
                 ", type=" + type +
                 ", children=" + children +
                 ", metrics=" + metrics +

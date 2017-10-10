@@ -294,9 +294,9 @@ public class InventoryRestTest {
     @Test
     public void test015_shouldFailOnDetectedCycle() {
         Resource corruptedParent = new Resource("CP", "CP", "feedX", "FOO", "CC",
-                new ArrayList<>(), new HashMap<>());
+                new ArrayList<>(), new HashMap<>(), new HashMap<>());
         Resource corruptedChild = new Resource("CC", "CC", "feedX", "BAR", "CP",
-                new ArrayList<>(), new HashMap<>());
+                new ArrayList<>(), new HashMap<>(), new HashMap<>());
         Inventory corruptedInventory = new Inventory(Arrays.asList(corruptedParent, corruptedChild), null);
 
         Client client = ClientBuilder.newClient();
