@@ -135,8 +135,12 @@ public class InventoryServiceIspn implements InventoryService {
         if (isEmpty(id)) {
             throw new IllegalArgumentException("Id must be not null");
         }
-        // FIXME: remove subtree?
         resource.remove(id);
+    }
+
+    @Override
+    public void deleteAllResources() {
+        resource.clear();
     }
 
     @Override
@@ -145,6 +149,11 @@ public class InventoryServiceIspn implements InventoryService {
             throw new IllegalArgumentException("Type must be not null");
         }
         resourceType.remove(typeId);
+    }
+
+    @Override
+    public void deleteAllTypes() {
+        resourceType.clear();
     }
 
     private Optional<Resource> getRawResource(String id) {
