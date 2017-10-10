@@ -52,7 +52,7 @@ public interface InventoryService {
     /**
      * Delete a single resource by ID
      */
-    void deleteResource(String id);
+    void deleteResources(Collection<String> ids);
 
     /**
      * Delete all resources
@@ -62,7 +62,7 @@ public interface InventoryService {
     /**
      * Delete a single resource type
      */
-    void deleteResourceType(String typeId);
+    void deleteResourceTypes(Collection<String> typeIds);
 
     /**
      * Delete all resource types
