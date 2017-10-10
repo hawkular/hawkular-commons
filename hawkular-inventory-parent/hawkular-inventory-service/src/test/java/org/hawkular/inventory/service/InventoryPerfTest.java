@@ -188,6 +188,23 @@ public class InventoryPerfTest {
     }
 
     @Test
+    public void test0001_clean() {
+        WebTarget target = ClientBuilder.newClient().target(baseUrl.toString()).path("resources");
+        Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .delete();
+        assertEquals(200, response.getStatus());
+
+        target = ClientBuilder.newClient().target(baseUrl.toString()).path("types");
+        response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .delete();
+        assertEquals(200, response.getStatus());
+    }
+
+    @Test
     public void test001_importResources() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("import");

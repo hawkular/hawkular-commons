@@ -144,6 +144,18 @@ public class InventoryHandlers {
     }
 
     @DELETE
+    @Path("/resources")
+    @Produces(APPLICATION_JSON)
+    public Response deleteAllResources() {
+        try {
+            inventoryService.deleteAllResources();
+            return ResponseUtil.ok();
+        } catch (Exception e) {
+            return ResponseUtil.internalError(e);
+        }
+    }
+
+    @DELETE
     @Path("/resources/{id}")
     @Produces(APPLICATION_JSON)
     public Response deleteResource(@PathParam("id") final String id) {
@@ -194,12 +206,37 @@ public class InventoryHandlers {
     }
 
     @DELETE
-    @Path("/type/{typeId}")
+    @Path("/types")
+    @Produces(APPLICATION_JSON)
+    public Response deleteAllTypes() {
+        try {
+            inventoryService.deleteAllTypes();
+            return ResponseUtil.ok();
+        } catch (Exception e) {
+            return ResponseUtil.internalError(e);
+        }
+    }
+
+    @DELETE
+    @Path("/types/{typeId}")
     @Produces(APPLICATION_JSON)
     public Response deleteResourceType(@PathParam("typeId") final String typeId) {
         try {
             inventoryService.deleteResourceType(typeId);
             return ResponseUtil.ok();
+        } catch (Exception e) {
+            return ResponseUtil.internalError(e);
+        }
+    }
+
+    @GET
+    @Path("/types/{typeId}")
+    @Produces(APPLICATION_JSON)
+    public Response getResourceType(@PathParam("typeId") final String typeId) {
+        try {
+            return inventoryService.getResourceType(typeId)
+                    .map(ResponseUtil::ok)
+                    .orElseGet(() -> ResponseUtil.notFound("Resource type [" + typeId + "] not found"));
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }

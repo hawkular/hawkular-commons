@@ -55,9 +55,19 @@ public interface InventoryService {
     void deleteResource(String id);
 
     /**
+     * Delete all resources
+     */
+    void deleteAllResources();
+
+    /**
      * Delete a single resource type
      */
     void deleteResourceType(String typeId);
+
+    /**
+     * Delete all resource types
+     */
+    void deleteAllTypes();
 
     /**
      * Get a resource from its ID. The resulting object includes {@link ResourceType}
