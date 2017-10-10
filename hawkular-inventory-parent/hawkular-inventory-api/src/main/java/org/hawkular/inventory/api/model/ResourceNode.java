@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.inventory.api;
+package org.hawkular.inventory.api.model;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -23,10 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import org.hawkular.inventory.model.Metric;
-import org.hawkular.inventory.model.Resource;
-import org.hawkular.inventory.model.ResourceType;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

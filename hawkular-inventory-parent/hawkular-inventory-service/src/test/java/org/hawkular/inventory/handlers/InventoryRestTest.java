@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.inventory.service;
+package org.hawkular.inventory.handlers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -35,12 +35,13 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.hawkular.inventory.api.Inventory;
-import org.hawkular.inventory.api.ResourceNode;
-import org.hawkular.inventory.api.ResourceWithType;
-import org.hawkular.inventory.api.ResultSet;
-import org.hawkular.inventory.model.Resource;
-import org.hawkular.inventory.model.ResourceType;
+import org.hawkular.inventory.Resources;
+import org.hawkular.inventory.api.model.Inventory;
+import org.hawkular.inventory.api.model.Resource;
+import org.hawkular.inventory.api.model.ResourceNode;
+import org.hawkular.inventory.api.model.ResourceType;
+import org.hawkular.inventory.api.model.ResourceWithType;
+import org.hawkular.inventory.api.model.ResultSet;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
