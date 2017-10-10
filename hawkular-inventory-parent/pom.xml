@@ -71,7 +71,6 @@
   </dependencyManagement>
 
   <modules>
-    <module>hawkular-inventory-model</module>
     <module>hawkular-inventory-api</module>
     <module>hawkular-inventory-service</module>
   </modules>

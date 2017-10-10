@@ -21,8 +21,11 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Optional;
 
-import org.hawkular.inventory.model.Resource;
-import org.hawkular.inventory.model.ResourceType;
+import org.hawkular.inventory.api.model.Resource;
+import org.hawkular.inventory.api.model.ResourceNode;
+import org.hawkular.inventory.api.model.ResourceType;
+import org.hawkular.inventory.api.model.ResourceWithType;
+import org.hawkular.inventory.api.model.ResultSet;
 
 /**
  * Provides access to the inventory backend

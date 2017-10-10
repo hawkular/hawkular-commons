@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.inventory.api;
+package org.hawkular.inventory.api.model;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.*;
 
