@@ -18,8 +18,8 @@ package org.hawkular.inventory.service.ispn;
 
 import java.io.Serializable;
 
-import org.hawkular.inventory.model.Operation;
-import org.hawkular.inventory.model.ResourceType;
+import org.hawkular.inventory.api.model.Operation;
+import org.hawkular.inventory.api.model.ResourceType;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;

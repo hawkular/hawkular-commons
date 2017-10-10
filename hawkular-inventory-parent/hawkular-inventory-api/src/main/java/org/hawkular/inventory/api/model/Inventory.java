@@ -14,13 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.inventory.api;
+package org.hawkular.inventory.api.model;
 
 import java.io.Serializable;
 import java.util.List;
-
-import org.hawkular.inventory.model.Resource;
-import org.hawkular.inventory.model.ResourceType;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
