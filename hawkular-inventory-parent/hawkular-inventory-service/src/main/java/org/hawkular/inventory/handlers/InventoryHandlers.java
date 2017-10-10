@@ -19,7 +19,9 @@ package org.hawkular.inventory.handlers;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ejb.EJB;
@@ -146,9 +148,13 @@ public class InventoryHandlers {
     @DELETE
     @Path("/resources")
     @Produces(APPLICATION_JSON)
-    public Response deleteAllResources() {
+    public Response deleteResources(@QueryParam("ids") List<String> ids) {
         try {
-            inventoryService.deleteAllResources();
+            if (ids == null || ids.isEmpty()) {
+                inventoryService.deleteAllResources();
+            } else {
+                inventoryService.deleteResources(ids);
+            }
             return ResponseUtil.ok();
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
@@ -160,7 +166,7 @@ public class InventoryHandlers {
     @Produces(APPLICATION_JSON)
     public Response deleteResource(@PathParam("id") final String id) {
         try {
-            inventoryService.deleteResource(id);
+            inventoryService.deleteResources(Collections.singleton(id));
             return ResponseUtil.ok();
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
@@ -208,9 +214,13 @@ public class InventoryHandlers {
     @DELETE
     @Path("/types")
     @Produces(APPLICATION_JSON)
-    public Response deleteAllTypes() {
+    public Response deleteTypes(@QueryParam("typeIds") List<String> typeIds) {
         try {
-            inventoryService.deleteAllTypes();
+            if (typeIds == null || typeIds.isEmpty()) {
+                inventoryService.deleteAllTypes();
+            } else {
+                inventoryService.deleteResourceTypes(typeIds);
+            }
             return ResponseUtil.ok();
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
@@ -222,7 +232,7 @@ public class InventoryHandlers {
     @Produces(APPLICATION_JSON)
     public Response deleteResourceType(@PathParam("typeId") final String typeId) {
         try {
-            inventoryService.deleteResourceType(typeId);
+            inventoryService.deleteResourceTypes(Collections.singleton(typeId));
             return ResponseUtil.ok();
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
