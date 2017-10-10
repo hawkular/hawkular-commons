@@ -87,12 +87,29 @@ public class InventoryRestTest {
     }
 
     @Test
-    public void test000_statusIsUp() {
+    public void test0000_statusIsUp() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("status");
         Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .get();
+        assertEquals(200, response.getStatus());
+    }
+
+    @Test
+    public void test0001_clean() {
+        WebTarget target = ClientBuilder.newClient().target(baseUrl.toString()).path("resources");
+        Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .delete();
+        assertEquals(200, response.getStatus());
+
+        target = ClientBuilder.newClient().target(baseUrl.toString()).path("types");
+        response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .delete();
         assertEquals(200, response.getStatus());
     }
 
@@ -371,5 +388,139 @@ public class InventoryRestTest {
         assertThat(imp.getResources()).extracting(Resource::getId).containsOnly("EAP-1", "EAP-2", "child-1",
                 "child-2", "child-3", "child-4", "CC", "CP");
         assertThat(imp.getTypes()).extracting(ResourceType::getId).containsOnly("EAP", "FOO", "BAR");
+    }
+
+    @Test
+    public void test022_shouldGetOneResourceType() {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString()).path("types/EAP");
+        Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        assertEquals(200, response.getStatus());
+        ResourceType rt = response.readEntity(ResourceType.class);
+        assertThat(rt).isNotNull();
+        assertThat(rt.getId()).isEqualTo("EAP");
+    }
+
+    @Test
+    public void test100_shouldDeleteSeveralResources() {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString()).path("resources")
+                .queryParam("ids", "CC")
+                .queryParam("ids", "CP");
+        Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .delete();
+        assertEquals(200, response.getStatus());
+
+        target = ClientBuilder.newClient().target(baseUrl.toString()).path("resources/CC");
+        response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        assertEquals(404, response.getStatus());
+
+        target = ClientBuilder.newClient().target(baseUrl.toString()).path("resources/CP");
+        response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        assertEquals(404, response.getStatus());
+
+        // Check that not everything was deleted
+        target = ClientBuilder.newClient().target(baseUrl.toString()).path("resources")
+                .queryParam("root", true);
+        response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        assertEquals(200, response.getStatus());
+        List<ResourceWithType> resources = (List<ResourceWithType>) response.readEntity(ResultSet.class).getResults();
+        assertThat(resources)
+                .extracting(ResourceWithType::getId)
+                .containsOnly("EAP-1", "EAP-2");
+    }
+
+    @Test
+    public void test101_shouldDeleteAllResources() {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString()).path("resources");
+        Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .delete();
+        assertEquals(200, response.getStatus());
+
+        target = ClientBuilder.newClient().target(baseUrl.toString()).path("resources")
+                .queryParam("root", true);
+        response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        assertEquals(200, response.getStatus());
+        List<ResourceWithType> resources = (List<ResourceWithType>) response.readEntity(ResultSet.class).getResults();
+        assertThat(resources).isEmpty();
+    }
+
+    @Test
+    public void test102_shouldDeleteSeveralTypes() {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString()).path("types")
+                .queryParam("typeIds", "FOO")
+                .queryParam("typeIds", "BAR");
+        Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .delete();
+        assertEquals(200, response.getStatus());
+
+        target = ClientBuilder.newClient().target(baseUrl.toString()).path("types/FOO");
+        response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        assertEquals(404, response.getStatus());
+
+        target = ClientBuilder.newClient().target(baseUrl.toString()).path("types/BAR");
+        response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        assertEquals(404, response.getStatus());
+
+        // Check that not everything was deleted
+        target = ClientBuilder.newClient().target(baseUrl.toString()).path("types");
+        response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        assertEquals(200, response.getStatus());
+        List<ResourceType> resources = (List<ResourceType>) response.readEntity(ResultSet.class).getResults();
+        assertThat(resources)
+                .extracting(ResourceType::getId)
+                .containsOnly("EAP");
+    }
+
+    @Test
+    public void test103_shouldDeleteAllTypes() {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString()).path("types");
+        Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .delete();
+        assertEquals(200, response.getStatus());
+
+        target = ClientBuilder.newClient().target(baseUrl.toString()).path("types");
+        response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        assertEquals(200, response.getStatus());
+        List<ResourceType> types = (List<ResourceType>) response.readEntity(ResultSet.class).getResults();
+        assertThat(types).isEmpty();
     }
 }

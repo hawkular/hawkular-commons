@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -220,14 +221,14 @@ public class InventoryServiceIspnTest {
     @Test
     public void shouldRemoveResource() {
         assertThat(service.getResourceById("EAP-1")).isPresent();
-        service.deleteResource("EAP-1");
+        service.deleteResources(Collections.singleton("EAP-1"));
         assertThat(service.getResourceById("EAP-1")).isNotPresent();
     }
 
     @Test
     public void shouldRemoveResourceType() {
         assertThat(service.getResourceType("EAP")).isPresent();
-        service.deleteResourceType("EAP");
+        service.deleteResourceTypes(Collections.singleton("EAP"));
         assertThat(service.getResourceType("EAP")).isNotPresent();
     }
 

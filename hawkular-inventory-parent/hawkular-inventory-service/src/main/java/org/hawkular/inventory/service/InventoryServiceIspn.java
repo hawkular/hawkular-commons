@@ -131,20 +131,29 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
-    public void deleteResource(String id) {
-        if (isEmpty(id)) {
-            throw new IllegalArgumentException("Id must be not null");
+    public void deleteResources(Collection<String> ids) {
+        if (isEmpty(ids)) {
+            throw new IllegalArgumentException("Ids must be not null or empty");
         }
-        // FIXME: remove subtree?
-        resource.remove(id);
+        ids.forEach(resource::remove);
     }
 
     @Override
-    public void deleteResourceType(String typeId) {
-        if (isEmpty(typeId)) {
-            throw new IllegalArgumentException("Type must be not null");
+    public void deleteAllResources() {
+        resource.clear();
+    }
+
+    @Override
+    public void deleteResourceTypes(Collection<String> typeIds) {
+        if (isEmpty(typeIds)) {
+            throw new IllegalArgumentException("Types must be not null or empty");
         }
-        resourceType.remove(typeId);
+        typeIds.forEach(resourceType::remove);
+    }
+
+    @Override
+    public void deleteAllTypes() {
+        resourceType.clear();
     }
 
     private Optional<Resource> getRawResource(String id) {
