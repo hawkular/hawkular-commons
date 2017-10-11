@@ -184,9 +184,9 @@ public class InventoryServiceIspnTest {
     @Test
     public void shouldFailOnDetectedCycle() {
         Resource corruptedParent = new Resource("CP", "CP", "feedX", "FOO", "CC",
-                new ArrayList<>(), new HashMap<>());
+                new ArrayList<>(), new HashMap<>(), new HashMap<>());
         Resource corruptedChild = new Resource("CC", "CC", "feedX", "BAR", "CP",
-                new ArrayList<>(), new HashMap<>());
+                new ArrayList<>(), new HashMap<>(), new HashMap<>());
         service.addResource(corruptedParent);
         service.addResource(corruptedChild);
 
@@ -252,7 +252,7 @@ public class InventoryServiceIspnTest {
             List<Resource> resources = new ArrayList<>();
             for (int i = 0; i < maxItems; i++) {
                 Resource resourceX = new Resource("F" + j + "L" + i, "Large" + i, "feed" + j, "FOO", null,
-                        new ArrayList<>(), new HashMap<>());
+                        new ArrayList<>(), new HashMap<>(), new HashMap<>());
                 resources.add(resourceX);
             }
             service.addResource(resources);
@@ -296,7 +296,7 @@ public class InventoryServiceIspnTest {
             List<Resource> resources = new ArrayList<>();
             for (int i = 0; i < maxItems; i++) {
                 Resource resourceX = new Resource("F" + j + "L" + i, "Large" + i, "feed" + j, "FOO", null,
-                        new ArrayList<>(), new HashMap<>());
+                        new ArrayList<>(), new HashMap<>(), new HashMap<>());
                 resources.add(resourceX);
             }
             service.addResource(resources);

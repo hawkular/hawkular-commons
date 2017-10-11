@@ -37,8 +37,12 @@ public class ResourceTest {
     private static final Metric METRIC2
             = new Metric("gc", "GC", MetricUnit.NONE, new HashMap<>());
 
-    private final Resource r = new Resource("id", "name", "feedX", "EAP",
-            null, Arrays.asList(METRIC1, METRIC2), new HashMap<>());
+    private static final Resource RAW = new Resource("id", "name", "feedX", "EAP",
+            null, Arrays.asList(METRIC1, METRIC2), new HashMap<>(), new HashMap<>());
+    private static final Resource CH1 = new Resource("child-1", "name-1", "feedX", "t", "id",
+            new ArrayList<>(), new HashMap<>(), new HashMap<>());
+    private static final Resource CH2 = new Resource("child-2", "name-2", "feedX", "t", "id",
+            new ArrayList<>(), new HashMap<>(), new HashMap<>());
 
     @Test
     public void shouldLazyLoadResourceType() {
@@ -49,32 +53,28 @@ public class ResourceTest {
             return eap;
         };
 
-        ResourceType result = r.getType(loader);
+        ResourceType result = RAW.getType(loader);
         assertThat(result.getId()).isEqualTo("EAP");
         assertThat(numberOfCalls.intValue()).isEqualTo(1);
         // Verify loader is not called again
-        r.getType(loader);
+        RAW.getType(loader);
         assertThat(numberOfCalls.intValue()).isEqualTo(1);
     }
 
     @Test
     public void shouldLazyLoadChildren() {
-        Resource child1 = new Resource("child-1", "name-1", "feedX", "t", "id",
-                new ArrayList<>(), new HashMap<>());
-        Resource child2 = new Resource("child-2", "name-2", "feedX", "t", "id",
-                new ArrayList<>(), new HashMap<>());
         LongAdder numberOfCalls = new LongAdder();
         Function<String, List<Resource>> loader = id -> {
             numberOfCalls.increment();
-            return Arrays.asList(child1, child2);
+            return Arrays.asList(CH1, CH2);
         };
 
-        assertThat(r.getChildren(loader))
+        assertThat(RAW.getChildren(loader))
                 .extracting(Resource::getName)
                 .containsExactly("name-1", "name-2");
         assertThat(numberOfCalls.intValue()).isEqualTo(1);
         // Verify loader is not called again
-        r.getChildren(loader);
+        RAW.getChildren(loader);
         assertThat(numberOfCalls.intValue()).isEqualTo(1);
     }
 }
