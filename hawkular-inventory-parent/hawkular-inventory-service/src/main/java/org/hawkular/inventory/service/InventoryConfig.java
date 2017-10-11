@@ -32,6 +32,7 @@ import org.infinispan.Cache;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.query.Search;
+import org.infinispan.query.SearchManager;
 import org.infinispan.query.dsl.QueryFactory;
 
 /**
@@ -42,11 +43,15 @@ import org.infinispan.query.dsl.QueryFactory;
 @Singleton
 public class InventoryConfig {
 
+    private static final String ISPN_REINDEX = "hawkular-inventory.reindex";
+    private static final String ISPN_REINDEX_DEFAULT = "true";
     public static final String CACHE_CONFIGURATION = "hawkular-inventory-ispn.xml";
     public static final String RESOURCE_CACHE_NAME = "resource";
     public static final String RESOURCE_TYPE_CACHE_NAME = "resource_type";
 
     private static final MsgLogger log = InventoryLoggers.getLogger(InventoryConfig.class);
+
+    private static boolean ispnReindex;
 
     private Cache<String, Object> resource;
     private QueryFactory queryResource;
@@ -58,6 +63,7 @@ public class InventoryConfig {
 
     public InventoryConfig() {
         configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
+        ispnReindex = Boolean.getBoolean(System.getProperty(ISPN_REINDEX, ISPN_REINDEX_DEFAULT));
     }
 
     @PostConstruct
@@ -91,6 +97,17 @@ public class InventoryConfig {
                 log.errorInventoryCacheNotFound();
                 throw new IllegalStateException("Inventory query factory for resource_type cache is not found");
             }
+            if (ispnReindex) {
+                log.infoStartInventoryReindex();
+                long startReindex = System.currentTimeMillis();
+                SearchManager searchResourceManager = Search.getSearchManager(resource);
+                searchResourceManager.getMassIndexer().start();
+                SearchManager searchResourceTypeManager = Search.getSearchManager(resourceType);
+                searchResourceTypeManager.getMassIndexer().start();
+                long stopReindex = System.currentTimeMillis();
+                log.infoStopInventoryReindex((stopReindex - startReindex));
+            }
+
             log.infoInventoryAppStarted();
         } catch (IOException e) {
             log.errorInventoryCacheConfigurationNotFound(e);

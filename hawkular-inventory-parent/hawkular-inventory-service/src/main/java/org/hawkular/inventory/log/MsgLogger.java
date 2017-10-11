@@ -40,4 +40,12 @@ public interface MsgLogger {
     @LogMessage(level = Level.ERROR)
     @Message(id = 100002, value = "Inventory configuration cache is not found")
     void errorInventoryCacheConfigurationNotFound(@Cause Throwable e);
+
+    @LogMessage(level = Level.INFO)
+    @Message(id = 100003, value = "Inventory is reindexing caches")
+    void infoStartInventoryReindex();
+
+    @LogMessage(level = Level.INFO)
+    @Message(id = 100004, value = "Inventory finished reindexing in [%s] ms")
+    void infoStopInventoryReindex(long time);
 }
