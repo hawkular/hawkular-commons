@@ -17,9 +17,11 @@
 package org.hawkular.inventory.api.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.data.MapEntry.entry;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,7 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class JsonTest {
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     public void deserializeResultSet() throws Exception {
@@ -45,11 +47,11 @@ public class JsonTest {
         List<ResourceType> resourceTypes = new ArrayList<>();
         ResourceType fooType = new ResourceType("FOO", new HashSet<>(), new HashMap<>());
         for (int i = 0; i < maxItems; i++) {
-            ResourceNode resourceX = new ResourceNode("L" + i, "Large" + i, "feedX", new HashMap<>(), fooType,
-                    new ArrayList<>(), new ArrayList<>());
+            ResourceNode resourceX = new ResourceNode("L" + i, "Large" + i, "feedX", fooType, new ArrayList<>(),
+                    new HashMap<>(), new HashMap<>(), new ArrayList<>());
             resources.add(resourceX);
-            ResourceWithType resourceWTX = new ResourceWithType("Lbis" + i, "Largebis" + i, "feedX", new HashMap<>(),
-                    fooType, new ArrayList<>());
+            ResourceWithType resourceWTX = new ResourceWithType("Lbis" + i, "Largebis" + i, "feedX", fooType, new ArrayList<>(),
+                    new HashMap<>(), new HashMap<>());
             resourcesWithType.add(resourceWTX);
             ResourceType resourceTypeX = new ResourceType("EAP" + i, new HashSet<>(), new HashMap<>());
             resourceTypes.add(resourceTypeX);
@@ -74,5 +76,23 @@ public class JsonTest {
                 .usingElementComparator(Comparator.comparing(ResourceWithType::getId))
                 .isEqualTo(dsRsResourceWT.getResults());
         assertEquals(rsResourceType.getResults(), dsRsResourceType.getResults());
+    }
+
+    @Test
+    public void deserializeRawResource() throws Exception {
+        Resource resource = new Resource("ID", "FOO", "FEED", "BAR", null,
+                Collections.singletonList(new Metric("metric", "mtype", MetricUnit.BYTES, new HashMap<>())),
+                Collections.singletonMap("r.prop", "r.val1"),
+                Collections.singletonMap("r.cfg", "r.val2"));
+
+        String jsonResource = objectMapper.writeValueAsString(resource);
+
+        Resource deserialized = objectMapper.readValue(jsonResource, Resource.class);
+
+        assertThat(deserialized).isNotNull();
+        assertThat(deserialized.getId()).isEqualTo("ID");
+        assertThat(deserialized.getMetrics()).extracting(Metric::getName).containsExactly("metric");
+        assertThat(deserialized.getProperties()).containsOnly(entry("r.prop", "r.val1"));
+        assertThat(deserialized.getConfig()).containsOnly(entry("r.cfg", "r.val2"));
     }
 }

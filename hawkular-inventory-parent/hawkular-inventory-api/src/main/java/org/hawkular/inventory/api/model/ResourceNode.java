@@ -44,31 +44,36 @@ public class ResourceNode implements Serializable {
     private final String feedId;
 
     @JsonInclude(Include.NON_NULL)
-    private final Map<String, String> properties;
-
-    @JsonInclude(Include.NON_NULL)
     private final ResourceType type;
-
-    @JsonInclude(Include.NON_NULL)
-    private final List<ResourceNode> children;
 
     @JsonInclude(Include.NON_NULL)
     private final List<Metric> metrics;
 
+    @JsonInclude(Include.NON_NULL)
+    private final Map<String, String> properties;
+
+    @JsonInclude(Include.NON_NULL)
+    private final Map<String, String> config;
+
+    @JsonInclude(Include.NON_NULL)
+    private final List<ResourceNode> children;
+
     public ResourceNode(@JsonProperty("id") String id,
                         @JsonProperty("name") String name,
                         @JsonProperty("feedId") String feedId,
-                        @JsonProperty("properties") Map<String, String> properties,
                         @JsonProperty("type") ResourceType type,
-                        @JsonProperty("children") List<ResourceNode> children,
-                        @JsonProperty("metrics") List<Metric> metrics) {
+                        @JsonProperty("metrics") List<Metric> metrics,
+                        @JsonProperty("properties") Map<String, String> properties,
+                        @JsonProperty("config") Map<String, String> config,
+                        @JsonProperty("children") List<ResourceNode> children) {
         this.id = id;
         this.name = name;
         this.feedId = feedId;
-        this.properties = properties;
         this.type = type;
-        this.children = children;
         this.metrics = metrics;
+        this.properties = properties;
+        this.config = config;
+        this.children = children;
     }
 
     /**
@@ -96,8 +101,8 @@ public class ResourceNode implements Serializable {
         List<ResourceNode> children = r.getChildren(rLoader).stream()
                 .map(child -> fromResource(child, rtLoader, rLoader, loaded))
                 .collect(Collectors.toList());
-        return new ResourceNode(r.getId(), r.getName(), r.getFeedId(), r.getProperties(), r.getType(rtLoader),
-                children, r.getMetrics());
+        return new ResourceNode(r.getId(), r.getName(), r.getFeedId(), r.getType(rtLoader), r.getMetrics(),
+                r.getProperties(), r.getConfig(), children);
     }
 
     public String getId() {
@@ -114,6 +119,10 @@ public class ResourceNode implements Serializable {
 
     public Map<String, String> getProperties() {
         return properties;
+    }
+
+    public Map<String, String> getConfig() {
+        return config;
     }
 
     public ResourceType getType() {

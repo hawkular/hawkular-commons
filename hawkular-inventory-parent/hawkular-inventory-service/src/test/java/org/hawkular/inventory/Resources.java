@@ -45,17 +45,17 @@ public final class Resources {
             = new Metric("gc2", "GC", MetricUnit.NONE, new HashMap<>());
 
     public static final Resource EAP1 = new Resource("EAP-1", "EAP-1", "feed1", "EAP", null,
-            Arrays.asList(METRIC1, METRIC2), new HashMap<>());
+            Arrays.asList(METRIC1, METRIC2), new HashMap<>(), new HashMap<>());
     public static final Resource EAP2 = new Resource("EAP-2", "EAP-2", "feed2", "EAP", null,
-            Arrays.asList(METRIC3, METRIC4), new HashMap<>());
+            Arrays.asList(METRIC3, METRIC4), new HashMap<>(), new HashMap<>());
     public static final Resource CHILD1 = new Resource("child-1", "Child 1", "feedX", "FOO", "EAP-1",
-            new ArrayList<>(), new HashMap<>());
+            new ArrayList<>(), new HashMap<>(), new HashMap<>());
     public static final Resource CHILD2 = new Resource("child-2", "Child 2", "feedX", "BAR", "EAP-1",
-            new ArrayList<>(), new HashMap<>());
+            new ArrayList<>(), new HashMap<>(), new HashMap<>());
     public static final Resource CHILD3 = new Resource("child-3", "Child 3", "feedX", "FOO", "EAP-2",
-            new ArrayList<>(), new HashMap<>());
+            new ArrayList<>(), new HashMap<>(), new HashMap<>());
     public static final Resource CHILD4 = new Resource("child-4", "Child 4", "feedX", "BAR", "EAP-2",
-            new ArrayList<>(), new HashMap<>());
+            new ArrayList<>(), new HashMap<>(), new HashMap<>());
     public static final Map<String, Map<String, String>> RELOAD_PARAMETERS;
     static {
         RELOAD_PARAMETERS = new HashMap<>();
