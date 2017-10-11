@@ -48,4 +48,8 @@ public interface MsgLogger {
     @LogMessage(level = Level.INFO)
     @Message(id = 100004, value = "Inventory finished reindexing in [%s] ms")
     void infoStopInventoryReindex(long time);
+
+    @LogMessage(level = Level.ERROR)
+    @Message(id = 100005, value = "Error reindexing caches")
+    void errorReindexingCaches(@Cause Throwable e);
 }

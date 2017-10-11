@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -51,7 +52,7 @@ public class InventoryConfig {
 
     private static final MsgLogger log = InventoryLoggers.getLogger(InventoryConfig.class);
 
-    private static boolean ispnReindex;
+    private boolean ispnReindex;
 
     private Cache<String, Object> resource;
     private QueryFactory queryResource;
@@ -63,7 +64,7 @@ public class InventoryConfig {
 
     public InventoryConfig() {
         configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
-        ispnReindex = Boolean.getBoolean(System.getProperty(ISPN_REINDEX, ISPN_REINDEX_DEFAULT));
+        ispnReindex = Boolean.parseBoolean(System.getProperty(ISPN_REINDEX, ISPN_REINDEX_DEFAULT));
     }
 
     @PostConstruct
@@ -101,16 +102,18 @@ public class InventoryConfig {
                 log.infoStartInventoryReindex();
                 long startReindex = System.currentTimeMillis();
                 SearchManager searchResourceManager = Search.getSearchManager(resource);
-                searchResourceManager.getMassIndexer().start();
+                CompletableFuture<Void> reindexResource = searchResourceManager.getMassIndexer().startAsync();
                 SearchManager searchResourceTypeManager = Search.getSearchManager(resourceType);
-                searchResourceTypeManager.getMassIndexer().start();
+                CompletableFuture<Void> reindexResourceType = searchResourceTypeManager.getMassIndexer().startAsync();
+                CompletableFuture.allOf(reindexResource, reindexResourceType).get();
                 long stopReindex = System.currentTimeMillis();
                 log.infoStopInventoryReindex((stopReindex - startReindex));
             }
-
             log.infoInventoryAppStarted();
         } catch (IOException e) {
             log.errorInventoryCacheConfigurationNotFound(e);
+        } catch (Exception e) {
+            log.errorReindexingCaches(e);
         }
     }
 
