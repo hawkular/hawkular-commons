@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * High-level model for full {@link Resource} with subtree, associated with their {@link ResourceType}
+ * High-level model for full {@link RawResource} with subtree, associated with their {@link ResourceType}
  * @author Joel Takvorian
  */
 public class ResourceNode implements Serializable {
@@ -77,32 +78,32 @@ public class ResourceNode implements Serializable {
     }
 
     /**
-     * Converts {@link Resource} into {@link ResourceNode} using loaders for {@link ResourceType} and {@code children}.
+     * Converts {@link RawResource} into {@link ResourceNode} using loaders for {@link ResourceType} and {@code children}.
      * @param r the resource to convert
      * @param rtLoader loader for {@link ResourceType}
-     * @param rLoader loader for {@link Resource} children
+     * @param rLoader loader for {@link RawResource} children
      * @return the node with its subtree
      */
-    public static ResourceNode fromResource(Resource r,
-                                     Function<String, ResourceType> rtLoader,
-                                     Function<String, List<Resource>> rLoader) {
-        return fromResource(r, rtLoader, rLoader, new HashSet<>());
+    public static ResourceNode fromRaw(RawResource r,
+                                     Function<String, Optional<ResourceType>> rtLoader,
+                                     Function<String, List<RawResource>> rLoader) {
+        return fromRaw(r, rtLoader, rLoader, new HashSet<>());
     }
 
-    private static ResourceNode fromResource(Resource r,
-                                             Function<String, ResourceType> rtLoader,
-                                             Function<String, List<Resource>> rLoader,
+    private static ResourceNode fromRaw(RawResource r,
+                                             Function<String, Optional<ResourceType>> rtLoader,
+                                             Function<String, List<RawResource>> rLoader,
                                              Set<String> loaded) {
         if (loaded.contains(r.getId())) {
             throw new IllegalStateException("Cycle detected in the tree with id " + r.getId()
                     + "; aborting operation. The inventory is invalid.");
         }
         loaded.add(r.getId());
-        List<ResourceNode> children = r.getChildren(rLoader).stream()
-                .map(child -> fromResource(child, rtLoader, rLoader, loaded))
+        List<ResourceNode> children = rLoader.apply(r.getId()).stream()
+                .map(child -> fromRaw(child, rtLoader, rLoader, loaded))
                 .collect(Collectors.toList());
-        return new ResourceNode(r.getId(), r.getName(), r.getFeedId(), r.getType(rtLoader), r.getMetrics(),
-                r.getProperties(), r.getConfig(), children);
+        return new ResourceNode(r.getId(), r.getName(), r.getFeedId(), rtLoader.apply(r.getTypeId()).orElse(null),
+                r.getMetrics(), r.getProperties(), r.getConfig(), children);
     }
 
     public String getId() {

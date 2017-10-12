@@ -17,9 +17,14 @@
 package org.hawkular.inventory.service.ispn;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
-import org.hawkular.inventory.api.model.Metric;
+import org.hawkular.inventory.api.model.RawResource;
 import org.hawkular.inventory.api.model.Resource;
+import org.hawkular.inventory.api.model.ResourceNode;
+import org.hawkular.inventory.api.model.ResourceType;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -41,16 +46,16 @@ public class IspnResource implements Serializable {
     @Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
     private final String parentId;
 
-    private final Resource resource;
+    private final RawResource rawResource;
 
-    public IspnResource(Resource resource) {
+    public IspnResource(RawResource resource) {
         if (resource == null) {
             throw new IllegalStateException("Resource must be not null");
         }
         this.feedId = resource.getFeedId();
         this.typeId = resource.getTypeId();
         this.parentId = resource.getParentId();
-        this.resource = cloneResource(resource);
+        this.rawResource = resource;
     }
 
     public String getFeedId() {
@@ -65,33 +70,16 @@ public class IspnResource implements Serializable {
         return parentId;
     }
 
-    public Resource getResource() {
-        if (resource == null) {
-            return null;
-        }
-        return cloneResource(resource);
+    public RawResource getRawResource() {
+        return rawResource;
     }
 
-    private Resource cloneResource(Resource resource) {
-        if (resource == null) {
-            return null;
-        }
-        Resource.Builder builder = Resource.builder()
-                .id(resource.getId())
-                .name(resource.getName())
-                .feedId(resource.getFeedId())
-                .typeId(resource.getTypeId())
-                .parentId(resource.getParentId());
-        if (resource.getMetrics() != null) {
-            for (Metric metric : resource.getMetrics()) {
-                // TODO [lponce] clone metric ?
-                builder.metric(metric);
-            }
-        }
-        if (resource.getProperties() != null) {
-            // TODO [lponce] clone properties ?
-            builder.properties(resource.getProperties());
-        }
-        return builder.build();
+    public Resource toResource(Function<String, Optional<ResourceType>> rtLoader) {
+        return Resource.fromRaw(rawResource, rtLoader);
+    }
+
+    public ResourceNode toResourceNode(Function<String, Optional<ResourceType>> rtLoader,
+                                       Function<String, List<RawResource>> rLoader) {
+        return ResourceNode.fromRaw(rawResource, rtLoader, rLoader);
     }
 }

@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ import org.junit.Test;
 /**
  * @author Joel Takvorian
  */
-public class ResourceTest {
+public class ResourceNodeTest {
 
     private static final ResourceType EAP = new ResourceType("EAP", new ArrayList<>(), new HashMap<>());
     private static final Metric METRIC1
@@ -39,10 +40,23 @@ public class ResourceTest {
     private static final RawResource RAW = new RawResource("id", "name", "feedX", "EAP",
             null, Arrays.asList(METRIC1, METRIC2), new HashMap<>(), new HashMap<>());
 
+    private static final RawResource CH1 = new RawResource("child-1", "name-1", "feedX", "t", "id",
+            new ArrayList<>(), new HashMap<>(), new HashMap<>());
+    private static final RawResource CH2 = new RawResource("child-2", "name-2", "feedX", "t", "id",
+            new ArrayList<>(), new HashMap<>(), new HashMap<>());
+
     @Test
     public void shouldCreateFromRaw() {
-        Resource r = Resource.fromRaw(RAW, id -> Optional.of(EAP));
+        ResourceNode r = ResourceNode.fromRaw(RAW, id -> Optional.of(EAP), id -> {
+            if (id.equals("id")) {
+                return Arrays.asList(CH1, CH2);
+            }
+            return Collections.emptyList();
+        });
         assertThat(r.getType().getId()).isEqualTo("EAP");
         assertThat(r.getMetrics()).extracting(Metric::getName).containsExactly("memory", "gc");
+        assertThat(r.getChildren())
+                .extracting(ResourceNode::getName)
+                .containsExactly("name-1", "name-2");
     }
 }

@@ -17,91 +17,22 @@
 package org.hawkular.inventory.api.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
+ * High-level model for {@link RawResource} associated with {@link ResourceType}
+ * Unlike {@link ResourceNode}, this class doesn't provide full children subtree,
+ * but just a list of children ids instead.
  * @author Joel Takvorian
  */
 public class Resource implements Serializable {
-
-    public static class Builder {
-        private String id;
-        private String name;
-        private String feedId;
-        private String typeId;
-        private String parentId;
-        private List<Metric> metrics = new ArrayList<>();
-        private Map<String, String> properties = new HashMap<>();
-        private Map<String, String> config = new HashMap<>();
-
-        public Resource build() {
-            return new Resource(id, name, feedId, typeId, parentId, metrics, properties, config);
-        }
-
-        public Builder id(String id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder name(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public Builder feedId(String feedId) {
-            this.feedId = feedId;
-            return this;
-        }
-
-        public Builder typeId(String typeId) {
-            this.typeId = typeId;
-            return this;
-        }
-
-        public Builder parentId(String parentId) {
-            this.parentId = parentId;
-            return this;
-        }
-
-        public Builder metric(Metric metric) {
-            this.metrics.add(metric);
-            return this;
-        }
-
-        public Builder property(String name, String value) {
-            this.properties.put(name, value);
-            return this;
-        }
-
-        public Builder properties(Map<String, String> props) {
-            this.properties.putAll(props);
-            return this;
-        }
-
-        public Builder config(String name, String value) {
-            this.config.put(name, value);
-            return this;
-        }
-
-        public Builder config(Map<String, String> cfg) {
-            this.config.putAll(cfg);
-            return this;
-        }
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
 
     @JsonInclude(Include.NON_NULL)
     private final String id;
@@ -113,10 +44,7 @@ public class Resource implements Serializable {
     private final String feedId;
 
     @JsonInclude(Include.NON_NULL)
-    private final String typeId;
-
-    @JsonInclude(Include.NON_NULL)
-    private final String parentId;
+    private final ResourceType type;
 
     @JsonInclude(Include.NON_NULL)
     private final List<Metric> metrics;
@@ -127,28 +55,32 @@ public class Resource implements Serializable {
     @JsonInclude(Include.NON_NULL)
     private final Map<String, String> config;
 
-    // Lazy-loaded references
-    @JsonIgnore
-    private ResourceType type;
-    @JsonIgnore
-    private List<Resource> children;
-
     public Resource(@JsonProperty("id") String id,
                     @JsonProperty("name") String name,
                     @JsonProperty("feedId") String feedId,
-                    @JsonProperty("typeId") String typeId,
-                    @JsonProperty("parentId") String parentId,
+                    @JsonProperty("type") ResourceType type,
                     @JsonProperty("metrics") List<Metric> metrics,
                     @JsonProperty("properties") Map<String, String> properties,
                     @JsonProperty("config") Map<String, String> config) {
         this.id = id;
         this.name = name;
         this.feedId = feedId;
-        this.typeId = typeId;
-        this.parentId = parentId;
+        this.type = type;
         this.metrics = metrics;
         this.properties = properties;
         this.config = config;
+    }
+
+    /**
+     * Converts {@link RawResource} into {@link Resource} using loader for {@link ResourceType}.
+     * The children are not loaded.
+     * @param r the resource to convert
+     * @param rtLoader loader for {@link ResourceType}
+     * @return the node without its subtree
+     */
+    public static Resource fromRaw(RawResource r, Function<String, Optional<ResourceType>> rtLoader) {
+        return new Resource(r.getId(), r.getName(), r.getFeedId(), rtLoader.apply(r.getTypeId()).orElse(null),
+                r.getMetrics(), r.getProperties(), r.getConfig());
     }
 
     public String getId() {
@@ -163,70 +95,19 @@ public class Resource implements Serializable {
         return feedId;
     }
 
-    public String getTypeId() {
-        return typeId;
+    public Map<String, String> getProperties() {
+        return properties;
     }
 
-    public String getParentId() {
-        return parentId;
+    public Map<String, String> getConfig() {
+        return config;
+    }
+
+    public ResourceType getType() {
+        return type;
     }
 
     public List<Metric> getMetrics() {
         return metrics;
-    }
-
-    public Map<String, String> getProperties() {
-        return Collections.unmodifiableMap(properties);
-    }
-
-    public Map<String, String> getConfig() {
-        return Collections.unmodifiableMap(config);
-    }
-
-    public ResourceType getType(Function<String, ResourceType> loader) {
-        // lazy loading
-        if (type == null) {
-            type = loader.apply(typeId);
-        }
-        return type;
-    }
-
-    public List<Resource> getChildren(Function<String, List<Resource>> loader) {
-        // lazy loading
-        if (children == null) {
-            children = loader.apply(id);
-        }
-        return Collections.unmodifiableList(children);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Resource resource = (Resource) o;
-
-        return id != null ? id.equals(resource.id) : resource.id == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
-    }
-
-    @Override
-    public String toString() {
-        return "Resource{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", feedId='" + feedId + '\'' +
-                ", typeId='" + typeId + '\'' +
-                ", parentId='" + parentId + '\'' +
-                ", properties=" + properties +
-                ", config=" + config +
-                ", type=" + type +
-                ", children=" + children +
-                ", metrics=" + metrics +
-                '}';
     }
 }

@@ -18,7 +18,6 @@ package org.hawkular.inventory.service.ispn;
 
 import java.io.Serializable;
 
-import org.hawkular.inventory.api.model.Operation;
 import org.hawkular.inventory.api.model.ResourceType;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
@@ -33,7 +32,7 @@ import org.hibernate.search.annotations.Store;
 public class IspnResourceType implements Serializable {
 
     @Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
-    private final String id;  // Unique index [Search resource type by id]
+    private final String id;
 
     private final ResourceType resourceType;
 
@@ -42,7 +41,7 @@ public class IspnResourceType implements Serializable {
             throw new IllegalStateException("ResourceType must be not null");
         }
         this.id = resourceType.getId();
-        this.resourceType = cloneResourceType(resourceType);
+        this.resourceType = resourceType;
     }
 
     public String getId() {
@@ -50,24 +49,6 @@ public class IspnResourceType implements Serializable {
     }
 
     public ResourceType getResourceType() {
-        if (resourceType == null) {
-            return null;
-        }
-        return cloneResourceType(resourceType);
-    }
-
-    private ResourceType cloneResourceType(ResourceType resourceType) {
-        if (resourceType == null) {
-            return null;
-        }
-        ResourceType.Builder builder = ResourceType.builder()
-                .id(resourceType.getId())
-                .properties(resourceType.getProperties());
-        if (resourceType.getOperations() != null) {
-            for (Operation operation : resourceType.getOperations()) {
-                builder.operation(operation);
-            }
-        }
-        return builder.build();
+        return resourceType;
     }
 }

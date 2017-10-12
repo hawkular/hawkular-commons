@@ -30,22 +30,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Inventory implements Serializable {
 
     @JsonInclude(Include.NON_NULL)
-    private List<Resource> resources;
+    private List<RawResource> resources;
 
     @JsonInclude(Include.NON_NULL)
     private List<ResourceType> types;
 
-    public Inventory(@JsonProperty("resources") List<Resource> resources,
+    public Inventory(@JsonProperty("resources") List<RawResource> resources,
                      @JsonProperty("types") List<ResourceType> types) {
         this.resources = resources;
         this.types = types;
     }
 
-    public List<Resource> getResources() {
+    public List<RawResource> getResources() {
         return resources;
     }
 
-    public void setResources(List<Resource> resources) {
+    public void setResources(List<RawResource> resources) {
         this.resources = resources;
     }
 

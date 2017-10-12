@@ -52,7 +52,7 @@ public class JacksonDeserializer {
                     if (resourceNode) {
                         results.add(objectCodec.treeToValue(element, ResourceNode.class));
                     } else if (resourceWithType) {
-                        results.add(objectCodec.treeToValue(element, ResourceWithType.class));
+                        results.add(objectCodec.treeToValue(element, Resource.class));
                     } else {
                         results.add(objectCodec.treeToValue(element, ResourceType.class));
                     }
