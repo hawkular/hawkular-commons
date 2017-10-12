@@ -1,0 +1,74 @@
+
+<div class="container-fluid container-cards-pf" ng-app="hwk.resourcesModule" ng-controller="hwk.resourcesController" id="theController">
+
+  <!-- TOAST NOTIFICATIONS -->
+
+  <pf-notification-list></pf-notification-list>
+
+  <!-- Toolbar Filters and Kebab -->
+  <div class="row toolbar-pf">
+    <div class="col-md-12">
+      <form class="toolbar-pf-actions">
+        <div class="form-group">
+          <div class="dropdown btn-group  dropdown-kebab-pf">
+            <button class="btn btn-link dropdown-toggle" type="button" id="resourcesKebab" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+              <span class="fa fa-ellipsis-v"></span>
+            </button>
+            <ul class="dropdown-menu " aria-labelledby="resourceDefinitionsKebab">
+              <li ng-click="refreshTree()"><a>Refresh</a></li>
+            </ul>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="resourceTree"></div>
+
+</div><!-- /container -->
+
+<!--
+<script type="text/javascript">
+  function getTree() {
+    var $element = $('div[ng-controller="hwk.resourcesController"]');
+    var scope = angular.element($element).scope();
+    return scope.tree;
+  };
+
+  $(document).ready(function(){
+    $('#resourceTree').treeview({
+      collapseIcon: "fa fa-angle-down",
+      data: getTree(),
+      expandIcon: "fa fa-angle-right",
+      icon: "fa fa-folder",
+      nodeIcon: "fa fa-folder",
+      showBorder: false
+    });
+  });
+</script>
+ -->
+
+<script type="text/ng-template" id="jsonModal.html">
+  <div class="modal-content modal-lg">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" ng-click="cancel()" aria-hidden="true">
+        <span class="pficon pficon-close"></span>
+      </button>
+      <h4 class="modal-title">{{ jsonModal.title }}</h4>
+    </div>
+    <div class="modal-body">
+      <form class="form-horizontal">
+        <div class="form-group">
+          <div class="col-md-12">
+            <textarea class="form-control textarea-resize" ng-model="jsonModal.json" ng-readonly="{{ jsonModal.readOnly }}" rows="20" placeholder="{{ jsonModal.placeholder }}" />
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="cancel()">Cancel</button>
+      <button type="button" class="btn btn-primary" data-dismiss="modal" ng-show="{{ !jsonModal.readOnly }}" ng-disabled="!isValid()" ng-click="save()">Save</button>
+    </div>
+  </div>
+</script>
+

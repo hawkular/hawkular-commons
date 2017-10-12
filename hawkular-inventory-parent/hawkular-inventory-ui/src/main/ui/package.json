@@ -1,0 +1,42 @@
+{
+  "name": "hawkular-inventory-ui",
+  "version": "1.0.0",
+  "description": "Hawkular Inventory UI",
+  "main": "Gruntfile.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hawkular/hawkular-commons"
+  },
+  "author": "Hawkular Services Team",
+  "license": "Red Hat",
+  "devDependencies": {
+    "bower": "^1.8.2",
+    "grunt": "^1.0.1",
+    "grunt-angular-file-loader": "^1.3.1",
+    "grunt-angular-templates": "^1.1.0",
+    "grunt-cli": "^1.2.0",
+    "grunt-connect-proxy": "^0.2.0",
+    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-compass": "^1.1.1",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-connect": "^1.0.2",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-cssmin": "^2.2.1",
+    "grunt-contrib-htmlmin": "^2.4.0",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-contrib-less": "^1.4.1",
+    "grunt-contrib-uglify": "^3.1.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-eslint": "^20.1.0",
+    "grunt-exec": "^3.0.0",
+    "grunt-htmlhint": "^0.9.13",
+    "grunt-newer": "^1.3.0",
+    "grunt-ngmin": "0.0.3",
+    "grunt-rev": "^0.1.0",
+    "grunt-text-replace": "^0.4.0",
+    "grunt-usemin": "^3.1.1",
+    "load-grunt-tasks": "^3.5.2",
+    "protractor": "^5.1.2",
+    "request": "^2.83.0"
+  }
+}

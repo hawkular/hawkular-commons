@@ -1,0 +1,174 @@
+
+<div class="container-fluid container-cards-pf" ng-controller="hwk.typesController">
+
+  <!-- TOAST NOTIFICATIONS -->
+
+  <pf-notification-list></pf-notification-list>
+
+  <!-- Toolbar -->
+  <div class="row toolbar-pf" id="toolbar">
+    <div class="col-md-12">
+      <form class="toolbar-pf-actions" ng-submit="updateFilter()">
+        <div class="form-group">
+          <div class="dropdown btn-group  dropdown-kebab-pf">
+            <button class="btn btn-link dropdown-toggle" type="button" id="triggersKebab" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+              <span class="fa fa-ellipsis-v"></span>
+            </button>
+            <ul class="dropdown-menu " aria-labelledby="triggersKebab">
+              <li ng-click="refreshTypes()"><a>Refresh</a></li>
+            </ul>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="row row-cards-pf">
+
+    <!-- List of rows -->
+
+    <div class="list-group list-view-pf list-view-pf-view">
+
+      <!-- Full Row details-->
+
+      <div class="list-group-item" ng-repeat="typeItem in typesList" repeat-done>
+
+        <!-- Action column found on the right of each row -->
+
+<!-- No checkbox needed if we don't have any global actions.
+        <div class="list-view-pf-checkbox">
+          <input type="checkbox" />
+        </div>
+-->
+        <div class="list-view-pf-actions">
+          <div class="dropdown pull-right dropdown-kebab-pf">
+            <button class="btn btn-link dropdown-toggle" type="button" id="dropdownKebabRight1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+              <span class="fa fa-ellipsis-v"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownKebabRight1">
+              <li ng-click="viewType(typeItem)"><a>View</a></li>
+              <li role="separator" class="divider"></li>
+              <li ng-confirm-click="Confirm Resource Type Deletion?" confirmed-click="deleteType(typeItem.id)"><a>Delete</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Main Row -->
+
+        <div class="list-view-pf-main-info">
+
+          <div class="list-view-pf-left">
+            <span class="fa fa-cube"></span>
+          </div>
+
+          <div class="list-view-pf-body">
+
+            <div class="list-view-pf-description">
+              <!-- Type Id/Name -->
+              <div class="list-group-item-heading">{{ typeItem.id }}</div>
+            </div>
+
+            <!-- Expandable sections -->
+
+            <div class="list-view-pf-additional-info">
+
+              <!-- Operations -->
+              <div class="list-view-pf-additional-info-item">
+                <div class="list-view-pf-expand">
+                  <span class="fa fa-angle-right"></span> <span class="pficon pficon-plugged"></span> <strong>{{ typeItem.properties ? typeItem.operations.length : 0 }}</strong> Operations
+                </div>
+              </div>
+
+              <!-- Configuration -->
+              <div class="list-view-pf-additional-info-item">
+                <div class="list-view-pf-expand">
+                  <span class="fa fa-angle-right"></span> <span class="pficon pficon-settings"></span> <strong>{{ typeItem.properties ? typeItem.properties.length : 0 }}</strong> Configuration
+                </div>
+              </div>
+
+              <!-- Properties -->
+              <div class="list-view-pf-additional-info-item">
+                <div class="list-view-pf-expand">
+                  <span class="fa fa-angle-right"></span> <span class="pficon pficon-info"></span> <strong>{{ typeItem.properties ? typeItem.properties.length : 0 }}</strong> Properties
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- The expanded sections -->
+
+        <!-- Operations -->
+        <div class="list-group-item-container container-fluid hidden">
+          <div class="close">
+            <span class="pficon pficon-close"></span>
+          </div>
+          <div class="row" ng-repeat="op in typeItem.operations">
+            <div class="col-md-12">
+              <p>
+                <b>Name:</b> {{ op.name }} <br />
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Configuration -->
+        <div class="list-group-item-container container-fluid hidden">
+          <div class="close">
+            <span class="pficon pficon-close"></span>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <dl class="dl-horizontal">
+                <dt ng-repeat-start="prop in typeItem.properties">{{ prop.key }}:</dt>
+                <dd ng-repeat-end>{{ prop.value }}</dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+
+        <!-- Properties -->
+        <div class="list-group-item-container container-fluid hidden">
+          <div class="close">
+            <span class="pficon pficon-close"></span>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <dl class="dl-horizontal">
+                <dt ng-repeat-start="prop in typeItem.properties">{{ prop.key }}:</dt>
+                <dd ng-repeat-end>{{ prop.value }}</dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /container -->
+
+<script type="text/ng-template" id="jsonModal.html">
+  <div class="modal-content modal-lg">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" ng-click="cancel()" aria-hidden="true">
+        <span class="pficon pficon-close"></span>
+      </button>
+      <h4 class="modal-title">{{ jsonModal.title }}</h4>
+    </div>
+    <div class="modal-body">
+      <form class="form-horizontal">
+        <div class="form-group">
+          <div class="col-md-12">
+            <textarea class="form-control textarea-resize" ng-model="jsonModal.json" ng-readonly="{{ jsonModal.readOnly }}" rows="20" placeholder="{{ jsonModal.placeholder }}" />
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="cancel()">Cancel</button>
+      <button type="button" class="btn btn-primary" data-dismiss="modal" ng-show="{{ !jsonModal.readOnly }}" ng-disabled="!isValid()" ng-click="save()">Save</button>
+    </div>
+  </div>
+</script>
