@@ -73,6 +73,7 @@
   <modules>
     <module>hawkular-inventory-api</module>
     <module>hawkular-inventory-service</module>
+    <module>hawkular-inventory-ui</module>
   </modules>
 
 </project>
