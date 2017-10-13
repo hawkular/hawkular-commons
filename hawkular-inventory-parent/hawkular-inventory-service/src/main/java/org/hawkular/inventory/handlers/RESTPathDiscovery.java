@@ -30,17 +30,17 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * Discovering REST resources path based on resteasy {@link ResourceMethodRegistry}
  * @author Joel Takvorian
  */
-public final class ResourcesDiscovery {
+public final class RESTPathDiscovery {
 
-    private ResourcesDiscovery() {
+    private RESTPathDiscovery() {
     }
 
-    public static List<Resource> discover(ResourceMethodRegistry registry) {
+    public static List<Path> discover(ResourceMethodRegistry registry) {
         return registry.getBounded().entrySet().stream()
                 .sorted(Comparator.comparing(Map.Entry::getKey))
                 .map(entry -> {
                     String path = entry.getKey();
-                    List<ResourceMethod> methods = entry.getValue().stream()
+                    List<PathMethod> methods = entry.getValue().stream()
                             .filter(resourceInvoker -> resourceInvoker instanceof ResourceMethodInvoker)
                             .map(resourceInvoker -> {
                                 ResourceMethodInvoker rmi = (ResourceMethodInvoker) resourceInvoker;
@@ -52,18 +52,18 @@ public final class ResourcesDiscovery {
                                 if (rmi.getConsumes() != null && rmi.getConsumes().length > 0) {
                                     consuming = rmi.getConsumes()[0].toString();
                                 }
-                                return new ResourceMethod(rmi.getHttpMethods().iterator().next(), producing, consuming);
+                                return new PathMethod(rmi.getHttpMethods().iterator().next(), producing, consuming);
                             }).collect(Collectors.toList());
-                    return new Resource(path, methods);
+                    return new Path(path, methods);
                 }).collect(Collectors.toList());
     }
 
-    public static class Resource {
+    public static class Path {
         private final String path;
-        private final List<ResourceMethod> methods;
+        private final List<PathMethod> methods;
 
-        private Resource(String path,
-                         List<ResourceMethod> methods) {
+        private Path(String path,
+                         List<PathMethod> methods) {
             this.path = path;
             this.methods = methods;
         }
@@ -72,18 +72,19 @@ public final class ResourcesDiscovery {
             return path;
         }
 
-        public List<ResourceMethod> getMethods() {
+        public List<PathMethod> getMethods() {
             return methods;
         }
     }
-    public static class ResourceMethod {
+
+    public static class PathMethod {
         private final String verb;
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private final String producing;
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private final String consuming;
 
-        private ResourceMethod(String verb, String producing, String consuming) {
+        private PathMethod(String verb, String producing, String consuming) {
             this.verb = verb;
             this.producing = producing;
             this.consuming = consuming;
