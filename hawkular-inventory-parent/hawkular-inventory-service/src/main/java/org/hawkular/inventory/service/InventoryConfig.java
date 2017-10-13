@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -32,6 +33,7 @@ import org.infinispan.Cache;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.query.Search;
+import org.infinispan.query.SearchManager;
 import org.infinispan.query.dsl.QueryFactory;
 
 /**
@@ -42,11 +44,15 @@ import org.infinispan.query.dsl.QueryFactory;
 @Singleton
 public class InventoryConfig {
 
+    private static final String ISPN_REINDEX = "hawkular-inventory.reindex";
+    private static final String ISPN_REINDEX_DEFAULT = "true";
     public static final String CACHE_CONFIGURATION = "hawkular-inventory-ispn.xml";
     public static final String RESOURCE_CACHE_NAME = "resource";
     public static final String RESOURCE_TYPE_CACHE_NAME = "resource_type";
 
     private static final MsgLogger log = InventoryLoggers.getLogger(InventoryConfig.class);
+
+    private boolean ispnReindex;
 
     private Cache<String, Object> resource;
     private QueryFactory queryResource;
@@ -58,6 +64,7 @@ public class InventoryConfig {
 
     public InventoryConfig() {
         configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
+        ispnReindex = Boolean.parseBoolean(System.getProperty(ISPN_REINDEX, ISPN_REINDEX_DEFAULT));
     }
 
     @PostConstruct
@@ -91,9 +98,22 @@ public class InventoryConfig {
                 log.errorInventoryCacheNotFound();
                 throw new IllegalStateException("Inventory query factory for resource_type cache is not found");
             }
+            if (ispnReindex) {
+                log.infoStartInventoryReindex();
+                long startReindex = System.currentTimeMillis();
+                SearchManager searchResourceManager = Search.getSearchManager(resource);
+                CompletableFuture<Void> reindexResource = searchResourceManager.getMassIndexer().startAsync();
+                SearchManager searchResourceTypeManager = Search.getSearchManager(resourceType);
+                CompletableFuture<Void> reindexResourceType = searchResourceTypeManager.getMassIndexer().startAsync();
+                CompletableFuture.allOf(reindexResource, reindexResourceType).get();
+                long stopReindex = System.currentTimeMillis();
+                log.infoStopInventoryReindex((stopReindex - startReindex));
+            }
             log.infoInventoryAppStarted();
         } catch (IOException e) {
             log.errorInventoryCacheConfigurationNotFound(e);
+        } catch (Exception e) {
+            log.errorReindexingCaches(e);
         }
     }
 
