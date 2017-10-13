@@ -17,9 +17,11 @@
 package org.hawkular.inventory.handlers;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.TEXT_HTML;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +57,9 @@ import org.hawkular.inventory.api.model.ResultSet;
 import org.hawkular.inventory.handlers.ResponseUtil.ApiError;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
+import org.jboss.resteasy.core.Dispatcher;
+import org.jboss.resteasy.core.ResourceMethodInvoker;
+import org.jboss.resteasy.core.ResourceMethodRegistry;
 
 /**
  * @author Jay Shaughnessy
@@ -83,6 +88,45 @@ public class InventoryHandlers {
             @DocResponse(code = 200, message = "Success, inventory exported.", response = Inventory.class),
             @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
     })
+    @GET
+    @Path("/")
+    @Produces(APPLICATION_JSON)
+    public Response root(@Context ServletContext servletContext) {
+        return status(servletContext);
+    }
+
+    @GET
+    @Path("/")
+    @Produces(TEXT_HTML)
+    public Response rootHtml(@Context Dispatcher dispatcher) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<h1>Hawkular Inventory - REST API overview</h1>")
+                // TODO: doc url
+                .append("This is a generated list of available endpoints. Click here for detailed documentation.");
+        ResourceMethodRegistry registry = (ResourceMethodRegistry) dispatcher.getRegistry();
+        registry.getBounded().entrySet().stream()
+                .sorted(Comparator.comparing(Map.Entry::getKey))
+                .forEach(entry -> {
+            sb.append("<h2>").append(entry.getKey()).append("</h2><ul>");
+            entry.getValue().forEach(resourceInvoker -> {
+                if (resourceInvoker instanceof ResourceMethodInvoker) {
+                    ResourceMethodInvoker rmi = (ResourceMethodInvoker) resourceInvoker;
+                    sb.append("<li>")
+                            .append(rmi.getHttpMethods()).append(" ");
+                    if (rmi.getConsumes() != null && rmi.getConsumes().length > 0) {
+                        sb.append("consumes <i>").append(rmi.getConsumes()[0]).append("</i> ");
+                    }
+                    if (rmi.getProduces() != null && rmi.getProduces().length > 0) {
+                        sb.append("produces <i>").append(rmi.getProduces()[0]).append("</i> ");
+                    }
+                    sb.append("</li>");
+                }
+            });
+            sb.append("</ul>");
+        });
+        return Response.ok(sb.toString()).build();
+    }
+
     @GET
     @Path("/export")
     @Produces(APPLICATION_JSON)
