@@ -21,7 +21,6 @@ import static javax.ws.rs.core.MediaType.TEXT_HTML;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,8 +57,9 @@ import org.hawkular.inventory.handlers.ResponseUtil.ApiError;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
 import org.jboss.resteasy.core.Dispatcher;
-import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ResourceMethodRegistry;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Jay Shaughnessy
@@ -70,8 +70,9 @@ import org.jboss.resteasy.core.ResourceMethodRegistry;
 public class InventoryHandlers {
 
     private static final MsgLogger log = InventoryLoggers.getLogger(InventoryHandlers.class);
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    ManifestUtil manifestUtil = new ManifestUtil();
+    private ManifestUtil manifestUtil = new ManifestUtil();
 
     @EJB
     private InventoryService inventoryService;
@@ -91,36 +92,36 @@ public class InventoryHandlers {
     @GET
     @Path("/")
     @Produces(APPLICATION_JSON)
-    public Response root(@Context ServletContext servletContext) {
-        return status(servletContext);
+    public Response listResources(@Context Dispatcher dispatcher) {
+        try {
+            List<ResourcesDiscovery.Resource> discovered = ResourcesDiscovery.discover((ResourceMethodRegistry) dispatcher.getRegistry());
+            String json = OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(discovered);
+            return ResponseUtil.ok(json);
+        } catch (Exception e) {
+            return ResponseUtil.internalError(e);
+        }
     }
 
     @GET
     @Path("/")
     @Produces(TEXT_HTML)
-    public Response rootHtml(@Context Dispatcher dispatcher) {
+    public Response listResourcesAsHtml(@Context Dispatcher dispatcher) {
+        List<ResourcesDiscovery.Resource> discovered = ResourcesDiscovery.discover((ResourceMethodRegistry) dispatcher.getRegistry());
         StringBuilder sb = new StringBuilder();
         sb.append("<h1>Hawkular Inventory - REST API overview</h1>")
                 // TODO: doc url
                 .append("This is a generated list of available endpoints. Click here for detailed documentation.");
-        ResourceMethodRegistry registry = (ResourceMethodRegistry) dispatcher.getRegistry();
-        registry.getBounded().entrySet().stream()
-                .sorted(Comparator.comparing(Map.Entry::getKey))
-                .forEach(entry -> {
-            sb.append("<h2>").append(entry.getKey()).append("</h2><ul>");
-            entry.getValue().forEach(resourceInvoker -> {
-                if (resourceInvoker instanceof ResourceMethodInvoker) {
-                    ResourceMethodInvoker rmi = (ResourceMethodInvoker) resourceInvoker;
-                    sb.append("<li>")
-                            .append(rmi.getHttpMethods()).append(" ");
-                    if (rmi.getConsumes() != null && rmi.getConsumes().length > 0) {
-                        sb.append("consumes <i>").append(rmi.getConsumes()[0]).append("</i> ");
-                    }
-                    if (rmi.getProduces() != null && rmi.getProduces().length > 0) {
-                        sb.append("produces <i>").append(rmi.getProduces()[0]).append("</i> ");
-                    }
-                    sb.append("</li>");
+        discovered.forEach(r -> {
+            sb.append("<h2>").append(r.getPath()).append("</h2><ul>");
+            r.getMethods().forEach(rm -> {
+                sb.append("<li>").append(rm.getVerb()).append(" ");
+                if (rm.getConsuming() != null) {
+                    sb.append("consumes <i>").append(rm.getConsuming()).append("</i> ");
                 }
+                if (rm.getProducing() != null) {
+                    sb.append("produces <i>").append(rm.getProducing()).append("</i> ");
+                }
+                sb.append("</li>");
             });
             sb.append("</ul>");
         });
