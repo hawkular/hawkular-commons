@@ -92,9 +92,9 @@ public class InventoryHandlers {
     @GET
     @Path("/")
     @Produces(APPLICATION_JSON)
-    public Response listResources(@Context Dispatcher dispatcher) {
+    public Response listRestPaths(@Context Dispatcher dispatcher) {
         try {
-            List<ResourcesDiscovery.Resource> discovered = ResourcesDiscovery.discover((ResourceMethodRegistry) dispatcher.getRegistry());
+            List<RESTPathDiscovery.Path> discovered = RESTPathDiscovery.discover((ResourceMethodRegistry) dispatcher.getRegistry());
             String json = OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(discovered);
             return ResponseUtil.ok(json);
         } catch (Exception e) {
@@ -105,8 +105,8 @@ public class InventoryHandlers {
     @GET
     @Path("/")
     @Produces(TEXT_HTML)
-    public Response listResourcesAsHtml(@Context Dispatcher dispatcher) {
-        List<ResourcesDiscovery.Resource> discovered = ResourcesDiscovery.discover((ResourceMethodRegistry) dispatcher.getRegistry());
+    public Response listRestPathsAsHtml(@Context Dispatcher dispatcher) {
+        List<RESTPathDiscovery.Path> discovered = RESTPathDiscovery.discover((ResourceMethodRegistry) dispatcher.getRegistry());
         StringBuilder sb = new StringBuilder();
         sb.append("<h1>Hawkular Inventory - REST API overview</h1>")
                 // TODO: doc url
