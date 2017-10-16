@@ -55,3 +55,8 @@ after_success:
   then
     ./mvnw -s .travis.maven.settings.xml deploy -DskipTests ;
   fi
+- if [[ "$PROJECT_VERSION" =~ .*SNAPSHOT ]] && [[ "${TRAVIS_BRANCH}" == "master" ]] && [[ "${TRAVIS_PULL_REQUEST}" == "false" ]];
+  then
+    ./mvnw -s .travis.maven.settings.xml deploy -DskipTests ;
+    ./.travis.swagger.sh ;
+  fi;

@@ -317,4 +317,54 @@
     -->
   </properties>
 
+  <profiles>
+
+    <profile>
+      <id>docgen</id>
+      <properties>
+        <restDocDirectory>${project.basedir}/src/main/rest-doc</restDocDirectory>
+        <generatedDocDirectory>${project.build.directory}/generated</generatedDocDirectory>
+        <classesDirectory>${project.build.directory}/classes</classesDirectory>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.gmavenplus</groupId>
+            <artifactId>gmavenplus-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>${version.org.codehaus.groovy}</version>
+              </dependency>
+            </dependencies>
+            <configuration>
+              <properties>
+                <inventoryVersion>${project.version}</inventoryVersion>
+                <classesDir>${classesDirectory}</classesDir>
+                <baseFile>${restDocDirectory}/base.adoc</baseFile>
+                <generatedFile>${generatedDocDirectory}/generated-doc.json</generatedFile>
+                <outputFile>${project.build.directory}/generated/rest-inventory-v4.adoc</outputFile>
+              </properties>
+              <scripts>
+                <script>file:///${restDocDirectory}/generate-api.groovy</script>
+                <script>file:///${restDocDirectory}/api-to-doc.groovy</script>
+              </scripts>
+            </configuration>
+            <executions>
+              <execution>
+                <id>generate-api-doc</id>
+                <phase>compile</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+  </profiles>
+
 </project>

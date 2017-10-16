@@ -25,6 +25,9 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.hawkular.commons.doc.DocModel;
+import org.hawkular.commons.doc.DocModelProperty;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -33,29 +36,49 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * High-level model for full {@link RawResource} with subtree, associated with their {@link ResourceType}
  * @author Joel Takvorian
  */
+@DocModel(description = "Representation of a complete resource tree stored in the inventory. + \n" +
+        "This resource embeds the <<ResourceType>> linked. + \n" +
+        "This resource embeds recursively its children.")
 public class ResourceNode implements Serializable {
 
+    @DocModelProperty(description = "Resource identifier. Unique within the inventory.",
+            position = 0,
+            required = true)
     @JsonInclude(Include.NON_NULL)
     private final String id;
 
+    @DocModelProperty(description = "Resource name. Used for display.",
+            position = 1,
+            required = true)
     @JsonInclude(Include.NON_NULL)
     private final String name;
 
     @JsonInclude(Include.NON_NULL)
     private final String feedId;
 
+    @DocModelProperty(description = "<<ResourceType>> linked.",
+            position = 3,
+            required = true)
     @JsonInclude(Include.NON_NULL)
     private final ResourceType type;
 
+    @DocModelProperty(description = "A list of metrics defined for this resource.",
+            position = 4)
     @JsonInclude(Include.NON_NULL)
     private final List<Metric> metrics;
 
+    @DocModelProperty(description = "Properties defined for this resource.",
+            position = 5)
     @JsonInclude(Include.NON_NULL)
     private final Map<String, String> properties;
 
+    @DocModelProperty(description = "Configuration defined for this resource.",
+            position = 6)
     @JsonInclude(Include.NON_NULL)
     private final Map<String, String> config;
 
+    @DocModelProperty(description = "Resource tree children.",
+            position = 6)
     @JsonInclude(Include.NON_NULL)
     private final List<ResourceNode> children;
 

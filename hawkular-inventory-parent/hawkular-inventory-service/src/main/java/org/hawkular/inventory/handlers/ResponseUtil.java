@@ -22,6 +22,11 @@ import java.util.Collection;
 
 import javax.ws.rs.core.Response;
 
+import org.hawkular.commons.doc.DocModel;
+import org.hawkular.commons.doc.DocModelProperty;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * Helper class used to build REST responses and deal with errors.
  *
@@ -60,8 +65,11 @@ public class ResponseUtil {
                 .entity(new ApiError(message)).type(APPLICATION_JSON_TYPE).build();
     }
 
+    @DocModel(description = "Payload for a REST error response.")
     public static class ApiError {
 
+        @DocModelProperty(description = "The error message.")
+        @JsonInclude
         private final String errorMsg;
 
         public ApiError(String errorMsg) {

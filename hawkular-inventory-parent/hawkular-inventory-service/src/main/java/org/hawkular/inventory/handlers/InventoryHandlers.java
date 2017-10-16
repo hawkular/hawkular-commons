@@ -39,9 +39,20 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.hawkular.commons.doc.DocEndpoint;
+import org.hawkular.commons.doc.DocParameter;
+import org.hawkular.commons.doc.DocParameters;
+import org.hawkular.commons.doc.DocPath;
+import org.hawkular.commons.doc.DocResponse;
+import org.hawkular.commons.doc.DocResponses;
 import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.model.Inventory;
+import org.hawkular.inventory.api.model.Resource;
+import org.hawkular.inventory.api.model.ResourceNode;
+import org.hawkular.inventory.api.model.ResourceType;
+import org.hawkular.inventory.api.model.ResultSet;
+import org.hawkular.inventory.handlers.ResponseUtil.ApiError;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
 
@@ -50,6 +61,7 @@ import org.hawkular.inventory.log.MsgLogger;
  * @author Lucas Ponce
  */
 @Path("/")
+@DocEndpoint(value = "/", description = "Inventory Handlers")
 public class InventoryHandlers {
 
     private static final MsgLogger log = InventoryLoggers.getLogger(InventoryHandlers.class);
@@ -63,6 +75,14 @@ public class InventoryHandlers {
         Let's order the methods by their Path
      */
 
+    @DocPath(method = "GET",
+            path = "/export",
+            name = "Export all resources and resource types.",
+            notes = "This endpoint produces a streaming response.")
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Success, inventory exported.", response = Inventory.class),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
     @GET
     @Path("/export")
     @Produces(APPLICATION_JSON)
@@ -75,6 +95,19 @@ public class InventoryHandlers {
         }
     }
 
+    @DocPath(method = "GET",
+            path = "/get-inventory-config/{templateName}",
+            name = "Get an existing inventory config file.",
+            produces = TEXT_PLAIN)
+    @DocParameters(value = {
+            @DocParameter(name = "templateName", required = true, path = true,
+                    description = "Inventory config file name to be retrieved.")
+    })
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Success, config file found.", response = String.class),
+            @DocResponse(code = 404, message = "Config file not found.", response = ApiError.class),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
     @GET
     @Path("/get-inventory-config/{templateName}")
     @Produces(TEXT_PLAIN)
@@ -88,6 +121,19 @@ public class InventoryHandlers {
         }
     }
 
+    @DocPath(method = "GET",
+            path = "/get-jmx-exporter-config/{templateName}",
+            name = "Get an existing jmx exporter config file.",
+            produces = TEXT_PLAIN)
+    @DocParameters(value = {
+            @DocParameter(name = "templateName", required = true, path = true,
+                    description = "Jmx exporter config file name to be retrieved.")
+    })
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Success, config file found.", response = String.class),
+            @DocResponse(code = 404, message = "Config file not found.", response = ApiError.class),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
     @GET
     @Path("/get-jmx-exporter-config/{templateName}")
     @Produces(TEXT_PLAIN)
@@ -101,6 +147,18 @@ public class InventoryHandlers {
         }
     }
 
+    @DocPath(method = "POST",
+            path = "/import",
+            name = "Import a list of resources and resource types.",
+            notes = "Previous resources and resource types stored under the same identifier will be overwritten.")
+    @DocParameters(value = {
+            @DocParameter(required = true, body = true, type = Inventory.class,
+                    description = "The list of resources and resource types to be imported.")
+    })
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Success, inventory exported."),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
     @POST
     @Path("/import")
     @Consumes(APPLICATION_JSON)
@@ -117,6 +175,26 @@ public class InventoryHandlers {
         }
     }
 
+    @DocPath(method = "GET",
+            path = "/resources",
+            name = "Get resources with optional filtering.",
+            notes = "If not filtering defined it fetches all resources with default pagination.")
+    @DocParameters(value = {
+            @DocParameter(name = "root", type = Boolean.class,
+                    description = "If true returns only top level resources. Default value is 'false'."),
+            @DocParameter(name = "feedId",
+                    description = "Filter resources by feedId"),
+            @DocParameter(name = "typeId",
+                    description = "Filter resources by typeId"),
+            @DocParameter(name = "starOffSet", type = Long.class,
+                    description = "Return results starting from an specific offset. Default value is 0."),
+            @DocParameter(name = "maxResults", type = Integer.class,
+                    description = "Define the maximum number of results on this query. Default value is 100.")
+    })
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Successfully fetched list of resources.", response = ResultSet.class),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
     @GET
     @Path("/resources")
     @Produces(APPLICATION_JSON)
@@ -132,6 +210,18 @@ public class InventoryHandlers {
         }
     }
 
+    @DocPath(method = "GET",
+            path = "/resources/{id}",
+            name = "Get a resource from its identifier.")
+    @DocParameters(value = {
+            @DocParameter(name = "id", path = true,
+                    description = "Resource identifier.")
+    })
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Success, resource found.", response = Resource.class),
+            @DocResponse(code = 404, message = "Resource not found.", response = ApiError.class),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
     @GET
     @Path("/resources/{id}")
     @Produces(APPLICATION_JSON)
@@ -145,6 +235,19 @@ public class InventoryHandlers {
         }
     }
 
+    @DocPath(method = "DELETE",
+            path = "/resources",
+            name = "Delete resources.",
+            notes = "A comma list of resource IDs can be used as web parameter. + \n" +
+                    "WARNING: If not IDs list is provided ALL resources will be deleted.")
+    @DocParameters(value = {
+            @DocParameter(name = "ids",
+                    description = "Comma list of Resource identifiers to delete.")
+    })
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Success, resources deleted."),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
     @DELETE
     @Path("/resources")
     @Produces(APPLICATION_JSON)
@@ -161,6 +264,17 @@ public class InventoryHandlers {
         }
     }
 
+    @DocPath(method = "DELETE",
+            path = "/resources/{id}",
+            name = "Delete a resource from its identifier.")
+    @DocParameters(value = {
+            @DocParameter(name = "id",
+                    description = "Resource identifier.")
+    })
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Success, resource deleted."),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
     @DELETE
     @Path("/resources/{id}")
     @Produces(APPLICATION_JSON)
@@ -173,6 +287,18 @@ public class InventoryHandlers {
         }
     }
 
+    @DocPath(method = "GET",
+            path = "/resources/{id}/tree",
+            name = "Get a complete resource tree from its identifier.")
+    @DocParameters(value = {
+            @DocParameter(name = "id", path = true,
+                    description = "Resource identifier.")
+    })
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Success, resource found.", response = ResourceNode.class),
+            @DocResponse(code = 404, message = "Resource not found.", response = ApiError.class),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
     @GET
     @Path("/resources/{id}/tree")
     @Produces(APPLICATION_JSON)
@@ -186,6 +312,20 @@ public class InventoryHandlers {
         }
     }
 
+    @DocPath(method = "GET",
+            path = "/resources/{id}/children",
+            name = "Get children from a resource from its identifier.",
+            notes = "If not filtering defined it fetches all children resources with default pagination.")
+    @DocParameters(value = {
+            @DocParameter(name = "starOffSet", type = Long.class,
+                    description = "Return results starting from an specific offset. Default value is 0."),
+            @DocParameter(name = "maxResults", type = Integer.class,
+                    description = "Define the maximum number of results on this query. Default value is 100.")
+    })
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Successfully fetched list of resources.", response = ResultSet.class),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
     @GET
     @Path("/resources/{id}/children")
     @Produces(APPLICATION_JSON)
@@ -199,6 +339,20 @@ public class InventoryHandlers {
         }
     }
 
+    @DocPath(method = "GET",
+            path = "/types",
+            name = "Get resource types.",
+            notes =  "If not filtering defined it fetches all resource types with default pagination.")
+    @DocParameters(value = {
+            @DocParameter(name = "starOffSet", type = Long.class,
+                    description = "Return results starting from an specific offset. Default value is 0."),
+            @DocParameter(name = "maxResults", type = Integer.class,
+                    description = "Define the maximum number of results on this query. Default value is 100.")
+    })
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Successfully fetched list of resources types.", response = ResultSet.class),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
     @GET
     @Path("/types")
     @Produces(APPLICATION_JSON)
@@ -211,6 +365,19 @@ public class InventoryHandlers {
         }
     }
 
+    @DocPath(method = "DELETE",
+            path = "/types",
+            name = "Delete resource types.",
+            notes = "A comma list of resource type IDs can be used as web parameter. + \n" +
+                    "WARNING: If not resource type IDs list is provided ALL resource types will be deleted.")
+    @DocParameters(value = {
+            @DocParameter(name = "typeIds",
+                    description = "Comma list of resource type identifiers to delete.")
+    })
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Success, resource types deleted."),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
     @DELETE
     @Path("/types")
     @Produces(APPLICATION_JSON)
@@ -227,6 +394,17 @@ public class InventoryHandlers {
         }
     }
 
+    @DocPath(method = "DELETE",
+            path = "/type/{typeId}",
+            name = "Delete resource type from its identifier.")
+    @DocParameters(value = {
+            @DocParameter(name = "typeId",
+                    description = "Resource type identifier to delete.")
+    })
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Success, resource type deleted."),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
     @DELETE
     @Path("/types/{typeId}")
     @Produces(APPLICATION_JSON)
@@ -239,6 +417,18 @@ public class InventoryHandlers {
         }
     }
 
+    @DocPath(method = "GET",
+            path = "/types/{typeId}",
+            name = "Get a resource type from its identifier.")
+    @DocParameters(value = {
+            @DocParameter(name = "typeId", path = true,
+                    description = "Resource type identifier.")
+    })
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Success, resource type found.", response = ResourceType.class),
+            @DocResponse(code = 404, message = "Resource not found.", response = ApiError.class),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
     @GET
     @Path("/types/{typeId}")
     @Produces(APPLICATION_JSON)
@@ -252,6 +442,21 @@ public class InventoryHandlers {
         }
     }
 
+    @DocPath(method = "GET",
+            path = "/status",
+            name = "Get status info.",
+            notes = "Status fields: + \n" +
+                    "``` \n" +
+                    "{\n" +
+                    "    \"status\":\"<UP>|<DOWN>\", \n" +
+                    "    \"Implementation-Version\":\"<Version>\", \n" +
+                    "    \"Built-From-Git-SHA1\":\"<Git-SHA1>\" \n" +
+                    "}\n" +
+                    "``` \n")
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Success.", response = DocResponse.OBJECT.class),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
     @GET
     @Path("/status")
     @Produces(APPLICATION_JSON)

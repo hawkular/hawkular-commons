@@ -21,6 +21,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hawkular.commons.doc.DocModel;
+import org.hawkular.commons.doc.DocModelProperty;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,6 +31,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Joel Takvorian
  */
+@DocModel(description = "Representation of an operation supported by a resource type. + \n")
 public class Operation implements Serializable {
 
     public static class Builder {
@@ -53,9 +57,16 @@ public class Operation implements Serializable {
         return new Builder();
     }
 
+    @DocModelProperty(description = "Operation name.",
+            position = 0,
+            required = true)
     @JsonInclude(Include.NON_NULL)
     private final String name;    // Ex: "Shutdown"
 
+    @DocModelProperty(description = "Operation parameters. + \n" +
+            "i.e. \"restart\" => {\"type\": \"bool\", \"description\": \"If true, blablabla\", \"required\": false}",
+            position = 1,
+            required = true)
     @JsonInclude(Include.NON_NULL)
     private final Map<String, Map<String, String>> parameters;  // Ex: "restart" => {"type": "bool", "description": "If true, blablabla", "required": false}
 

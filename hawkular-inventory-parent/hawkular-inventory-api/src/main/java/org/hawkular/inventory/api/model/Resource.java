@@ -22,6 +22,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.hawkular.commons.doc.DocModel;
+import org.hawkular.commons.doc.DocModelProperty;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -32,26 +35,46 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * but just a list of children ids instead.
  * @author Joel Takvorian
  */
+@DocModel(description = "Representation of a resource stored in the inventory. + \n" +
+        "This resource embeds the <<ResourceType>> linked.")
 public class Resource implements Serializable {
 
+    @DocModelProperty(description = "Resource identifier. Unique within the inventory.",
+            position = 0,
+            required = true)
     @JsonInclude(Include.NON_NULL)
     private final String id;
 
+    @DocModelProperty(description = "Resource name. Used for display.",
+            position = 1,
+            required = true)
     @JsonInclude(Include.NON_NULL)
     private final String name;
 
+    @DocModelProperty(description = "Feed identifier. Used to identify the agent that manages this resource.",
+            position = 2,
+            required = true)
     @JsonInclude(Include.NON_NULL)
     private final String feedId;
 
+    @DocModelProperty(description = "<<ResourceType>> linked.",
+            position = 3,
+            required = true)
     @JsonInclude(Include.NON_NULL)
     private final ResourceType type;
 
+    @DocModelProperty(description = "A list of metrics defined for this resource.",
+            position = 4)
     @JsonInclude(Include.NON_NULL)
     private final List<Metric> metrics;
 
+    @DocModelProperty(description = "Properties defined for this resource.",
+            position = 5)
     @JsonInclude(Include.NON_NULL)
     private final Map<String, String> properties;
 
+    @DocModelProperty(description = "Configuration defined for this resource.",
+            position = 6)
     @JsonInclude(Include.NON_NULL)
     private final Map<String, String> config;
 
