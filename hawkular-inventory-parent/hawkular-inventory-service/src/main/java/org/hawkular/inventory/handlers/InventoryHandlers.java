@@ -46,6 +46,7 @@ import org.hawkular.commons.doc.DocParameters;
 import org.hawkular.commons.doc.DocPath;
 import org.hawkular.commons.doc.DocResponse;
 import org.hawkular.commons.doc.DocResponses;
+import org.hawkular.commons.json.JsonUtil;
 import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.model.Inventory;
@@ -59,8 +60,6 @@ import org.hawkular.inventory.log.MsgLogger;
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.core.ResourceMethodRegistry;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Jay Shaughnessy
  * @author Lucas Ponce
@@ -70,7 +69,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class InventoryHandlers {
 
     private static final MsgLogger log = InventoryLoggers.getLogger(InventoryHandlers.class);
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private ManifestUtil manifestUtil = new ManifestUtil();
 
@@ -91,11 +89,13 @@ public class InventoryHandlers {
     })
     @GET
     @Path("/")
-    @Produces(APPLICATION_JSON)
+    @Produces("application/json; qs=0.8")
     public Response listRestPaths(@Context Dispatcher dispatcher) {
         try {
             List<RESTPathDiscovery.Path> discovered = RESTPathDiscovery.discover((ResourceMethodRegistry) dispatcher.getRegistry());
-            String json = OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(discovered);
+            String json = JsonUtil.getMapper()
+                    .writerWithDefaultPrettyPrinter()
+                    .writeValueAsString(discovered);
             return ResponseUtil.ok(json);
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
@@ -110,7 +110,7 @@ public class InventoryHandlers {
         StringBuilder sb = new StringBuilder();
         sb.append("<h1>Hawkular Inventory - REST API overview</h1>")
                 // TODO: doc url
-                .append("This is a generated list of available endpoints. Click here for detailed documentation.");
+                .append("This is a generated list of available endpoints. Check the documentation for more details.");
         discovered.forEach(r -> {
             sb.append("<h2>").append(r.getPath()).append("</h2><ul>");
             r.getMethods().forEach(rm -> {
