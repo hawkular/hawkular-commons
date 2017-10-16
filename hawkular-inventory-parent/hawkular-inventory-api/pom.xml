@@ -33,6 +33,12 @@
   <dependencies>
 
     <dependency>
+      <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-commons-utils</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
       <scope>provided</scope>
@@ -61,6 +67,11 @@
       <artifactId>assertj-core</artifactId>
       <scope>test</scope>
       <version>${version.org.assertj}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-commons-utils</artifactId>
+      <version>0.9.8.Final-SNAPSHOT</version>
     </dependency>
 
   </dependencies>

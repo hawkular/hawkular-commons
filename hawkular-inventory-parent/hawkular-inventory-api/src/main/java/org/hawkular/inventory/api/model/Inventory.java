@@ -19,6 +19,9 @@ package org.hawkular.inventory.api.model;
 import java.io.Serializable;
 import java.util.List;
 
+import org.hawkular.commons.doc.DocModel;
+import org.hawkular.commons.doc.DocModelProperty;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,11 +30,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Jay Shaughnessy
  * @author Lucas Ponce
  */
+@DocModel(description = "Representation of a list of resources and a list of resource types. + \n" +
+        "Used for bulk import/export operations.")
 public class Inventory implements Serializable {
 
+    @DocModelProperty(description = "List of resources.",
+            position = 0,
+            required = false)
     @JsonInclude(Include.NON_NULL)
     private List<RawResource> resources;
 
+    @DocModelProperty(description = "List of resource types.",
+            position = 1,
+            required = false)
     @JsonInclude(Include.NON_NULL)
     private List<ResourceType> types;
 

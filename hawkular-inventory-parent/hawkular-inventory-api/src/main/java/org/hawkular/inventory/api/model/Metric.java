@@ -21,6 +21,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hawkular.commons.doc.DocModel;
+import org.hawkular.commons.doc.DocModelProperty;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,6 +31,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Joel Takvorian
  */
+@DocModel(description = "Representation of a resource metric. + \n")
 public class Metric implements Serializable {
 
     public static class Builder {
@@ -70,15 +74,28 @@ public class Metric implements Serializable {
         return new Builder();
     }
 
+    @DocModelProperty(description = "Metric name.",
+            position = 0,
+            required = true)
     @JsonInclude(Include.NON_NULL)
     private final String name;  // Name (for display?)
 
+    @DocModelProperty(description = "Metric type.",
+            position = 1,
+            required = true)
     @JsonInclude(Include.NON_NULL)
     private final String type;  // Ex: Deployment status, Server availability
 
+    @DocModelProperty(description = "Metric type.",
+            position = 2,
+            required = true,
+            defaultValue = "NONE")
     @JsonInclude(Include.NON_NULL)
     private final MetricUnit unit;
 
+    @DocModelProperty(description = "Metric properties.",
+            position = 3,
+            required = false)
     @JsonInclude(Include.NON_NULL)
     private final Map<String, String> properties;   // properties may contain, for instance, the full prometheus metric name
 

@@ -22,6 +22,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.hawkular.commons.doc.DocModel;
+import org.hawkular.commons.doc.DocModelProperty;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -30,15 +33,22 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  * @author Jay Shaughnessy
  * @author Lucas Ponce
  */
+@DocModel(description = "Page object for queries of <<Resource>> or <<ResourceType>>. + \n" +
+        "It defines the global result size of the query. + \n" +
+        "It contains a list of results defined by maxResults parameter and starting from startOffset.")
 @JsonDeserialize(using = JacksonDeserializer.ResultSetDeserializer.class)
 public class ResultSet<T> {
 
+    @DocModelProperty(description = "List of results of <<Resource>> or <<ResourceType>> types. + \n" +
+            "Page size it is defined by maxResults parameters in queries.")
     @JsonInclude(Include.NON_NULL)
     private List<T> results;
 
+    @DocModelProperty(description = "Global result size.")
     @JsonInclude(Include.NON_NULL)
     private Long resultSize;
 
+    @DocModelProperty(description = "StartOffset for results returned on this page.")
     @JsonInclude(Include.NON_NULL)
     private Long startOffset;
 
