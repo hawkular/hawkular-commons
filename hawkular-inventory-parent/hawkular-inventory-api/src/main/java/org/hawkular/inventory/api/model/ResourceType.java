@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hawkular.commons.doc.DocModel;
+import org.hawkular.commons.doc.DocModelProperty;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -31,6 +34,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Joel Takvorian
  */
+@DocModel(description = "Representation of a resource type stored in the inventory. + \n")
 public class ResourceType implements Serializable {
 
     public static class Builder {
@@ -67,12 +71,20 @@ public class ResourceType implements Serializable {
         return new Builder();
     }
 
+    @DocModelProperty(description = "Resource type identifier. Unique within the inventory.",
+            position = 0,
+            required = true)
     @JsonInclude(Include.NON_NULL)
     private final String id;  // Unique index [Search resource type by id]
 
+    @DocModelProperty(description = "List of operations supported by this resource type.",
+            position = 1,
+            required = false)
     @JsonInclude(Include.NON_NULL)
     private final Collection<Operation> operations;
 
+    @DocModelProperty(description = "Properties defined for this resource type.",
+            position = 2)
     @JsonInclude(Include.NON_NULL)
     private final Map<String, String> properties;
 
