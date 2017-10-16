@@ -37,6 +37,8 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
       readOnly: false
     };
 
+    $scope.detail = "Click Resource to See Detail";
+
     var updateTree = function () {
       console.debug("[Resources] refresh tree roots at " + new Date());
 
@@ -52,7 +54,14 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
         for (var i = 0; i < resources.length; ++i) {
           var resource = resources[i];
           var text = '[' + resource.type.id + '] ' + resource.name;
-          $scope.tree.push( { text: text, lazyLoad: true, resource: resource } );
+          $scope.tree.push({
+            checkable: false,
+            lazyLoad: true,
+            selectable: true,
+            text: text,
+            // store entire resource json as custom prop
+            resource: resource
+          });
         }
 
         refreshTreeView();
@@ -62,15 +71,29 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
 
     var refreshTreeView = function () {
       $('#resourceTree').treeview({
-        collapseIcon: "fa fa-angle-down",
         data: $scope.tree,
         lazyLoad: function(n,f) {
           expandNode(n, f);
         },
+
+        onNodeSelected: function(event, data) {
+          $scope.detail = angular.toJson(data.resource,true);
+          $scope.$apply();
+        },
+
+        collapseIcon: "fa fa-angle-down",
+        emptyIcon: 'fa',
         expandIcon: "fa fa-angle-right",
-        icon: "fa fa-folder",
-        nodeIcon: "fa fa-folder",
-        showBorder: false
+        loadingIcon: 'fa fa-clock-o',
+        nodeIcon: "fa",
+        selectedIcon: 'fa fa-star',
+        checkedIcon: 'fa fa-check',
+        partiallyCheckedIcon: 'fa fa-minus',
+        uncheckedIcon: 'fa fa-close',
+
+        // highlightSelected: true, // not working as expected, maybe need a custom color
+        levels: 1
+        // showBorder: true // not working as expected
       });
     };
 
