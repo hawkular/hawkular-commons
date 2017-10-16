@@ -17,6 +17,7 @@
 package org.hawkular.inventory.handlers;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.TEXT_HTML;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 import java.util.Collections;
@@ -45,6 +46,7 @@ import org.hawkular.commons.doc.DocParameters;
 import org.hawkular.commons.doc.DocPath;
 import org.hawkular.commons.doc.DocResponse;
 import org.hawkular.commons.doc.DocResponses;
+import org.hawkular.commons.json.JsonUtil;
 import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.model.Inventory;
@@ -55,6 +57,8 @@ import org.hawkular.inventory.api.model.ResultSet;
 import org.hawkular.inventory.handlers.ResponseUtil.ApiError;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
+import org.jboss.resteasy.core.Dispatcher;
+import org.jboss.resteasy.core.ResourceMethodRegistry;
 
 /**
  * @author Jay Shaughnessy
@@ -66,7 +70,7 @@ public class InventoryHandlers {
 
     private static final MsgLogger log = InventoryLoggers.getLogger(InventoryHandlers.class);
 
-    ManifestUtil manifestUtil = new ManifestUtil();
+    private ManifestUtil manifestUtil = new ManifestUtil();
 
     @EJB
     private InventoryService inventoryService;
@@ -83,6 +87,47 @@ public class InventoryHandlers {
             @DocResponse(code = 200, message = "Success, inventory exported.", response = Inventory.class),
             @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
     })
+    @GET
+    @Path("/")
+    @Produces("application/json; qs=0.8")
+    public Response listRestPaths(@Context Dispatcher dispatcher) {
+        try {
+            List<RESTPathDiscovery.Path> discovered = RESTPathDiscovery.discover((ResourceMethodRegistry) dispatcher.getRegistry());
+            String json = JsonUtil.getMapper()
+                    .writerWithDefaultPrettyPrinter()
+                    .writeValueAsString(discovered);
+            return ResponseUtil.ok(json);
+        } catch (Exception e) {
+            return ResponseUtil.internalError(e);
+        }
+    }
+
+    @GET
+    @Path("/")
+    @Produces(TEXT_HTML)
+    public Response listRestPathsAsHtml(@Context Dispatcher dispatcher) {
+        List<RESTPathDiscovery.Path> discovered = RESTPathDiscovery.discover((ResourceMethodRegistry) dispatcher.getRegistry());
+        StringBuilder sb = new StringBuilder();
+        sb.append("<h1>Hawkular Inventory - REST API overview</h1>")
+                // TODO: doc url
+                .append("This is a generated list of available endpoints. Check the documentation for more details.");
+        discovered.forEach(r -> {
+            sb.append("<h2>").append(r.getPath()).append("</h2><ul>");
+            r.getMethods().forEach(rm -> {
+                sb.append("<li>").append(rm.getVerb()).append(" ");
+                if (rm.getConsuming() != null) {
+                    sb.append("consumes <i>").append(rm.getConsuming()).append("</i> ");
+                }
+                if (rm.getProducing() != null) {
+                    sb.append("produces <i>").append(rm.getProducing()).append("</i> ");
+                }
+                sb.append("</li>");
+            });
+            sb.append("</ul>");
+        });
+        return Response.ok(sb.toString()).build();
+    }
+
     @GET
     @Path("/export")
     @Produces(APPLICATION_JSON)
