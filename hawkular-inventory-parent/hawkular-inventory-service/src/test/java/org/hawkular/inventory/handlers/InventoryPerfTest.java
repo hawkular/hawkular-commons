@@ -38,6 +38,7 @@ import javax.ws.rs.core.Response;
 
 import org.hawkular.inventory.Resources;
 import org.hawkular.inventory.api.model.Inventory;
+import org.hawkular.inventory.api.model.InventoryHealth;
 import org.hawkular.inventory.api.model.Metric;
 import org.hawkular.inventory.api.model.MetricUnit;
 import org.hawkular.inventory.api.model.Operation;
@@ -217,7 +218,7 @@ public class InventoryPerfTest {
     }
 
     @Test
-    public void test002_largeImport() {
+    public void test002_largeImportWithStats() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("import");
         Response response = target
@@ -276,6 +277,18 @@ public class InventoryPerfTest {
         assertThat((List<ResourceType>) response.readEntity(ResultSet.class).getResults())
                 .extracting(ResourceType::getId)
                 .containsOnly("EAP", "FOO", "BAR", "JDG");
+
+        client = ClientBuilder.newClient();
+        target = client.target(baseUrl.toString()).path("health");
+        response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        InventoryHealth health = (InventoryHealth) response.readEntity(InventoryHealth.class);
+        assertThat(health.getInventoryStats()).isNotNull();
+        assertThat(health.getInventoryStats().getNumberOfResources() > 10000);
+        assertThat(health.getInventoryStats().getNumberOfResourcesInMemory() ==  5000);
+        assertThat(health.getDiskStats().getInventoryTotalSpace() > 4000000L);
     }
 
     @Test

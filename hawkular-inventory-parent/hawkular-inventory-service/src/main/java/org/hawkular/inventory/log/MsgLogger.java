@@ -52,4 +52,21 @@ public interface MsgLogger {
     @LogMessage(level = Level.ERROR)
     @Message(id = 100005, value = "Error reindexing caches")
     void errorReindexingCaches(@Cause Throwable e);
+
+    @LogMessage(level = Level.ERROR)
+    @Message(id = 100006, value = "Error reading inventory disk")
+    void errorReadingInventoryDisk(@Cause Throwable e);
+
+    @LogMessage(level = Level.ERROR)
+    @Message(id = 100007, value = "Error registering MBean")
+    void errorRegisteringMBean(@Cause Throwable e);
+
+    @LogMessage(level = Level.ERROR)
+    @Message(id = 100008, value = "Error unregistering MBean")
+    void errorUnregisteringMBean(@Cause Throwable e);
+
+    @LogMessage(level = Level.INFO)
+    @Message(id = 100009, value = "Changing polling stats interval to [%s] ms")
+    void infoChangingPollingStatsInterval(long newPollingInterval);
+
 }
