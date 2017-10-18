@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Optional;
 
+import org.hawkular.inventory.api.model.InventoryHealth;
 import org.hawkular.inventory.api.model.RawResource;
 import org.hawkular.inventory.api.model.Resource;
 import org.hawkular.inventory.api.model.ResourceNode;
@@ -152,4 +153,6 @@ public interface InventoryService {
     boolean isRunning();
 
     void buildExport(OutputStream os) throws IOException;
+
+    InventoryHealth getHealthStatus();
 }
