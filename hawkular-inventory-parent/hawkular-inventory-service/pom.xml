@@ -316,10 +316,7 @@
   </build>
 
   <properties>
-    <!--
-      [lponce] making perf tests optional is prone to errors
-      <excluded.groups>org.hawkular.inventory.handlers.Performance</excluded.groups>
-    -->
+    <excluded.groups>org.hawkular.inventory.handlers.Performance</excluded.groups>
   </properties>
 
   <profiles>
