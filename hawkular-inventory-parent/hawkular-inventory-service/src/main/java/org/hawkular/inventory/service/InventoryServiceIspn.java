@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -38,6 +39,7 @@ import javax.inject.Inject;
 import org.hawkular.commons.json.JsonUtil;
 import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.api.ResourceFilter;
+import org.hawkular.inventory.api.model.InventoryHealth;
 import org.hawkular.inventory.api.model.RawResource;
 import org.hawkular.inventory.api.model.Resource;
 import org.hawkular.inventory.api.model.ResourceNode;
@@ -87,16 +89,20 @@ public class InventoryServiceIspn implements InventoryService {
     @InventoryResourceType
     private QueryFactory qResourceType;
 
+    @EJB
+    private InventoryStatsMBean inventoryStatsMBean;
+
     public InventoryServiceIspn() {
         configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
     }
 
-    InventoryServiceIspn(Cache<String, Object> resource, Cache<String, Object> resourceType, String configPath) {
+    InventoryServiceIspn(Cache<String, Object> resource, Cache<String, Object> resourceType, String configPath, InventoryStatsMBean inventoryStatsMBean) {
         this.resource = resource;
         this.resourceType = resourceType;
         qResource = Search.getQueryFactory(resource);
         qResourceType = Search.getQueryFactory(resourceType);
         this.configPath = Paths.get(configPath);
+        this.inventoryStatsMBean = inventoryStatsMBean;
     }
 
     @Override
@@ -360,5 +366,10 @@ public class InventoryServiceIspn implements InventoryService {
         jsonGen.writeEndArray();
         jsonGen.writeEndObject();
         jsonGen.flush();
+    }
+
+    @Override
+    public InventoryHealth getHealthStatus() {
+        return inventoryStatsMBean.lastHealth();
     }
 }

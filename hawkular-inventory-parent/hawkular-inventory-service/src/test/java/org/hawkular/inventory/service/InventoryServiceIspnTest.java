@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,12 +32,14 @@ import java.util.Optional;
 import org.hawkular.inventory.Resources;
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.model.Inventory;
+import org.hawkular.inventory.api.model.InventoryHealth;
 import org.hawkular.inventory.api.model.RawResource;
 import org.hawkular.inventory.api.model.Resource;
 import org.hawkular.inventory.api.model.ResourceNode;
 import org.hawkular.inventory.api.model.ResourceType;
 import org.hawkular.inventory.api.model.ResultSet;
 import org.infinispan.Cache;
+import org.infinispan.configuration.cache.SingleFileStoreConfiguration;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.junit.Before;
@@ -53,6 +56,7 @@ public class InventoryServiceIspnTest {
     private static final String ISPN_CONFIG_LOCAL = "/hawkular-inventory-ispn-test.xml";
     private static EmbeddedCacheManager CACHE_MANAGER;
     private final InventoryServiceIspn service;
+    private final InventoryStats inventoryStats;
 
     static {
         try {
@@ -67,7 +71,16 @@ public class InventoryServiceIspnTest {
         Cache<String, Object> resourceType = CACHE_MANAGER.getCache("resource_type");
         resource.clear();
         resourceType.clear();
-        service = new InventoryServiceIspn(resource, resourceType, getClass().getClassLoader().getResource("").getPath());
+        inventoryStats = new InventoryStats(resource,
+                resourceType,
+                new File(((SingleFileStoreConfiguration) resource.getAdvancedCache()
+                        .getCacheConfiguration()
+                        .persistence()
+                        .stores()
+                        .iterator()
+                        .next()).location()));
+        inventoryStats.init();
+        service = new InventoryServiceIspn(resource, resourceType, getClass().getClassLoader().getResource("").getPath(), inventoryStats);
     }
 
     @Before
@@ -289,7 +302,7 @@ public class InventoryServiceIspnTest {
     }
 
     @Test
-    public void shouldGetLargeExport() throws IOException {
+    public void shouldGetLargeExportWithStats() throws IOException, InterruptedException {
         int maxFeeds = 10;
         int maxItems = 1000;
         for (int j = 0; j < maxFeeds; j++) {
@@ -323,5 +336,11 @@ public class InventoryServiceIspnTest {
                 .hasSize(maxTypes + 3)
                 .extracting(ResourceType::getId)
                 .contains("EAP", "RT0", "RT100", "RT199");
+
+        InventoryHealth health = service.getHealthStatus();
+        assertThat(health.getInventoryStats()).isNotNull();
+        assertThat(health.getInventoryStats().getNumberOfResources()).isGreaterThan(10000);
+        assertThat(health.getInventoryStats().getNumberOfResourcesInMemory()).isEqualTo(5000);
+        assertThat(health.getDiskStats().getInventoryTotalSpace()).isGreaterThan(4000000L);
     }
 }

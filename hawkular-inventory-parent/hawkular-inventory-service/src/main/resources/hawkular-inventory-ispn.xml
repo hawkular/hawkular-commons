@@ -24,7 +24,7 @@
 
   <cache-container name="hawkular-inventory">
     <jmx duplicate-domains="true" />
-    <local-cache name="resource">
+    <local-cache name="resource" statistics="true">
       <transaction mode="NON_XA"/>
       <persistence>
         <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="${jboss.server.data.dir}/hawkular-inventory">
@@ -88,7 +88,7 @@
       <indexing index="NONE" />
     </local-cache>
 
-    <local-cache name="resource_type">
+    <local-cache name="resource_type" statistics="true">
       <transaction mode="NON_XA"/>
       <persistence>
         <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="${jboss.server.data.dir}/hawkular-inventory">

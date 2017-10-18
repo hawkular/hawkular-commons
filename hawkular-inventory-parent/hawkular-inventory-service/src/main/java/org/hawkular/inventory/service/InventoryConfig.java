@@ -30,6 +30,7 @@ import javax.enterprise.inject.Produces;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
 import org.infinispan.Cache;
+import org.infinispan.configuration.cache.SingleFileStoreConfiguration;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.query.Search;
@@ -61,6 +62,8 @@ public class InventoryConfig {
     private QueryFactory queryResourceType;
 
     private final Path configPath;
+
+    private File inventoryLocation;
 
     public InventoryConfig() {
         configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
@@ -98,6 +101,7 @@ public class InventoryConfig {
                 log.errorInventoryCacheNotFound();
                 throw new IllegalStateException("Inventory query factory for resource_type cache is not found");
             }
+
             if (ispnReindex) {
                 log.infoStartInventoryReindex();
                 long startReindex = System.currentTimeMillis();
@@ -109,6 +113,12 @@ public class InventoryConfig {
                 long stopReindex = System.currentTimeMillis();
                 log.infoStopInventoryReindex((stopReindex - startReindex));
             }
+            inventoryLocation = new File(((SingleFileStoreConfiguration) resource.getAdvancedCache()
+                    .getCacheConfiguration()
+                    .persistence()
+                    .stores()
+                    .iterator()
+                    .next()).location());
             log.infoInventoryAppStarted();
         } catch (IOException e) {
             log.errorInventoryCacheConfigurationNotFound(e);
@@ -141,4 +151,9 @@ public class InventoryConfig {
         return queryResourceType;
     }
 
+    @Produces
+    @InventoryLocation
+    public File getInventoryLocation() {
+        return inventoryLocation;
+    }
 }

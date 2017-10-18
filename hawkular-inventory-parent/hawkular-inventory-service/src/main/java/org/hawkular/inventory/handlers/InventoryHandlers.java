@@ -50,6 +50,7 @@ import org.hawkular.commons.json.JsonUtil;
 import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.model.Inventory;
+import org.hawkular.inventory.api.model.InventoryHealth;
 import org.hawkular.inventory.api.model.Resource;
 import org.hawkular.inventory.api.model.ResourceNode;
 import org.hawkular.inventory.api.model.ResourceType;
@@ -79,14 +80,6 @@ public class InventoryHandlers {
         Let's order the methods by their Path
      */
 
-    @DocPath(method = "GET",
-            path = "/export",
-            name = "Export all resources and resource types.",
-            notes = "This endpoint produces a streaming response.")
-    @DocResponses(value = {
-            @DocResponse(code = 200, message = "Success, inventory exported.", response = Inventory.class),
-            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
-    })
     @GET
     @Path("/")
     @Produces("application/json; qs=0.8")
@@ -128,6 +121,14 @@ public class InventoryHandlers {
         return Response.ok(sb.toString()).build();
     }
 
+    @DocPath(method = "GET",
+            path = "/export",
+            name = "Export all resources and resource types.",
+            notes = "This endpoint produces a streaming response.")
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Success, inventory exported.", response = Inventory.class),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
     @GET
     @Path("/export")
     @Produces(APPLICATION_JSON)
@@ -187,6 +188,25 @@ public class InventoryHandlers {
             return inventoryService.getJMXExporterConfig(templateName)
                     .map(ResponseUtil::ok)
                     .orElseGet(() -> ResponseUtil.notFound("JMX Exporter config [" + templateName + "] not found"));
+        } catch (Exception e) {
+            return ResponseUtil.internalError(e);
+        }
+    }
+
+    @DocPath(method = "GET",
+            path = "/health",
+            name = "Get last health information collected.",
+            notes = "Metrics collection task is performed asynchronously.")
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Success.", response = InventoryHealth.class),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
+    @GET
+    @Path("/health")
+    @Produces(APPLICATION_JSON)
+    public Response getInventoryHealth() {
+        try {
+            return ResponseUtil.ok(inventoryService.getHealthStatus());
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }
