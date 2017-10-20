@@ -406,6 +406,32 @@ public class InventoryRestTest {
     }
 
     @Test
+    public void test023_shouldGetParent() {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString()).path("resources/child-1/parent");
+        Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        assertThat(response.getStatus()).isEqualTo(200);
+        Resource parent = response.readEntity(Resource.class);
+        assertThat(parent).isNotNull();
+        assertThat(parent.getId()).isEqualTo("EAP-1");
+    }
+
+    @Test
+    public void test024_shouldNotGetParentForRoot() {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString()).path("resources/EAP-1/parent");
+        Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+        assertThat(response.getStatus()).isEqualTo(204);
+        assertThat(response.hasEntity()).isFalse();
+    }
+
+    @Test
     public void test100_shouldDeleteSeveralResources() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("resources")

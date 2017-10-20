@@ -53,6 +53,9 @@ public class ResourceNode implements Serializable {
     @JsonInclude(Include.NON_NULL)
     private final String name;
 
+    @DocModelProperty(description = "Feed identifier. Used to identify the agent that manages this resource.",
+            position = 2,
+            required = true)
     @JsonInclude(Include.NON_NULL)
     private final String feedId;
 
@@ -62,23 +65,29 @@ public class ResourceNode implements Serializable {
     @JsonInclude(Include.NON_NULL)
     private final ResourceType type;
 
+    @DocModelProperty(description = "Parent resource identifier. Can be null if it's a root resource.",
+            position = 4,
+            required = true)
+    @JsonInclude
+    private final String parentId;
+
     @DocModelProperty(description = "A list of metrics defined for this resource.",
-            position = 4)
+            position = 5)
     @JsonInclude(Include.NON_NULL)
     private final List<Metric> metrics;
 
     @DocModelProperty(description = "Properties defined for this resource.",
-            position = 5)
+            position = 6)
     @JsonInclude(Include.NON_NULL)
     private final Map<String, String> properties;
 
     @DocModelProperty(description = "Configuration defined for this resource.",
-            position = 6)
+            position = 7)
     @JsonInclude(Include.NON_NULL)
     private final Map<String, String> config;
 
     @DocModelProperty(description = "Resource tree children.",
-            position = 6)
+            position = 8)
     @JsonInclude(Include.NON_NULL)
     private final List<ResourceNode> children;
 
@@ -86,6 +95,7 @@ public class ResourceNode implements Serializable {
                         @JsonProperty("name") String name,
                         @JsonProperty("feedId") String feedId,
                         @JsonProperty("type") ResourceType type,
+                        @JsonProperty("parentId") String parentId,
                         @JsonProperty("metrics") List<Metric> metrics,
                         @JsonProperty("properties") Map<String, String> properties,
                         @JsonProperty("config") Map<String, String> config,
@@ -94,6 +104,7 @@ public class ResourceNode implements Serializable {
         this.name = name;
         this.feedId = feedId;
         this.type = type;
+        this.parentId = parentId;
         this.metrics = metrics;
         this.properties = properties;
         this.config = config;
@@ -108,15 +119,15 @@ public class ResourceNode implements Serializable {
      * @return the node with its subtree
      */
     public static ResourceNode fromRaw(RawResource r,
-                                     Function<String, Optional<ResourceType>> rtLoader,
-                                     Function<String, List<RawResource>> rLoader) {
+                                       Function<String, Optional<ResourceType>> rtLoader,
+                                       Function<String, List<RawResource>> rLoader) {
         return fromRaw(r, rtLoader, rLoader, new HashSet<>());
     }
 
     private static ResourceNode fromRaw(RawResource r,
-                                             Function<String, Optional<ResourceType>> rtLoader,
-                                             Function<String, List<RawResource>> rLoader,
-                                             Set<String> loaded) {
+                                        Function<String, Optional<ResourceType>> rtLoader,
+                                        Function<String, List<RawResource>> rLoader,
+                                        Set<String> loaded) {
         if (loaded.contains(r.getId())) {
             throw new IllegalStateException("Cycle detected in the tree with id " + r.getId()
                     + "; aborting operation. The inventory is invalid.");
@@ -126,7 +137,7 @@ public class ResourceNode implements Serializable {
                 .map(child -> fromRaw(child, rtLoader, rLoader, loaded))
                 .collect(Collectors.toList());
         return new ResourceNode(r.getId(), r.getName(), r.getFeedId(), rtLoader.apply(r.getTypeId()).orElse(null),
-                r.getMetrics(), r.getProperties(), r.getConfig(), children);
+                r.getParentId(), r.getMetrics(), r.getProperties(), r.getConfig(), children);
     }
 
     public String getId() {
@@ -139,6 +150,10 @@ public class ResourceNode implements Serializable {
 
     public String getFeedId() {
         return feedId;
+    }
+
+    public String getParentId() {
+        return parentId;
     }
 
     public Map<String, String> getProperties() {
