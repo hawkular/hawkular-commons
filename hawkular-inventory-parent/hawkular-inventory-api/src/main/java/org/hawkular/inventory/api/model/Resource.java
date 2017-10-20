@@ -63,18 +63,24 @@ public class Resource implements Serializable {
     @JsonInclude(Include.NON_NULL)
     private final ResourceType type;
 
+    @DocModelProperty(description = "Parent resource identifier. Can be null if it's a root resource.",
+            position = 4,
+            required = true)
+    @JsonInclude
+    private final String parentId;
+
     @DocModelProperty(description = "A list of metrics defined for this resource.",
-            position = 4)
+            position = 5)
     @JsonInclude(Include.NON_NULL)
     private final List<Metric> metrics;
 
     @DocModelProperty(description = "Properties defined for this resource.",
-            position = 5)
+            position = 6)
     @JsonInclude(Include.NON_NULL)
     private final Map<String, String> properties;
 
     @DocModelProperty(description = "Configuration defined for this resource.",
-            position = 6)
+            position = 7)
     @JsonInclude(Include.NON_NULL)
     private final Map<String, String> config;
 
@@ -82,6 +88,7 @@ public class Resource implements Serializable {
                     @JsonProperty("name") String name,
                     @JsonProperty("feedId") String feedId,
                     @JsonProperty("type") ResourceType type,
+                    @JsonProperty("parentId") String parentId,
                     @JsonProperty("metrics") List<Metric> metrics,
                     @JsonProperty("properties") Map<String, String> properties,
                     @JsonProperty("config") Map<String, String> config) {
@@ -89,6 +96,7 @@ public class Resource implements Serializable {
         this.name = name;
         this.feedId = feedId;
         this.type = type;
+        this.parentId = parentId;
         this.metrics = metrics;
         this.properties = properties;
         this.config = config;
@@ -103,7 +111,7 @@ public class Resource implements Serializable {
      */
     public static Resource fromRaw(RawResource r, Function<String, Optional<ResourceType>> rtLoader) {
         return new Resource(r.getId(), r.getName(), r.getFeedId(), rtLoader.apply(r.getTypeId()).orElse(null),
-                r.getMetrics(), r.getProperties(), r.getConfig());
+                r.getParentId(), r.getMetrics(), r.getProperties(), r.getConfig());
     }
 
     public String getId() {
@@ -116,6 +124,10 @@ public class Resource implements Serializable {
 
     public String getFeedId() {
         return feedId;
+    }
+
+    public String getParentId() {
+        return parentId;
     }
 
     public Map<String, String> getProperties() {

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.ejb.EJB;
 import javax.servlet.ServletContext;
@@ -399,6 +400,37 @@ public class InventoryHandlers {
                                 @DefaultValue("100") @QueryParam("maxResults") final Integer maxResults) {
         try {
             return ResponseUtil.ok(inventoryService.getChildren(id, startOffset, maxResults));
+        } catch (Exception e) {
+            return ResponseUtil.internalError(e);
+        }
+    }
+
+    @DocPath(method = "GET",
+            path = "/resources/{id}/parent",
+            name = "Get the parent of a resource from its identifier.")
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Successfully fetched parent resource.", response = Resource.class),
+            @DocResponse(code = 204, message = "No parent, resource is root.", response = Resource.class),
+            @DocResponse(code = 404, message = "Resource not found.", response = ApiError.class),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
+    @GET
+    @Path("/resources/{id}/parent")
+    @Produces(APPLICATION_JSON)
+    public Response getParent(@PathParam("id") final String id) {
+        try {
+            Optional<Resource> optR = inventoryService.getResourceById(id);
+            if (!optR.isPresent()) {
+                return ResponseUtil.notFound("Resource id [" + id + "] not found");
+            }
+            Resource r = optR.get();
+            if (r.getParentId() == null) {
+                return Response.status(Response.Status.NO_CONTENT).build();
+            }
+            return inventoryService.getResourceById(r.getParentId())
+                    .map(ResponseUtil::ok)
+                    .orElseGet(() -> ResponseUtil.notFound("Graph inconsistency detected." +
+                            " Parent id [" + r.getParentId() + "] not found"));
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }
