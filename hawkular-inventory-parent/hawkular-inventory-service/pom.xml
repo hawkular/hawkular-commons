@@ -124,7 +124,7 @@
   <profiles>
 
     <profile>
-      <id>community-ispn-packaged-inside-war</id>
+      <id>upstream-ispn-packaged-inside-war</id>
       <activation>
         <property>
           <name>!eap.home</name>
@@ -165,6 +165,38 @@
 
       <build>
         <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>rename-ispn-config</id>
+                <phase>compile</phase>
+                <configuration>
+                  <target name="copy and rename file">
+                    <copy file="${project.build.outputDirectory}/hawkular-inventory-ispn-91.xml" tofile="${project.build.outputDirectory}/hawkular-inventory-ispn.xml" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+
+              <execution>
+                <id>rename-ispn-config-test</id>
+                <phase>test-compile</phase>
+                <configuration>
+                  <target name="copy and rename file">
+                    <copy file="${project.build.testOutputDirectory}/hawkular-inventory-ispn-test-91.xml" tofile="${project.build.testOutputDirectory}/hawkular-inventory-ispn-test.xml" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
 
           <plugin>
             <artifactId>maven-war-plugin</artifactId>
@@ -210,28 +242,28 @@
         <dependency>
           <groupId>org.infinispan</groupId>
           <artifactId>infinispan-query</artifactId>
-          <version>${version.org.infinispan.upstream}</version>
+          <version>${version.org.infinispan.jdg72}</version>
           <scope>provided</scope>
         </dependency>
 
         <dependency>
           <groupId>org.infinispan</groupId>
           <artifactId>infinispan-core</artifactId>
-          <version>${version.org.infinispan.upstream}</version>
+          <version>${version.org.infinispan.jdg72}</version>
           <scope>provided</scope>
         </dependency>
 
         <dependency>
           <groupId>org.hibernate</groupId>
           <artifactId>hibernate-search-engine</artifactId>
-          <version>${version.org.hibernate.search.upstream}</version>
+          <version>${version.org.hibernate.search.jdg72}</version>
           <scope>provided</scope>
         </dependency>
 
         <dependency>
           <groupId>org.hibernate</groupId>
           <artifactId>hibernate-search-elasticsearch</artifactId>
-          <version>${version.org.hibernate.search.upstream}</version>
+          <version>${version.org.hibernate.search.jdg72}</version>
           <scope>provided</scope>
         </dependency>
 
@@ -239,6 +271,38 @@
 
       <build>
         <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>rename-jdg-config</id>
+                <phase>compile</phase>
+                <configuration>
+                  <target name="copy and rename file">
+                    <copy file="${project.build.outputDirectory}/hawkular-inventory-ispn-85.xml" tofile="${project.build.outputDirectory}/hawkular-inventory-ispn.xml" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+
+              <execution>
+                <id>rename-jdg-config-test</id>
+                <phase>test-compile</phase>
+                <configuration>
+                  <target name="copy and rename file">
+                    <copy file="${project.build.testOutputDirectory}/hawkular-inventory-ispn-test-85.xml" tofile="${project.build.testOutputDirectory}/hawkular-inventory-ispn-test.xml" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
 
           <plugin>
             <artifactId>maven-war-plugin</artifactId>
@@ -254,7 +318,7 @@
                   <Implementation-Version>${project.version}</Implementation-Version>
                   <Built-From-Git-SHA1>${buildNumber}</Built-From-Git-SHA1>
                   <Built-On>${timestamp}</Built-On>
-                  <Dependencies>org.infinispan:jdg-7.1 services, org.infinispan.query:jdg-7.1 services, org.infinispan.query.dsl:jdg-7.1 services</Dependencies>
+                  <Dependencies>org.infinispan:jdg-7.2 services, org.infinispan.query:jdg-7.2 services, org.infinispan.query.dsl:jdg-7.2 services</Dependencies>
                 </manifestEntries>
               </archive>
               <webResources>
