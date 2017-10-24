@@ -47,6 +47,22 @@ rules:
     labels:
       name: $1
 
+  - pattern: "^jboss.as<deployment=(.+)><>status: OK"
+    attrNameSnakeCase: true
+    name: wildfly_deployment_availability
+    value: 1
+    type: GAUGE
+    labels:
+      name: $1
+
+  - pattern: "^jboss.as<deployment=(.+)><>status: (FAILED|STOPPED)"
+    attrNameSnakeCase: true
+    name: wildfly_deployment_availability
+    value: 0
+    type: GAUGE
+    labels:
+      name: $1
+
   # MESSAGING
 
   - pattern: "^jboss.as<subsystem=messaging-activemq, server=(.+), jms-(queue|topic)=(.+)><>(.+):"
