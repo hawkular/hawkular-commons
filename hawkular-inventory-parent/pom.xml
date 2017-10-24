@@ -29,7 +29,7 @@
   <artifactId>hawkular-inventory-parent</artifactId>
   <packaging>pom</packaging>
 
-  <name>Common classes for dealing with inventory</name>
+  <name>Hawkular Inventory: Parent</name>
 
   <dependencyManagement>
     <dependencies>
@@ -74,6 +74,7 @@
     <module>hawkular-inventory-api</module>
     <module>hawkular-inventory-service</module>
     <module>hawkular-inventory-ui</module>
+    <module>hawkular-inventory-itest</module>
   </modules>
 
 </project>

@@ -34,7 +34,7 @@ install:
 # unshallow is needed by license-maven-plugin
 - git fetch origin --unshallow
 script:
-- ./mvnw -s .travis.maven.settings.xml verify -Pitest -Dwildfly.logging.console.level=DEBUG -Dexcluded.groups='' -B | grep -vF "[INFO] Downloading:" | grep -vF "[INFO] Downloaded:"; test ${PIPESTATUS[0]} -eq 0
+- ./mvnw -s .travis.maven.settings.xml verify -Pitest -Dwildfly.logging.console.level=DEBUG -B | grep -vF "[INFO] Downloading:" | grep -vF "[INFO] Downloaded:"; test ${PIPESTATUS[0]} -eq 0
 
 before_cache:
 # Clean the cached directories once their size exceeds the space left on the partition.

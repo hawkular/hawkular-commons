@@ -19,8 +19,6 @@ package org.hawkular.inventory.handlers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -45,13 +43,9 @@ import org.hawkular.inventory.api.model.Operation;
 import org.hawkular.inventory.api.model.RawResource;
 import org.hawkular.inventory.api.model.ResourceType;
 import org.hawkular.inventory.api.model.ResultSet;
-import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.logging.Logger;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -65,7 +59,7 @@ import org.junit.runners.MethodSorters;
 @RunWith(Arquillian.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @Category(Performance.class)
-public class InventoryPerfTest {
+public class InventoryPerfTest extends AbstractInventoryITest {
     private final Logger log = Logger.getLogger(InventoryPerfTest.class);
 
     public static Inventory createResourceTypes() {
@@ -154,33 +148,8 @@ public class InventoryPerfTest {
         return new Inventory(resources, null);
     }
 
-    @ArquillianResource
-    private URL baseUrl;
-
-    @Deployment
-    public static WebArchive createDeployment() {
-        File[] libs = Maven.resolver()
-                .loadPomFromFile("pom.xml")
-                .importRuntimeDependencies()
-                .resolve()
-                .withTransitivity()
-                .asFile();
-        File[] assertj = Maven.resolver()
-                .loadPomFromFile("pom.xml")
-                .resolve("org.assertj:assertj-core")
-                .withTransitivity()
-                .asFile();
-        return ShrinkWrap.create(WebArchive.class)
-                .addPackages(true, "org.hawkular.inventory")
-                .addAsLibraries(libs)
-                .addAsLibraries(assertj)
-                .setWebXML(new File("src/main/webapp/WEB-INF/web.xml"))
-                .addAsResource(new File("src/main/resources/hawkular-inventory-ispn.xml"))
-                .addAsResource(new File("src/main/resources/wildfly-10-jmx-exporter.yml"))
-                .addAsWebInfResource(new File("src/main/webapp/WEB-INF/beans.xml"));
-    }
-
     @Test
+    @RunAsClient
     public void test000_statusIsUp() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("status");
@@ -191,6 +160,7 @@ public class InventoryPerfTest {
     }
 
     @Test
+    @RunAsClient
     public void test0001_clean() {
         WebTarget target = ClientBuilder.newClient().target(baseUrl.toString()).path("resources");
         Response response = target
@@ -208,6 +178,7 @@ public class InventoryPerfTest {
     }
 
     @Test
+    @RunAsClient
     public void test001_importResources() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("import");
@@ -218,6 +189,7 @@ public class InventoryPerfTest {
     }
 
     @Test
+    @RunAsClient
     public void test002_largeImportWithStats() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("import");
@@ -292,6 +264,7 @@ public class InventoryPerfTest {
     }
 
     @Test
+    @RunAsClient
     public void test003_shouldGetResourceTypesAndNotImpactFromResources() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("types");

@@ -28,7 +28,7 @@
 
   <artifactId>hawkular-inventory-api</artifactId>
 
-  <name>Hawkular Commons: Inventory API</name>
+  <name>Hawkular Inventory: API</name>
 
   <dependencies>
 

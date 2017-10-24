@@ -19,8 +19,6 @@ package org.hawkular.inventory.handlers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -42,12 +40,8 @@ import org.hawkular.inventory.api.model.Resource;
 import org.hawkular.inventory.api.model.ResourceNode;
 import org.hawkular.inventory.api.model.ResourceType;
 import org.hawkular.inventory.api.model.ResultSet;
-import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,35 +53,10 @@ import org.junit.runners.MethodSorters;
  */
 @RunWith(Arquillian.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class InventoryRestTest {
-
-    @ArquillianResource
-    private URL baseUrl;
-
-    @Deployment
-    public static WebArchive createDeployment() {
-        File[] libs = Maven.resolver()
-                .loadPomFromFile("pom.xml")
-                .importRuntimeDependencies()
-                .resolve()
-                .withTransitivity()
-                .asFile();
-        File[] assertj = Maven.resolver()
-                .loadPomFromFile("pom.xml")
-                .resolve("org.assertj:assertj-core")
-                .withTransitivity()
-                .asFile();
-        return ShrinkWrap.create(WebArchive.class)
-                .addPackages(true, "org.hawkular.inventory")
-                .addAsLibraries(libs)
-                .addAsLibraries(assertj)
-                .setWebXML(new File("src/main/webapp/WEB-INF/web.xml"))
-                .addAsResource(new File("src/main/resources/hawkular-inventory-ispn.xml"))
-                .addAsResource(new File("src/main/resources/wildfly-10-jmx-exporter.yml"))
-                .addAsWebInfResource(new File("src/main/webapp/WEB-INF/beans.xml"));
-    }
+public class InventoryRestTest extends AbstractInventoryITest {
 
     @Test
+    @RunAsClient
     public void test0000_statusIsUp() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("status");
@@ -98,6 +67,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test0001_clean() {
         WebTarget target = ClientBuilder.newClient().target(baseUrl.toString()).path("resources");
         Response response = target
@@ -115,6 +85,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test001_importResources() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("import");
@@ -125,6 +96,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test002_shouldFindResourcesById() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("resources/EAP-1");
@@ -155,6 +127,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test003_shouldNotFindResourcesById() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("resources/nada");
@@ -166,6 +139,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test004_shouldGetTopResources() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("resources")
@@ -182,6 +156,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test005_shouldGetResourceTypes() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("types");
@@ -196,6 +171,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test006_shouldGetAllEAPs() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("resources")
@@ -211,6 +187,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test007_shouldGetAllFOOs() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("resources")
@@ -226,6 +203,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test008_shouldGetNoNada() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("resources")
@@ -239,6 +217,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test009_shouldGetChildren() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("resources/EAP-1/tree");
@@ -254,6 +233,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test010_shouldGetEmptyChildren() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("resources/child-1/tree");
@@ -267,6 +247,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test011_shouldNotGetTree() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("resources/nada/tree");
@@ -278,6 +259,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test012_shouldGetOnlyChildren() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("resources/EAP-1/children");
@@ -292,6 +274,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test015_shouldFailOnDetectedCycle() {
         RawResource corruptedParent = new RawResource("CP", "CP", "feedX", "FOO", "CC",
                 new ArrayList<>(), new HashMap<>(), new HashMap<>());
@@ -318,6 +301,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test016_shouldGetAgentConfig() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("get-inventory-config/test");
@@ -338,6 +322,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test017_shouldNotGetAgentConfig() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("get-inventory-config/nada");
@@ -348,6 +333,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test020_shouldGetAllEAPsPerFeed() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("resources")
@@ -377,6 +363,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test021_shouldGetExport() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("export");
@@ -392,6 +379,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test022_shouldGetOneResourceType() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("types/EAP");
@@ -406,6 +394,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test023_shouldGetParent() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("resources/child-1/parent");
@@ -420,6 +409,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test024_shouldNotGetParentForRoot() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("resources/EAP-1/parent");
@@ -432,6 +422,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test100_shouldDeleteSeveralResources() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("resources")
@@ -472,6 +463,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test101_shouldDeleteAllResources() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("resources");
@@ -493,6 +485,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test102_shouldDeleteSeveralTypes() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("types")
@@ -532,6 +525,7 @@ public class InventoryRestTest {
     }
 
     @Test
+    @RunAsClient
     public void test103_shouldDeleteAllTypes() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(baseUrl.toString()).path("types");
