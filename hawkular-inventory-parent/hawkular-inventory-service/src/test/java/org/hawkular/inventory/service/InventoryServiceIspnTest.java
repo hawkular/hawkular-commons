@@ -43,6 +43,7 @@ import org.infinispan.configuration.cache.SingleFileStoreConfiguration;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -64,6 +65,11 @@ public class InventoryServiceIspnTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @BeforeClass
+    public static void initClass() {
+
     }
 
     public InventoryServiceIspnTest() throws IOException {

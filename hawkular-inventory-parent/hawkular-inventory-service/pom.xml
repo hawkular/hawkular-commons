@@ -40,22 +40,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
-      <dependency>
-        <groupId>org.jboss.arquillian</groupId>
-        <artifactId>arquillian-bom</artifactId>
-        <version>${version.org.jboss.arquillian}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.wildfly.arquillian</groupId>
-        <artifactId>wildfly-arquillian-parent</artifactId>
-        <version>${version.org.wildfly.arquillian}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -71,38 +55,6 @@
       <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-commons-utils</artifactId>
       <version>${project.version}</version>
-    </dependency>
-
-    <!-- Infinispan/Hibernate Search deps -->
-    <dependency>
-      <groupId>org.infinispan</groupId>
-      <artifactId>infinispan-query</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.infinispan</groupId>
-          <artifactId>infinispan-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.hibernate</groupId>
-          <artifactId>hibernate-search-engine</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.infinispan</groupId>
-      <artifactId>infinispan-core</artifactId>
-    </dependency>
-
-    <!-- infinispan-query 9.1.1 pulls the wrong version of deps. Override here (below) -->
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-search-engine</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-search-elasticsearch</artifactId>
     </dependency>
 
     <dependency>
@@ -158,33 +110,6 @@
       </plugin>
 
       <plugin>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>${version.maven-war-plugin}</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-            </manifest>
-            <manifestEntries>
-              <Implementation-Vendor-Id>org.hawkular.inventory</Implementation-Vendor-Id>
-              <Implementation-Version>${project.version}</Implementation-Version>
-              <Built-From-Git-SHA1>${buildNumber}</Built-From-Git-SHA1>
-              <Built-On>${timestamp}</Built-On>
-            </manifestEntries>
-            <!-- <manifestEntries> <Build-Number>${buildNumber}</Build-Number>
-              </manifestEntries> -->
-          </archive>
-          <webResources>
-            <resource>
-              <filtering>false</filtering>
-              <directory>${basedir}/src/main/webapp</directory>
-            </resource>
-          </webResources>
-        </configuration>
-      </plugin>
-
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
@@ -199,6 +124,154 @@
   <profiles>
 
     <profile>
+      <id>community-ispn-packaged-inside-war</id>
+      <activation>
+        <property>
+          <name>!eap.home</name>
+        </property>
+      </activation>
+
+      <dependencies>
+
+        <dependency>
+          <groupId>org.infinispan</groupId>
+          <artifactId>infinispan-query</artifactId>
+          <version>${version.org.infinispan.upstream}</version>
+          <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.infinispan</groupId>
+          <artifactId>infinispan-core</artifactId>
+          <version>${version.org.infinispan.upstream}</version>
+          <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-search-engine</artifactId>
+          <version>${version.org.hibernate.search.upstream}</version>
+          <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-search-elasticsearch</artifactId>
+          <version>${version.org.hibernate.search.upstream}</version>
+          <scope>compile</scope>
+        </dependency>
+
+      </dependencies>
+
+      <build>
+        <plugins>
+
+          <plugin>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>${version.maven-war-plugin}</version>
+            <configuration>
+              <archive>
+                <manifest>
+                  <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                </manifest>
+                <manifestEntries>
+                  <Implementation-Vendor-Id>org.hawkular.inventory</Implementation-Vendor-Id>
+                  <Implementation-Version>${project.version}</Implementation-Version>
+                  <Built-From-Git-SHA1>${buildNumber}</Built-From-Git-SHA1>
+                  <Built-On>${timestamp}</Built-On>
+                </manifestEntries>
+              </archive>
+              <webResources>
+                <resource>
+                  <filtering>false</filtering>
+                  <directory>${basedir}/src/main/webapp</directory>
+                </resource>
+              </webResources>
+              <packagingExcludes>WEB-INF/jboss-deployment-structure.xml</packagingExcludes>
+            </configuration>
+          </plugin>
+
+        </plugins>
+      </build>
+
+    </profile>
+
+    <profile>
+      <id>jdg-library-deployed-on-eap</id>
+      <activation>
+        <property>
+          <name>eap.home</name>
+        </property>
+      </activation>
+
+      <dependencies>
+
+        <dependency>
+          <groupId>org.infinispan</groupId>
+          <artifactId>infinispan-query</artifactId>
+          <version>${version.org.infinispan.upstream}</version>
+          <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.infinispan</groupId>
+          <artifactId>infinispan-core</artifactId>
+          <version>${version.org.infinispan.upstream}</version>
+          <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-search-engine</artifactId>
+          <version>${version.org.hibernate.search.upstream}</version>
+          <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-search-elasticsearch</artifactId>
+          <version>${version.org.hibernate.search.upstream}</version>
+          <scope>provided</scope>
+        </dependency>
+
+      </dependencies>
+
+      <build>
+        <plugins>
+
+          <plugin>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>${version.maven-war-plugin}</version>
+            <configuration>
+              <archive>
+                <manifest>
+                  <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                </manifest>
+                <manifestEntries>
+                  <Implementation-Vendor-Id>org.hawkular.inventory</Implementation-Vendor-Id>
+                  <Implementation-Version>${project.version}</Implementation-Version>
+                  <Built-From-Git-SHA1>${buildNumber}</Built-From-Git-SHA1>
+                  <Built-On>${timestamp}</Built-On>
+                  <Dependencies>org.infinispan:jdg-7.1 services, org.infinispan.query:jdg-7.1 services, org.infinispan.query.dsl:jdg-7.1 services</Dependencies>
+                </manifestEntries>
+              </archive>
+              <webResources>
+                <resource>
+                  <filtering>false</filtering>
+                  <directory>${basedir}/src/main/webapp</directory>
+                </resource>
+              </webResources>
+            </configuration>
+          </plugin>
+
+        </plugins>
+      </build>
+
+    </profile>
+
+    <profile>
       <id>docgen</id>
       <properties>
         <restDocDirectory>${project.basedir}/src/main/rest-doc</restDocDirectory>
@@ -207,6 +280,13 @@
       </properties>
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
           <plugin>
             <groupId>org.codehaus.gmavenplus</groupId>
             <artifactId>gmavenplus-plugin</artifactId>
