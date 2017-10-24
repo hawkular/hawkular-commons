@@ -297,6 +297,127 @@
                         <include>test-jmx-exporter.yml</include>
                       </includes>
                     </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>rename-ispn-config</id>
+                <phase>test-compile</phase>
+                <configuration>
+                  <target name="copy and rename file">
+                    <copy file="${project.build.testOutputDirectory}/hawkular-inventory-ispn-91.xml" tofile="${project.build.directory}/wildfly-${version.org.wildfly}/standalone/configuration/hawkular/hawkular-inventory-ispn.xml" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+        </plugins>
+
+      </build>
+    </profile>
+
+    <profile>
+      <id>itest-eap</id>
+      <build>
+        <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skip>false</skip>
+              <systemPropertyVariables>
+                <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                <logging.configuration>file:${project.build.directory}/test-classes/logging.properties</logging.configuration>
+                <jboss.home>${eap.home}</jboss.home>
+              </systemPropertyVariables>
+              <redirectTestOutputToFile>false</redirectTestOutputToFile>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-inventory-war</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.hawkular.commons</groupId>
+                      <artifactId>hawkular-inventory-service</artifactId>
+                      <version>${project.version}</version>
+                      <type>war</type>
+                      <overWrite>false</overWrite>
+                      <outputDirectory>${eap.home}/standalone/deployments</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>xml-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>transform-standalone-xml</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>transform</goal>
+                </goals>
+                <configuration>
+                  <transformationSets>
+                    <!-- standalone.xml -->
+                    <transformationSet>
+                      <dir>${project.build.directory}/wildfly-${version.org.wildfly}/standalone/configuration</dir>
+                      <stylesheet>src/test/resources/standalone.xsl</stylesheet>
+                      <includes>
+                        <include>standalone.xml</include>
+                      </includes>
+                      <outputDir>${project.build.directory}/wildfly-${version.org.wildfly}/standalone/configuration</outputDir>
+                    </transformationSet>
+                  </transformationSets>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <artifactId>maven-resources-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-resources</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${eap.home}/standalone/configuration/hawkular</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>src/test/resources</directory>
+                      <includes>
+                        <include>test-inventory.yml</include>
+                        <include>test-jmx-exporter.yml</include>
+                      </includes>
+                    </resource>
                     <resource>
                       <directory>src/test/resources</directory>
                       <includes>
@@ -305,6 +426,25 @@
                     </resource>
                   </resources>
                 </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>rename-ispn-config</id>
+                <phase>test-compile</phase>
+                <configuration>
+                  <target name="copy and rename file">
+                    <copy file="${project.build.testOutputDirectory}/hawkular-inventory-ispn-85.xml" tofile="${eap.home}/standalone/configuration/hawkular/hawkular-inventory-ispn.xml" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
               </execution>
             </executions>
           </plugin>

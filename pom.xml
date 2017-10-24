@@ -92,9 +92,10 @@
     <version.org.assertj>3.6.1</version.org.assertj>
     <!-- Keep in sync with modules/system/layers/base/org/freemarker/main in the Keycloak or Hawkular Accounts feature pack -->
     <version.org.freemarker>2.3.23</version.org.freemarker>
-    <version.org.hibernate.search>5.8.0.Final</version.org.hibernate.search>
-    <version.org.infinispan.community>9.1.1.Final</version.org.infinispan.community>
-    <version.org.infinispan.product>8.5.0.Final</version.org.infinispan.product>
+    <version.org.hibernate.search.upstream>5.8.0.Final</version.org.hibernate.search.upstream>
+    <version.org.hibernate.search.jdg72>5.6.2.Final-redhat-1</version.org.hibernate.search.jdg72>
+    <version.org.infinispan.upstream>9.1.1.Final</version.org.infinispan.upstream>
+    <version.org.infinispan.jdg72>8.5.0.DR2-redhat-1</version.org.infinispan.jdg72>
     <version.org.jboss.arquillian>1.1.11.Final</version.org.jboss.arquillian>
     <version.org.jboss.logging.log4j>2.1.2.GA</version.org.jboss.logging.log4j>
     <version.org.wildfly.arquillian>2.0.0.Alpha1</version.org.wildfly.arquillian>
