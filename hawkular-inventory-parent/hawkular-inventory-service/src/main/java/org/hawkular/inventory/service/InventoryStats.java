@@ -34,6 +34,7 @@ import org.hawkular.inventory.api.model.InventoryHealth;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
 import org.infinispan.Cache;
+import org.infinispan.context.Flag;
 import org.infinispan.stats.Stats;
 
 /**
@@ -193,13 +194,13 @@ public class InventoryStats implements InventoryStatsMBean {
                 log.errorReadingInventoryDisk(e);
             }
             Stats resourceStats = resource.getAdvancedCache().getStats();
-            builder.numberOfResources(resourceStats.getCurrentNumberOfEntries());
-            builder.numberOfResourcesInMemory(resourceStats.getCurrentNumberOfEntriesInMemory());
+            builder.numberOfResources(resource.size());
+            builder.numberOfResourcesInMemory(resource.getAdvancedCache().withFlags(Flag.SKIP_CACHE_LOAD).size());
             builder.averageReadTimeForResources(resourceStats.getAverageReadTime());
             builder.averageWriteTimeForResources(resourceStats.getAverageWriteTime());
             Stats resourceTypeStats = resourceType.getAdvancedCache().getStats();
-            builder.numberOfResourceTypes(resourceTypeStats.getCurrentNumberOfEntries());
-            builder.numberOfResourceTypesInMemory(resourceTypeStats.getCurrentNumberOfEntriesInMemory());
+            builder.numberOfResourceTypes(resourceType.size());
+            builder.numberOfResourceTypesInMemory(resourceType.getAdvancedCache().withFlags(Flag.SKIP_CACHE_LOAD).size());
             builder.averageReadTimeForResourceTypes(resourceTypeStats.getAverageReadTime());
             builder.averageWriteTimeForResourceTypes(resourceTypeStats.getAverageWriteTime());
             health = builder.build();
