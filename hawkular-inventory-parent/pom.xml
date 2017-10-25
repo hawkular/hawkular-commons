@@ -31,45 +31,6 @@
 
   <name>Hawkular Inventory: Parent</name>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.wildfly.bom</groupId>
-        <artifactId>wildfly-javaee7</artifactId>
-        <version>${version.org.wildfly.bom}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-
-      <!-- WildFly does not package the ispn versions we need. Override the wf bom versions
-           and make it explicit here what we want for ispn and hibernate search -->
-      <dependency>
-        <groupId>org.infinispan</groupId>
-        <artifactId>infinispan-query</artifactId>
-        <version>${version.org.infinispan.community}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.infinispan</groupId>
-        <artifactId>infinispan-core</artifactId>
-        <version>${version.org.infinispan.community}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-search-engine</artifactId>
-        <version>${version.org.hibernate.search}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-search-elasticsearch</artifactId>
-        <version>${version.org.hibernate.search}</version>
-      </dependency>
-
-    </dependencies>
-  </dependencyManagement>
-
   <modules>
     <module>hawkular-inventory-api</module>
     <module>hawkular-inventory-service</module>

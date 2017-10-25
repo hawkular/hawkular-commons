@@ -80,6 +80,15 @@ public class InventoryStats implements InventoryStatsMBean {
     public void init() {
         try {
             objectName = new ObjectName(MBEAN_NAME);
+        } catch (Exception e) {
+            log.errorRegisteringMBean(e);
+        }
+        try {
+            ManagementFactory.getPlatformMBeanServer().unregisterMBean(objectName);
+        } catch (Exception e) {
+            // Ignored as we might have a previous mbean registered
+        }
+        try {
             ManagementFactory.getPlatformMBeanServer().registerMBean(this, objectName);
         } catch (Exception e) {
             log.errorRegisteringMBean(e);
