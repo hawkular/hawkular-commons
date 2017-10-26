@@ -19,11 +19,33 @@
 startDelaySeconds: 1
 lowercaseOutputName: true
 lowercaseOutputLabelNames: true
+whitelistObjectNames: [
+  "jboss.as:path=*",
+  "jboss.as:deployment=*,subsystem=ejb3,stateless-session-bean=*",
+  "jboss.as:deployment=*,subsystem=ejb3,stateful-session-bean=*",
+  "jboss.as:deployment=*,subsystem=ejb3,message-driven-bean=*",
+  "jboss.as:deployment=*,subsystem=ejb3,singleton-bean=*",
+  "jboss.as:deployment=*,subsystem=undertow",
+  "jboss.as:deployment=*,subsystem=undertow,servlet=*",
+  "jboss.as:deployment=*,subdeployment=*,subsystem=ejb3,stateless-session-bean=*",
+  "jboss.as:deployment=*,subdeployment=*,subsystem=ejb3,stateful-session-bean=*",
+  "jboss.as:deployment=*,subdeployment=*,subsystem=ejb3,message-driven-bean=*",
+  "jboss.as:deployment=*,subdeployment=*,subsystem=ejb3,singleton-bean=*",
+  "jboss.as:deployment=*,subdeployment=*,subsystem=undertow",
+  "jboss.as:deployment=*,subdeployment=*,subsystem=undertow,servlet=*",
+  "jboss.as:subsystem=messaging-activemq,server=*,jms-queue=*",
+  "jboss.as:subsystem=messaging-activemq,server=*,jms-topic=*",
+  "jboss.as:subsystem=datasources,data-source=*,statistics=*",
+  "jboss.as:subsystem=datasources,xa-data-source=*,statistics=*",
+  "jboss.as:subsystem=transactions",
+  "jboss.as:subsystem=undertow,server=*,http-listener=*",
+  "jboss.as:subsystem=undertow,server=*,https-listener=*"
+]
 rules:
 
   # CONFIG
 
-  - pattern: "^jboss.as<path=(.+)><>path:(.+)"
+  - pattern: "jboss.as<path=(.+)><>path: (.+)"
     attrNameSnakeCase: true
     name: wildfly_config
     labels:
@@ -32,7 +54,7 @@ rules:
 
   # DEPLOYMENTS
 
-  - pattern: "^jboss.as<deployment=(.+), subdeployment=(.+), subsystem=undertow><>(.+_sessions|session_.+):"
+  - pattern: "jboss.as<deployment=(.+), subdeployment=(.+), subsystem=undertow><>(.+_sessions|session_.+):"
     attrNameSnakeCase: true
     name: wildfly_deployment_$3
     type: GAUGE
@@ -40,7 +62,7 @@ rules:
       name: $1
       subdeployment: $2
 
-  - pattern: "^jboss.as<deployment=(.+), subsystem=undertow><>(.+_sessions|session_.+):"
+  - pattern: "jboss.as<deployment=(.+), subsystem=undertow><>(.+_sessions|session_.+):"
     attrNameSnakeCase: true
     name: wildfly_deployment_$2
     type: GAUGE
@@ -49,7 +71,7 @@ rules:
 
   # MESSAGING
 
-  - pattern: "^jboss.as<subsystem=messaging-activemq, server=(.+), jms-(queue|topic)=(.+)><>(.+):"
+  - pattern: "jboss.as<subsystem=messaging-activemq, server=(.+), jms-(queue|topic)=(.+)><>(.+):"
     attrNameSnakeCase: true
     name: wildfly_messaging_$4
     type: GAUGE
@@ -59,7 +81,7 @@ rules:
 
   # DATASOURCES
 
-  - pattern: "^jboss.as<subsystem=datasources, (?:xa-)*data-source=(.+), statistics=(.+)><>(.+):"
+  - pattern: "jboss.as<subsystem=datasources, (?:xa-)*data-source=(.+), statistics=(.+)><>(.+):"
     attrNameSnakeCase: true
     name: wildfly_datasource_$2_$3
     type: GAUGE
@@ -68,14 +90,14 @@ rules:
 
   # TRANSACTIONS
 
-  - pattern: "^jboss.as<subsystem=transactions><>number_of_(.+):"
+  - pattern: "jboss.as<subsystem=transactions><>number_of_(.+):"
     attrNameSnakeCase: true
     name: wildfly_transactions_$1
     type: GAUGE
 
   # WEB SUBSYSTEM
 
-  - pattern: "^jboss.as<subsystem=undertow, server=(.+), (https?)-listener=(.+)><>(bytes_.+|error_count|processing_time|request_count):"
+  - pattern: "jboss.as<subsystem=undertow, server=(.+), (https?)-listener=(.+)><>(bytes_.+|error_count|processing_time|request_count):"
     attrNameSnakeCase: true
     name: wildfly_undertow_$4
     type: GAUGE
@@ -86,7 +108,7 @@ rules:
 
   # SERVLET
 
-  - pattern: "^jboss.as<deployment=(.+), subdeployment=(.+), subsystem=undertow, servlet=(.+)><>(.+_time|.+_count):"
+  - pattern: "jboss.as<deployment=(.+), subdeployment=(.+), subsystem=undertow, servlet=(.+)><>(.+_time|.+_count):"
     attrNameSnakeCase: true
     name: wildfly_servlet_$4
     type: GAUGE
@@ -95,7 +117,7 @@ rules:
       deployment: $1
       subdeployment: $2
 
-  - pattern: "^jboss.as<deployment=(.+), subsystem=undertow, servlet=(.+)><>(.+_time|.+_count):"
+  - pattern: "jboss.as<deployment=(.+), subsystem=undertow, servlet=(.+)><>(.+_time|.+_count):"
     attrNameSnakeCase: true
     name: wildfly_servlet_$3
     type: GAUGE
@@ -105,7 +127,7 @@ rules:
 
   # EJB
 
-  - pattern: "^jboss.as<deployment=(.+), subdeployment=(.+), subsystem=ejb3, (stateless-session|stateful-session|message-driven|singleton)-bean=(.+)><>(.+):"
+  - pattern: "jboss.as<deployment=(.+), subdeployment=(.+), subsystem=ejb3, (stateless-session|stateful-session|message-driven|singleton)-bean=(.+)><>(.+):"
     attrNameSnakeCase: true
     name: wildfly_ejb_$5
     type: GAUGE
@@ -115,7 +137,7 @@ rules:
       deployment: $1
       subdeployment: $2
 
-  - pattern: "^jboss.as<deployment=(.+), subsystem=ejb3, (stateless-session|stateful-session|message-driven|singleton)-bean=(.+)><>(.+):"
+  - pattern: "jboss.as<deployment=(.+), subsystem=ejb3, (stateless-session|stateful-session|message-driven|singleton)-bean=(.+)><>(.+):"
     attrNameSnakeCase: true
     name: wildfly_ejb_$4
     type: GAUGE
