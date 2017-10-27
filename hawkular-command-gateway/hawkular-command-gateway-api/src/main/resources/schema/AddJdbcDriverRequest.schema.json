@@ -2,11 +2,11 @@
   "type": "object",
   "extends": {
     "type": "object",
-    "javaType": "org.hawkular.cmdgw.api.ResourcePathRequest"
+    "javaType": "org.hawkular.cmdgw.api.ResourceRequest"
   },
   "javaType": "org.hawkular.cmdgw.api.AddJdbcDriverRequest",
-  "javaInterfaces" : ["org.hawkular.cmdgw.api.ResourcePathDestination"],
-  "description": "Adds a JDBC Driver to an Application Server instance given by the inventory path stored in resourcePath field. The driver module is created only if driverJarName is set (in such a case, the jar file content must be appended to this JSON message). Otherwise, the existence of the module given by moduleName and default slot \"main\" will be assumed.",
+  "javaInterfaces" : ["org.hawkular.cmdgw.api.ResourceDestination"],
+  "description": "Adds a JDBC Driver to an Application Server instance given by the inventory path stored in resourceId field. The driver module is created only if driverJarName is set (in such a case, the jar file content must be appended to this JSON message). Otherwise, the existence of the module given by moduleName and default slot \"main\" will be assumed.",
   "additionalProperties": false,
   "properties": {
     "driverName": {

@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.hawkular.commons</groupId>
     <artifactId>hawkular-command-gateway</artifactId>
-    <version>0.9.8.Final-SNAPSHOT</version>
+    <version>1.0.0.Final-SNAPSHOT</version>
   </parent>
 
   <artifactId>hawkular-command-gateway-war</artifactId>
@@ -69,7 +69,7 @@
 
     <dependency>
       <groupId>org.hawkular.commons</groupId>
-      <artifactId>hawkular-inventory-paths</artifactId>
+      <artifactId>hawkular-inventory-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope> <!-- the nest provides this -->
     </dependency>

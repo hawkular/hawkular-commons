@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.hawkular.commons</groupId>
     <artifactId>hawkular-nest-parent</artifactId>
-    <version>0.9.8.Final-SNAPSHOT</version>
+    <version>1.0.0.Final-SNAPSHOT</version>
   </parent>
 
   <artifactId>hawkular-nest-feature-pack</artifactId>
@@ -57,6 +57,20 @@
 
     <dependency>
       <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-inventory-service</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-inventory-ui</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hawkular.commons</groupId>
       <artifactId>hawkular-command-gateway-war</artifactId>
       <version>${project.version}</version>
       <type>war</type>
@@ -73,12 +87,6 @@
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.hawkular.commons</groupId>
-      <artifactId>hawkular-inventory-paths</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>

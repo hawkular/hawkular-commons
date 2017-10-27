@@ -23,29 +23,19 @@
   <parent>
     <groupId>org.hawkular.commons</groupId>
     <artifactId>hawkular-commons-parent</artifactId>
-    <version>0.9.8.Final-SNAPSHOT</version>
+    <version>1.0.0.Final-SNAPSHOT</version>
   </parent>
 
   <artifactId>hawkular-inventory-parent</artifactId>
   <packaging>pom</packaging>
 
-  <name>Common classes for dealing with inventory</name>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.wildfly.bom</groupId>
-        <artifactId>wildfly-javaee7</artifactId>
-        <version>${version.org.wildfly.bom}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+  <name>Hawkular Inventory: Parent</name>
 
   <modules>
-    <module>hawkular-inventory-paths</module>
     <module>hawkular-inventory-api</module>
-    <module>hawkular-inventory-json-helper</module>
+    <module>hawkular-inventory-service</module>
+    <module>hawkular-inventory-ui</module>
+    <module>hawkular-inventory-itest</module>
   </modules>
+
 </project>

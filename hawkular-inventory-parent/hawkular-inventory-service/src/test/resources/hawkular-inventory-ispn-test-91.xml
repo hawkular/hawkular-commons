@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2014-2017 Red Hat, Inc. and/or its affiliates
+    and other contributors as indicated by the @author tags.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<infinispan
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:infinispan:config:9.1 http://www.infinispan.org/schemas/infinispan-config-9.1.xsd"
+    xmlns="urn:infinispan:config:9.1">
+
+  <cache-container name="hawkular-inventory">
+    <jmx duplicate-domains="true" />
+    <local-cache name="resource" statistics="true">
+      <transaction mode="NON_XA"/>
+      <persistence>
+        <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="target/persisted/inventory">
+          <write-behind thread-pool-size="5" modification-queue-size="10000" />
+        </file-store>
+      </persistence>
+      <memory>
+        <!--
+          <binary eviction="COUNT" size="10000" />
+        -->
+        <object size="5000" />
+        <!--
+          <off-heap eviction="COUNT" size="100000" />
+        -->
+      </memory>
+      <indexing index="LOCAL">
+        <indexed-entities>
+          <indexed-entity>org.hawkular.inventory.service.ispn.IspnResource</indexed-entity>
+        </indexed-entities>
+        <property name="default.indexmanager">near-real-time</property>
+        <property name="default.directory_provider">infinispan</property>
+        <property name="default.chunk_size">128000</property>
+        <property name="default.locking_cachename">resource_indexes_locking</property>
+        <property name="default.data_cachename">resource_indexes_data</property>
+        <property name="default.metadata_cachename">resource_indexes_metadata</property>
+        <!-- The default is 10, but we don't want to waste many cycles in merging
+         (tune for writes at cost of reader fragmentation) -->
+
+        <property name="default.indexwriter.merge_factor">30</property>
+        <!-- Never create segments larger than 1GB -->
+        <property name="default.indexwriter.merge_max_size">1024</property>
+        <!-- IndexWriter flush buffer size in MB -->
+        <property name="default.indexwriter.ram_buffer_size">64</property>
+        <!-- Enable sharding on writers -->
+        <property name="default.sharding_strategy.nbr_of_shards">6</property>
+        <property name="lucene_version">LUCENE_CURRENT</property>
+      </indexing>
+    </local-cache>
+    <local-cache name="resource_indexes_metadata">
+      <persistence passivation="false">
+        <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="target/persisted/inventory">
+          <write-behind thread-pool-size="5" />
+        </file-store>
+      </persistence>
+      <indexing index="NONE"/>
+    </local-cache>
+    <local-cache name="resource_indexes_data">
+      <persistence passivation="false">
+        <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="target/persisted/inventory">
+          <write-behind thread-pool-size="5" />
+        </file-store>
+      </persistence>
+      <indexing index="NONE" />
+    </local-cache>
+    <local-cache name="resource_indexes_locking">
+      <persistence passivation="false">
+        <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="target/persisted/inventory">
+          <write-behind thread-pool-size="5" />
+        </file-store>
+      </persistence>
+      <indexing index="NONE" />
+    </local-cache>
+
+    <local-cache name="resource_type" statistics="true">
+      <transaction mode="NON_XA"/>
+      <persistence>
+        <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="target/persisted/inventory">
+          <write-behind thread-pool-size="5" modification-queue-size="10000" />
+        </file-store>
+      </persistence>
+      <indexing index="LOCAL">
+        <indexed-entities>
+          <indexed-entity>org.hawkular.inventory.service.ispn.IspnResourceType</indexed-entity>
+        </indexed-entities>
+        <property name="default.indexmanager">near-real-time</property>
+        <property name="default.directory_provider">infinispan</property>
+        <property name="default.chunk_size">128000</property>
+        <property name="default.locking_cachename">resource_type_indexes_locking</property>
+        <property name="default.data_cachename">resource_type_indexes_data</property>
+        <property name="default.metadata_cachename">resource_type_indexes_metadata</property>
+        <!-- The default is 10, but we don't want to waste many cycles in merging
+         (tune for writes at cost of reader fragmentation) -->
+
+        <property name="default.indexwriter.merge_factor">30</property>
+        <!-- Never create segments larger than 1GB -->
+        <property name="default.indexwriter.merge_max_size">1024</property>
+        <!-- IndexWriter flush buffer size in MB -->
+        <property name="default.indexwriter.ram_buffer_size">64</property>
+        <!-- Enable sharding on writers -->
+        <property name="default.sharding_strategy.nbr_of_shards">6</property>
+        <property name="lucene_version">LUCENE_CURRENT</property>
+      </indexing>
+    </local-cache>
+    <local-cache name="resource_type_indexes_metadata">
+      <persistence passivation="false">
+        <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="target/persisted/inventory">
+          <write-behind thread-pool-size="5" />
+        </file-store>
+      </persistence>
+      <indexing index="NONE"/>
+    </local-cache>
+    <local-cache name="resource_type_indexes_data">
+      <persistence passivation="false">
+        <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="target/persisted/inventory">
+          <write-behind thread-pool-size="5" />
+        </file-store>
+      </persistence>
+      <indexing index="NONE" />
+    </local-cache>
+    <local-cache name="resource_type_indexes_locking">
+      <persistence passivation="false">
+        <file-store preload="true" fetch-state="true" read-only="false" purge="false" path="target/persisted/inventory">
+          <write-behind thread-pool-size="5" />
+        </file-store>
+      </persistence>
+      <indexing index="NONE" />
+    </local-cache>
+  </cache-container>
+</infinispan>

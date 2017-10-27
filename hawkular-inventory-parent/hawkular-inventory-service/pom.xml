@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2014-2017 Red Hat, Inc. and/or its affiliates
+    and other contributors as indicated by the @author tags.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.hawkular.commons</groupId>
+    <artifactId>hawkular-inventory-parent</artifactId>
+    <version>1.0.0.Final-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>hawkular-inventory-service</artifactId>
+  <packaging>war</packaging>
+
+  <name>Hawkular Inventory: Service</name>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.wildfly.bom</groupId>
+        <artifactId>wildfly-javaee7</artifactId>
+        <version>${version.org.wildfly.bom}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-inventory-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hawkular.commons</groupId>
+      <artifactId>hawkular-commons-utils</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax</groupId>
+      <artifactId>javaee-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.logging</groupId>
+      <artifactId>jboss-logging</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.logging</groupId>
+      <artifactId>jboss-logging-annotations</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.logging</groupId>
+      <artifactId>jboss-logging-processor</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jaxrs</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- SCOPE TEST -->
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+      <version>${version.org.assertj}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+      <version>${version.junit}</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <finalName>hawkular-${project.artifactId}-${project.version}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <version>${version.org.codehaus.buildnumber-maven-plugin}</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <redirectTestOutputToFile>false</redirectTestOutputToFile>
+        </configuration>
+
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <profiles>
+
+    <profile>
+      <id>upstream-ispn-packaged-inside-war</id>
+      <activation>
+        <property>
+          <name>!eap.home</name>
+        </property>
+      </activation>
+
+      <dependencies>
+
+        <dependency>
+          <groupId>org.infinispan</groupId>
+          <artifactId>infinispan-query</artifactId>
+          <version>${version.org.infinispan.upstream}</version>
+          <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.infinispan</groupId>
+          <artifactId>infinispan-core</artifactId>
+          <version>${version.org.infinispan.upstream}</version>
+          <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-search-engine</artifactId>
+          <version>${version.org.hibernate.search.upstream}</version>
+          <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-search-elasticsearch</artifactId>
+          <version>${version.org.hibernate.search.upstream}</version>
+          <scope>compile</scope>
+        </dependency>
+
+      </dependencies>
+
+      <build>
+        <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>rename-ispn-config</id>
+                <phase>compile</phase>
+                <configuration>
+                  <target name="copy and rename file">
+                    <copy file="${project.build.outputDirectory}/hawkular-inventory-ispn-91.xml" tofile="${project.build.outputDirectory}/hawkular-inventory-ispn.xml" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+
+              <execution>
+                <id>rename-ispn-config-test</id>
+                <phase>test-compile</phase>
+                <configuration>
+                  <target name="copy and rename file">
+                    <copy file="${project.build.testOutputDirectory}/hawkular-inventory-ispn-test-91.xml" tofile="${project.build.testOutputDirectory}/hawkular-inventory-ispn-test.xml" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>${version.maven-war-plugin}</version>
+            <configuration>
+              <archive>
+                <manifest>
+                  <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                </manifest>
+                <manifestEntries>
+                  <Implementation-Vendor-Id>org.hawkular.inventory</Implementation-Vendor-Id>
+                  <Implementation-Version>${project.version}</Implementation-Version>
+                  <Built-From-Git-SHA1>${buildNumber}</Built-From-Git-SHA1>
+                  <Built-On>${timestamp}</Built-On>
+                </manifestEntries>
+              </archive>
+              <webResources>
+                <resource>
+                  <filtering>false</filtering>
+                  <directory>${basedir}/src/main/webapp</directory>
+                </resource>
+              </webResources>
+              <packagingExcludes>WEB-INF/jboss-deployment-structure.xml</packagingExcludes>
+            </configuration>
+          </plugin>
+
+        </plugins>
+      </build>
+
+    </profile>
+
+    <profile>
+      <id>jdg-library-deployed-on-eap</id>
+      <activation>
+        <property>
+          <name>eap.home</name>
+        </property>
+      </activation>
+
+      <dependencies>
+
+        <dependency>
+          <groupId>org.infinispan</groupId>
+          <artifactId>infinispan-query</artifactId>
+          <version>${version.org.infinispan.jdg72}</version>
+          <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.infinispan</groupId>
+          <artifactId>infinispan-core</artifactId>
+          <version>${version.org.infinispan.jdg72}</version>
+          <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-search-engine</artifactId>
+          <version>${version.org.hibernate.search.jdg72}</version>
+          <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-search-elasticsearch</artifactId>
+          <version>${version.org.hibernate.search.jdg72}</version>
+          <scope>provided</scope>
+        </dependency>
+
+      </dependencies>
+
+      <build>
+        <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>rename-jdg-config</id>
+                <phase>compile</phase>
+                <configuration>
+                  <target name="copy and rename file">
+                    <copy file="${project.build.outputDirectory}/hawkular-inventory-ispn-85.xml" tofile="${project.build.outputDirectory}/hawkular-inventory-ispn.xml" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+
+              <execution>
+                <id>rename-jdg-config-test</id>
+                <phase>test-compile</phase>
+                <configuration>
+                  <target name="copy and rename file">
+                    <copy file="${project.build.testOutputDirectory}/hawkular-inventory-ispn-test-85.xml" tofile="${project.build.testOutputDirectory}/hawkular-inventory-ispn-test.xml" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>${version.maven-war-plugin}</version>
+            <configuration>
+              <archive>
+                <manifest>
+                  <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                </manifest>
+                <manifestEntries>
+                  <Implementation-Vendor-Id>org.hawkular.inventory</Implementation-Vendor-Id>
+                  <Implementation-Version>${project.version}</Implementation-Version>
+                  <Built-From-Git-SHA1>${buildNumber}</Built-From-Git-SHA1>
+                  <Built-On>${timestamp}</Built-On>
+                  <Dependencies>org.infinispan:jdg-7.2 services, org.infinispan.query:jdg-7.2 services, org.infinispan.query.dsl:jdg-7.2 services</Dependencies>
+                </manifestEntries>
+              </archive>
+              <webResources>
+                <resource>
+                  <filtering>false</filtering>
+                  <directory>${basedir}/src/main/webapp</directory>
+                </resource>
+              </webResources>
+            </configuration>
+          </plugin>
+
+        </plugins>
+      </build>
+
+    </profile>
+
+    <profile>
+      <id>docgen</id>
+      <properties>
+        <restDocDirectory>${project.basedir}/src/main/rest-doc</restDocDirectory>
+        <generatedDocDirectory>${project.build.directory}/generated</generatedDocDirectory>
+        <classesDirectory>${project.build.directory}/classes</classesDirectory>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.gmavenplus</groupId>
+            <artifactId>gmavenplus-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>${version.org.codehaus.groovy}</version>
+              </dependency>
+            </dependencies>
+            <configuration>
+              <properties>
+                <inventoryVersion>${project.version}</inventoryVersion>
+                <classesDir>${classesDirectory}</classesDir>
+                <baseFile>${restDocDirectory}/base.adoc</baseFile>
+                <generatedFile>${generatedDocDirectory}/generated-doc.json</generatedFile>
+                <outputFile>${project.build.directory}/generated/rest-inventory-v4.adoc</outputFile>
+              </properties>
+              <scripts>
+                <script>file:///${restDocDirectory}/generate-api.groovy</script>
+                <script>file:///${restDocDirectory}/api-to-doc.groovy</script>
+              </scripts>
+            </configuration>
+            <executions>
+              <execution>
+                <id>generate-api-doc</id>
+                <phase>compile</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+  </profiles>
+
+</project>

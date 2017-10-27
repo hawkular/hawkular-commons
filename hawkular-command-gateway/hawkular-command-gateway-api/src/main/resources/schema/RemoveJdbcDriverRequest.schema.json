@@ -2,9 +2,9 @@
   "type": "object",
   "extends": {
     "type": "object",
-    "javaType": "org.hawkular.cmdgw.api.ResourcePathRequest"
+    "javaType": "org.hawkular.cmdgw.api.ResourceRequest"
   },
   "javaType": "org.hawkular.cmdgw.api.RemoveJdbcDriverRequest",
-  "description": "Unregisters a JDBC Driver that corresponds to the resource given by the resourcePath field.",
+  "description": "Unregisters a JDBC Driver that corresponds to the resource given by the resourceId field.",
   "additionalProperties": false
 }

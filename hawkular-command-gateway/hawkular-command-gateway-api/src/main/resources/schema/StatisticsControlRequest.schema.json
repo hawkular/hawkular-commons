@@ -10,10 +10,10 @@
   "type": "object",
   "extends": {
     "type": "object",
-    "javaType": "org.hawkular.cmdgw.api.ResourcePathRequest"
+    "javaType": "org.hawkular.cmdgw.api.ResourceRequest"
   },
   "javaType": "org.hawkular.cmdgw.api.StatisticsControlRequest",
-  "javaInterfaces" : ["org.hawkular.cmdgw.api.ResourcePathDestination"],
+  "javaInterfaces" : ["org.hawkular.cmdgw.api.ResourceDestination"],
   "description": "Turns on or off statistics emissions from the different WildFly subsystems.",
   "additionalProperties": false,
   "properties": {

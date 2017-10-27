@@ -16,107 +16,119 @@
  */
 package org.hawkular.inventory.api.model;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.hawkular.inventory.paths.CanonicalPath;
-import org.hawkular.inventory.paths.SegmentType;
+import org.hawkular.commons.doc.DocModel;
+import org.hawkular.commons.doc.DocModelProperty;
 
-import io.swagger.annotations.ApiModel;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Type of a resource. A resource type is versioned and currently just defines the types of metrics that should be
- * present in the resources of this type.
- *
- * @author Lukas Krejci
+ * @author Joel Takvorian
  */
-@ApiModel(description = "A resource type contains metadata about resources it defines. It contains" +
-        " \"configurationSchema\" and \"connectionConfigurationSchema\" data entities that can prescribe a JSON" +
-        " schema to which the configurations of the resources should conform.",
-        parent = Entity.class)
-public final class ResourceType extends Entity {
+@DocModel(description = "Representation of a resource type stored in the inventory. + \n")
+public class ResourceType implements Serializable {
 
-    public static final SegmentType SEGMENT_TYPE = SegmentType.rt;
+    public static class Builder {
+        private String id;
+        private List<Operation> operations = new ArrayList<>();
+        private Map<String, String> properties = new HashMap<>();
 
-    /**
-     * Jackson support
-     */
-    @SuppressWarnings("unused")
-    private ResourceType() {
+        public ResourceType build() {
+            return new ResourceType(id, operations, properties);
+        }
+
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder operation(Operation op) {
+            this.operations.add(op);
+            return this;
+        }
+
+        public Builder property(String name, String value) {
+            this.properties.put(name, value);
+            return this;
+        }
+
+        public Builder properties(Map<String, String> props) {
+            this.properties.putAll(props);
+            return this;
+        }
     }
 
-    public ResourceType(CanonicalPath path) {
-        super(path);
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public ResourceType(String name, CanonicalPath path) {
-        super(name, path);
+    @DocModelProperty(description = "Resource type identifier. Unique within the inventory.",
+            position = 0,
+            required = true)
+    @JsonInclude(Include.NON_NULL)
+    private final String id;  // Unique index [Search resource type by id]
+
+    @DocModelProperty(description = "List of operations supported by this resource type.",
+            position = 1,
+            required = false)
+    @JsonInclude(Include.NON_NULL)
+    private final Collection<Operation> operations;
+
+    @DocModelProperty(description = "Properties defined for this resource type.",
+            position = 2)
+    @JsonInclude(Include.NON_NULL)
+    private final Map<String, String> properties;
+
+    public ResourceType(@JsonProperty("id") String id,
+                        @JsonProperty("operations") Collection<Operation> operations,
+                        @JsonProperty("properties") Map<String, String> properties) {
+        this.id = id;
+        this.operations = operations;
+        this.properties = properties;
     }
 
-    public ResourceType(CanonicalPath path, Map<String, Object> properties) {
-        super(path, properties);
+    public String getId() {
+        return id;
     }
 
-    public ResourceType(String name, CanonicalPath path, Map<String, Object> properties) {
-        super(name, path, properties);
+    public Collection<Operation> getOperations() {
+        return Collections.unmodifiableCollection(operations);
+    }
+
+    public Map<String, String> getProperties() {
+        return Collections.unmodifiableMap(properties);
     }
 
     @Override
-    public <R, P> R accept(ElementVisitor<R, P> visitor, P parameter) {
-        return visitor.visitResourceType(this, parameter);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ResourceType that = (ResourceType) o;
+
+        return id != null ? id.equals(that.id) : that.id == null;
     }
 
-    /**
-     * Data required to create a resource type.
-     *
-     * <p>Note that tenantId, etc., are not needed here because they are provided by the context in which the
-     * {@link org.hawkular.inventory.api.WriteInterface#create(org.hawkular.inventory.api.model.Blueprint)} method is
-     * called.
-     */
-    @ApiModel("ResourceTypeBlueprint")
-    public static final class Blueprint extends Entity.Blueprint {
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 
-        public static Builder builder() {
-            return new Builder();
-        }
-
-        //JAXB support
-        @SuppressWarnings("unused")
-        private Blueprint() {
-        }
-
-        public Blueprint(String id) {
-            this(id, Collections.emptyMap());
-        }
-
-        public Blueprint(String id, Map<String, Object> properties) {
-            super(id, properties);
-        }
-
-        public Blueprint(String id, Map<String, Object> properties,
-                         Map<String, Set<CanonicalPath>> outgoing,
-                         Map<String, Set<CanonicalPath>> incoming) {
-            super(id, properties, outgoing, incoming);
-        }
-
-        public Blueprint(String id, String name, Map<String, Object> properties,
-                         Map<String, Set<CanonicalPath>> outgoing,
-                         Map<String, Set<CanonicalPath>> incoming) {
-            super(id, name, properties, outgoing, incoming);
-        }
-
-        @Override
-        public <R, P> R accept(ElementBlueprintVisitor<R, P> visitor, P parameter) {
-            return visitor.visitResourceType(this, parameter);
-        }
-
-        public static final class Builder extends Entity.Blueprint.Builder<Blueprint, Builder> {
-
-            @Override
-            public Blueprint build() {
-                return new Blueprint(id, name, properties, outgoing, incoming);
-            }
-        }
+    @Override
+    public String toString() {
+        return "ResourceType{" +
+                "id='" + id + '\'' +
+                ", operations=" + operations +
+                ", properties=" + properties +
+                '}';
     }
 }

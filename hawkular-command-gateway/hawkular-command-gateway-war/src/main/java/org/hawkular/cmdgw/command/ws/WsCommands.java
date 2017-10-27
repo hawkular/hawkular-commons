@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 Red Hat, Inc. and/or its affiliates
+ * Copyright 2014-2017 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ import org.hawkular.bus.common.BasicMessage;
 import org.hawkular.cmdgw.NoCommandForMessageException;
 import org.hawkular.cmdgw.api.EchoRequest;
 import org.hawkular.cmdgw.api.EventDestination;
-import org.hawkular.cmdgw.api.ResourcePathDestination;
+import org.hawkular.cmdgw.api.ResourceDestination;
 import org.hawkular.cmdgw.api.UiSessionDestination;
 
 /**
@@ -39,8 +39,8 @@ public class WsCommands {
     // Here we define the only known commands we are expected to handle.
     // Notice we instantiate them here - these must be thread-safe.
 
-    private final ResourcePathDestinationWsCommand resourcePathDestinationWsCommand = //
-    new ResourcePathDestinationWsCommand();
+    private final ResourceDestinationWsCommand resourcePathDestinationWsCommand = //
+    new ResourceDestinationWsCommand();
 
     private final EchoCommand echoCommand = new EchoCommand();
     private final UiSessionDestinationWsCommand uiSessionDestinationWsCommand = new UiSessionDestinationWsCommand();
@@ -59,7 +59,7 @@ public class WsCommands {
 
         ArrayList<WsCommand<REQ>> results = new ArrayList<>(2);
 
-        if (ResourcePathDestination.class.isAssignableFrom(requestClass)) {
+        if (ResourceDestination.class.isAssignableFrom(requestClass)) {
             results.add((WsCommand<REQ>) resourcePathDestinationWsCommand);
         } else if (UiSessionDestination.class.isAssignableFrom(requestClass)) {
             results.add((WsCommand<REQ>) uiSessionDestinationWsCommand);

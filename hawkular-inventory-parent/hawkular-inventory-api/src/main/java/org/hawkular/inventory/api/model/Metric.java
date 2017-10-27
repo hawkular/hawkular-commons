@@ -16,175 +16,122 @@
  */
 package org.hawkular.inventory.api.model;
 
+import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-import org.hawkular.inventory.paths.CanonicalPath;
-import org.hawkular.inventory.paths.SegmentType;
+import org.hawkular.commons.doc.DocModel;
+import org.hawkular.commons.doc.DocModelProperty;
 
-import io.swagger.annotations.ApiModel;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Metric describes a single metric that is sent out from a feed. Each metric has a unique ID and a type. Metrics live
- * in an environment and can be "incorporated" by {@link Resource resources} (surprisingly, many resources can
- * incorporate a single metric).
- *
- * @author Lukas Krejci
- * @since 0.0.1
+ * @author Joel Takvorian
  */
-@ApiModel(description = "A metric represents a monitored \"quality\". Its metric type specifies the unit in which" +
-        " the metric reports its values and the collection interval specifies how often the feed should be collecting" +
-        " the metric for changes in value.",
-        parent = Entity.class)
-public final class Metric extends Entity {
+@DocModel(description = "Representation of a resource metric. + \n")
+public class Metric implements Serializable {
 
-    public static final SegmentType SEGMENT_TYPE = SegmentType.m;
+    public static class Builder {
+        private String name;
+        private String type;
+        private MetricUnit unit;
+        private Map<String, String> properties = new HashMap<>();
 
-    private final MetricType type;
-    private final Long collectionInterval;
+        public Metric build() {
+            return new Metric(name, type, unit, properties);
+        }
 
-    /**
-     * Jackson support
-     */
-    @SuppressWarnings("unused")
-    private Metric() {
-        type = null;
-        collectionInterval = null;
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder type(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder unit(MetricUnit unit) {
+            this.unit = unit;
+            return this;
+        }
+
+        public Builder property(String name, String value) {
+            this.properties.put(name, value);
+            return this;
+        }
+
+        public Builder properties(Map<String, String> props) {
+            this.properties.putAll(props);
+            return this;
+        }
     }
 
-    public Metric(CanonicalPath path, MetricType type) {
-        this(null, path, type, null, null);
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public Metric(String name, CanonicalPath path, MetricType type) {
-        this(name, path, type, null ,null);
-    }
+    @DocModelProperty(description = "Metric name.",
+            position = 0,
+            required = true)
+    @JsonInclude(Include.NON_NULL)
+    private final String name;  // Name (for display?)
 
-    public Metric(CanonicalPath path, MetricType type, Long collectionInterval) {
-        this(null, path, type, collectionInterval, null);
-    }
+    @DocModelProperty(description = "Metric type.",
+            position = 1,
+            required = true)
+    @JsonInclude(Include.NON_NULL)
+    private final String type;  // Ex: Deployment status, Server availability
 
-    public Metric(CanonicalPath path, MetricType type, Map<String, Object> properties) {
-        this(null, path, type, null, properties);
-    }
+    @DocModelProperty(description = "Metric type.",
+            position = 2,
+            required = true,
+            defaultValue = "NONE")
+    @JsonInclude(Include.NON_NULL)
+    private final MetricUnit unit;
 
-    public Metric(String name, CanonicalPath path, MetricType type, Long collectionInterval, Map<String, Object> properties) {
-        super(name, path, properties);
+    @DocModelProperty(description = "Metric properties.",
+            position = 3,
+            required = false)
+    @JsonInclude(Include.NON_NULL)
+    private final Map<String, String> properties;   // properties may contain, for instance, the full prometheus metric name
+
+    public Metric(@JsonProperty("name") String name,
+                  @JsonProperty("type") String type,
+                  @JsonProperty("unit") MetricUnit unit,
+                  @JsonProperty("properties") Map<String, String> properties) {
+        this.name = name;
         this.type = type;
-        this.collectionInterval = collectionInterval;
+        this.unit = unit;
+        this.properties = properties;
     }
 
-    public MetricType getType() {
+    public String getName() {
+        return name;
+    }
+
+    public String getType() {
         return type;
     }
 
-    public Long getCollectionInterval() {
-        return collectionInterval;
+    public MetricUnit getUnit() {
+        return unit;
+    }
+
+    public Map<String, String> getProperties() {
+        return Collections.unmodifiableMap(properties);
     }
 
     @Override
-    protected void appendToString(StringBuilder toStringBuilder) {
-        super.appendToString(toStringBuilder);
-        toStringBuilder.append(", definition=").append(type);
-    }
-
-    @Override
-    public <R, P> R accept(ElementVisitor<R, P> visitor, P parameter) {
-        return visitor.visitMetric(this, parameter);
-    }
-
-    /**
-     * Data required to create a new metric.
-     *
-     * <p>Note that tenantId, etc., are not needed here because they are provided by the context in which the
-     * {@link org.hawkular.inventory.api.WriteInterface#create(org.hawkular.inventory.api.model.Blueprint)} method is
-     * called.
-     */
-    @ApiModel("MetricBlueprint")
-    public static final class Blueprint extends Entity.Blueprint {
-        private final String metricTypePath;
-        private final Long collectionInterval;
-
-        public static Builder builder() {
-            return new Builder();
-        }
-
-        /**
-         * Jackson support
-         */
-        @SuppressWarnings("unused")
-        private Blueprint() {
-            metricTypePath = null;
-            collectionInterval = null;
-        }
-
-        public Blueprint(String metricTypePath, String id) {
-            this(metricTypePath, id, Collections.emptyMap());
-        }
-
-        public Blueprint(String metricTypePath, String id, Map<String, Object> properties) {
-            super(id, properties);
-            this.metricTypePath = metricTypePath;
-            this.collectionInterval = null;
-        }
-
-        public Blueprint(String metricTypePath, String id, Map<String, Object> properties,
-                         Map<String, Set<CanonicalPath>> outgoing,
-                         Map<String, Set<CanonicalPath>> incoming) {
-            super(id, properties, outgoing, incoming);
-            this.metricTypePath = metricTypePath;
-            this.collectionInterval = null;
-        }
-
-        public Blueprint(String metricTypePath, String id, String name, Map<String, Object> properties,
-                         Map<String, Set<CanonicalPath>> outgoing,
-                         Map<String, Set<CanonicalPath>> incoming) {
-            super(id, name, properties, outgoing, incoming);
-            this.metricTypePath = metricTypePath;
-            this.collectionInterval = null;
-        }
-
-        public Blueprint(String metricTypePath, String id, String name, Long collectionInterval,
-                         Map<String, Object> properties,
-                         Map<String, Set<CanonicalPath>> outgoing,
-                         Map<String, Set<CanonicalPath>> incoming) {
-            super(id, name, properties, outgoing, incoming);
-            this.metricTypePath = metricTypePath;
-            this.collectionInterval = collectionInterval;
-        }
-
-        public String getMetricTypePath() {
-            return metricTypePath;
-        }
-
-        public Long getCollectionInterval() {
-            return collectionInterval;
-        }
-
-        @Override
-        public <R, P> R accept(ElementBlueprintVisitor<R, P> visitor, P parameter) {
-            return visitor.visitMetric(this, parameter);
-        }
-
-        public static final class Builder extends Entity.Blueprint.Builder<Blueprint, Builder> {
-            private String metricTypeId;
-            private Long collectionInterval;
-
-            public Builder withMetricTypePath(String metricTypePath) {
-                this.metricTypeId = metricTypePath;
-                return this;
-            }
-
-            public Builder withInterval(Long interval) {
-                this.collectionInterval = interval;
-                return this;
-            }
-
-            @Override
-            public Blueprint build() {
-                return new Blueprint(metricTypeId, id, name, collectionInterval, properties, outgoing, incoming);
-            }
-        }
+    public String toString() {
+        return "Metric{" +
+                "name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", unit=" + unit +
+                ", properties=" + properties +
+                '}';
     }
 }

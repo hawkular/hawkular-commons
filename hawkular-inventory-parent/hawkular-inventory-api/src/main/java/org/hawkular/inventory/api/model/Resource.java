@@ -16,140 +16,133 @@
  */
 package org.hawkular.inventory.api.model;
 
-import java.util.Collections;
+import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
+import java.util.function.Function;
 
-import org.hawkular.inventory.paths.CanonicalPath;
-import org.hawkular.inventory.paths.SegmentType;
+import org.hawkular.commons.doc.DocModel;
+import org.hawkular.commons.doc.DocModelProperty;
 
-import io.swagger.annotations.ApiModel;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * A resource is a grouping of other data (currently just metrics). A resource can have a type, which prescribes how
- * the data in the resource should look like.
- *
- * @author Heiko Rupp
- * @author Lukas Krejci
+ * High-level model for {@link RawResource} associated with {@link ResourceType}
+ * Unlike {@link ResourceNode}, this class doesn't provide full children subtree,
+ * but just a list of children ids instead.
+ * @author Joel Takvorian
  */
-@ApiModel(description = "A resource has a type, can have configuration and connection configuration and can" +
-        " incorporate metrics.", parent = Entity.class)
-public final class Resource extends Entity {
+@DocModel(description = "Representation of a resource stored in the inventory. + \n" +
+        "This resource embeds the <<ResourceType>> linked.")
+public class Resource implements Serializable {
 
-    public static final SegmentType SEGMENT_TYPE = SegmentType.r;
+    @DocModelProperty(description = "Resource identifier. Unique within the inventory.",
+            position = 0,
+            required = true)
+    @JsonInclude(Include.NON_NULL)
+    private final String id;
 
+    @DocModelProperty(description = "Resource name. Used for display.",
+            position = 1,
+            required = true)
+    @JsonInclude(Include.NON_NULL)
+    private final String name;
+
+    @DocModelProperty(description = "Feed identifier. Used to identify the agent that manages this resource.",
+            position = 2,
+            required = true)
+    @JsonInclude(Include.NON_NULL)
+    private final String feedId;
+
+    @DocModelProperty(description = "<<ResourceType>> linked.",
+            position = 3,
+            required = true)
+    @JsonInclude(Include.NON_NULL)
     private final ResourceType type;
 
+    @DocModelProperty(description = "Parent resource identifier. Can be null if it's a root resource.",
+            position = 4,
+            required = true)
+    @JsonInclude
+    private final String parentId;
+
+    @DocModelProperty(description = "A list of metrics defined for this resource.",
+            position = 5)
+    @JsonInclude(Include.NON_NULL)
+    private final List<Metric> metrics;
+
+    @DocModelProperty(description = "Properties defined for this resource.",
+            position = 6)
+    @JsonInclude(Include.NON_NULL)
+    private final Map<String, String> properties;
+
+    @DocModelProperty(description = "Configuration defined for this resource.",
+            position = 7)
+    @JsonInclude(Include.NON_NULL)
+    private final Map<String, String> config;
+
+    public Resource(@JsonProperty("id") String id,
+                    @JsonProperty("name") String name,
+                    @JsonProperty("feedId") String feedId,
+                    @JsonProperty("type") ResourceType type,
+                    @JsonProperty("parentId") String parentId,
+                    @JsonProperty("metrics") List<Metric> metrics,
+                    @JsonProperty("properties") Map<String, String> properties,
+                    @JsonProperty("config") Map<String, String> config) {
+        this.id = id;
+        this.name = name;
+        this.feedId = feedId;
+        this.type = type;
+        this.parentId = parentId;
+        this.metrics = metrics;
+        this.properties = properties;
+        this.config = config;
+    }
+
     /**
-     * Jackson support
+     * Converts {@link RawResource} into {@link Resource} using loader for {@link ResourceType}.
+     * The children are not loaded.
+     * @param r the resource to convert
+     * @param rtLoader loader for {@link ResourceType}
+     * @return the node without its subtree
      */
-    @SuppressWarnings("unused")
-    private Resource() {
-        type = null;
+    public static Resource fromRaw(RawResource r, Function<String, Optional<ResourceType>> rtLoader) {
+        return new Resource(r.getId(), r.getName(), r.getFeedId(), rtLoader.apply(r.getTypeId()).orElse(null),
+                r.getParentId(), r.getMetrics(), r.getProperties(), r.getConfig());
     }
 
-    public Resource(CanonicalPath path, ResourceType type) {
-        this(path, type, null);
+    public String getId() {
+        return id;
     }
 
-    public Resource(String name, CanonicalPath path, ResourceType type) {
-        this(name, path, type, null);
+    public String getName() {
+        return name;
     }
 
-    public Resource(CanonicalPath path, ResourceType type,
-                    Map<String, Object> properties) {
-        super(path, properties);
-        this.type = type;
+    public String getFeedId() {
+        return feedId;
     }
 
-    public Resource(String name, CanonicalPath path, ResourceType type, Map<String, Object> properties) {
-        super(name, path, properties);
-        this.type = type;
+    public String getParentId() {
+        return parentId;
+    }
+
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public Map<String, String> getConfig() {
+        return config;
     }
 
     public ResourceType getType() {
         return type;
     }
 
-    @Override
-    public <R, P> R accept(ElementVisitor<R, P> visitor, P parameter) {
-        return visitor.visitResource(this, parameter);
-    }
-
-    @Override
-    protected void appendToString(StringBuilder toStringBuilder) {
-        super.appendToString(toStringBuilder);
-        toStringBuilder.append(", type=").append(type);
-    }
-
-    /**
-     * Data required to create a resource.
-     *
-     * <p>Note that tenantId, etc., are not needed here because they are provided by the context in which the
-     * {@link org.hawkular.inventory.api.WriteInterface#create(org.hawkular.inventory.api.model.Blueprint)} method is
-     * called.
-     */
-    @ApiModel("ResourceBlueprint")
-    public static final class Blueprint extends Entity.Blueprint {
-        private final String resourceTypePath;
-
-        public static Builder builder() {
-            return new Builder();
-        }
-
-        /**
-         * JAXB support
-         */
-        @SuppressWarnings("unused")
-        private Blueprint() {
-            resourceTypePath = null;
-        }
-
-        public Blueprint(String id, String resourceTypePath) {
-            this(id, resourceTypePath, Collections.emptyMap());
-        }
-
-        public Blueprint(String id, String resourceTypePath, Map<String, Object> properties) {
-            super(id, properties);
-            this.resourceTypePath = resourceTypePath;
-        }
-
-        public Blueprint(String id, String resourceTypePath, Map<String, Object> properties,
-                         Map<String, Set<CanonicalPath>> outgoing,
-                         Map<String, Set<CanonicalPath>> incoming) {
-            super(id, properties, outgoing, incoming);
-            this.resourceTypePath = resourceTypePath;
-        }
-
-        public Blueprint(String id, String name, String resourceTypePath, Map<String, Object> properties,
-                         Map<String, Set<CanonicalPath>> outgoing,
-                         Map<String, Set<CanonicalPath>> incoming) {
-            super(id, name, properties, outgoing, incoming);
-            this.resourceTypePath = resourceTypePath;
-        }
-
-        public String getResourceTypePath() {
-            return resourceTypePath;
-        }
-
-        @Override
-        public <R, P> R accept(ElementBlueprintVisitor<R, P> visitor, P parameter) {
-            return visitor.visitResource(this, parameter);
-        }
-
-        public static final class Builder extends Entity.Blueprint.Builder<Blueprint, Builder> {
-            private String resourceTypePath;
-
-            public Builder withResourceTypePath(String resourceTypePath) {
-                this.resourceTypePath = resourceTypePath;
-                return this;
-            }
-
-            @Override
-            public Blueprint build() {
-                return new Blueprint(id, name, resourceTypePath, properties, outgoing, incoming);
-            }
-        }
+    public List<Metric> getMetrics() {
+        return metrics;
     }
 }

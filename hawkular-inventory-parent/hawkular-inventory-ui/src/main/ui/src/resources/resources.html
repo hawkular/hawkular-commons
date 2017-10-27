@@ -1,0 +1,40 @@
+
+<div class="container-fluid" ng-app="hwk.resourcesModule" ng-controller="hwk.resourcesController" id="theController">
+
+  <!-- TOAST NOTIFICATIONS -->
+
+  <pf-notification-list></pf-notification-list>
+
+  <!-- Toolbar Filters and Kebab -->
+  <div class="row toolbar-pf">
+    <div class="col-md-12">
+      <form class="toolbar-pf-actions">
+        <div class="form-group">
+          <div class="dropdown btn-group  dropdown-kebab-pf">
+            <button class="btn btn-link dropdown-toggle" type="button" id="resourcesKebab" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+              <span class="fa fa-ellipsis-v"></span>
+            </button>
+            <ul class="dropdown-menu " aria-labelledby="resourceDefinitionsKebab">
+              <li ng-click="refreshTree()"><a>Refresh</a></li>
+            </ul>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="panel panel-default col-md-6 col-sm-6">
+      <div class="panel panel-body">
+        <div id="resourceTree" style="height:80vh"></div>
+      </div>
+    </div>
+    <div class="panel panel-default col-md-6 col-sm-6">
+      <div class="panel panel-body">
+        <textarea class="form-control" ng-model="detail" ng-readonly="true" style="height:80vh" />
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+

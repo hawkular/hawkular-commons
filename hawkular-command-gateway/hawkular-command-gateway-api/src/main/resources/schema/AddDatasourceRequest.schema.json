@@ -2,10 +2,10 @@
   "type": "object",
   "extends": {
     "type": "object",
-    "javaType": "org.hawkular.cmdgw.api.ResourcePathRequest"
+    "javaType": "org.hawkular.cmdgw.api.ResourceRequest"
   },
   "javaType": "org.hawkular.cmdgw.api.AddDatasourceRequest",
-  "description": "Adds a Datasource or a XA Datasource to an Application Server instance given by the inventory path stored in resourcePath field.",
+  "description": "Adds a Datasource or a XA Datasource to an Application Server instance given by the inventory path stored in resourceId field.",
   "additionalProperties": false,
   "properties": {
     "xaDatasource": {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 Red Hat, Inc. and/or its affiliates
+ * Copyright 2014-2017 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -96,7 +96,8 @@ public class ApiDeserializerTest {
         ExecuteOperationRequest newpojo;
         ExecuteOperationRequest pojo = new ExecuteOperationRequest();
         pojo.setOperationName("opname");
-        pojo.setResourcePath("respath");
+        pojo.setFeedId("feedid");
+        pojo.setResourceId("resid");
         pojo.setParameters(new HashMap<String, String>());
         pojo.getParameters().put("one", "1");
         pojo.getParameters().put("two", "22");
@@ -104,7 +105,8 @@ public class ApiDeserializerTest {
 
         newpojo = testSpecificPojo(pojo);
         Assert.assertEquals(pojo.getOperationName(), newpojo.getOperationName());
-        Assert.assertEquals(pojo.getResourcePath(), newpojo.getResourcePath());
+        Assert.assertEquals(pojo.getFeedId(), newpojo.getFeedId());
+        Assert.assertEquals(pojo.getResourceId(), newpojo.getResourceId());
         Assert.assertEquals(pojo.getParameters(), newpojo.getParameters());
     }
 

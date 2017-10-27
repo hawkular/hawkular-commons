@@ -2,11 +2,11 @@
   "type": "object",
   "extends": {
     "type": "object",
-    "javaType": "org.hawkular.cmdgw.api.ResourcePathRequest"
+    "javaType": "org.hawkular.cmdgw.api.ResourceRequest"
   },
   "javaType": "org.hawkular.cmdgw.api.DisableApplicationRequest",
-  "javaInterfaces" : ["org.hawkular.cmdgw.api.ResourcePathDestination"],
-  "description": "If enabled, disable the deployment with destinationFileName, on the Application Server instance given by the inventory path stored in resourcePath field.",
+  "javaInterfaces" : ["org.hawkular.cmdgw.api.ResourceDestination"],
+  "description": "If enabled, disable the deployment with destinationFileName, on the Application Server instance given by the inventory path stored in resourceId field.",
   "additionalProperties": false,
   "properties": {
     "destinationFileName": {

@@ -22,3 +22,10 @@ nb-configuration.xml
 
 # OSX
 .DS_Store
+
+hawkular-inventory-parent/hawkular-inventory-ui/src/main/ui/node_modules
+hawkular-inventory-parent/hawkular-inventory-ui/src/main/ui/bower_components
+hawkular-inventory-parent/hawkular-inventory-ui/src/main/ui/.sass-cache
+hawkular-inventory-parent/hawkular-inventory-ui/src/main/ui/dist
+hawkular-inventory-parent/hawkular-inventory-ui/src/main/ui/index.html
+hawkular-inventory-parent/hawkular-inventory-ui/src/main/ui/src/templates/appModuleTemplates.js

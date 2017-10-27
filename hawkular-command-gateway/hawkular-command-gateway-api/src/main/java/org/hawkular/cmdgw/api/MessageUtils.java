@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 Red Hat, Inc. and/or its affiliates
+ * Copyright 2014-2017 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,9 +20,10 @@ package org.hawkular.cmdgw.api;
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  */
 public class MessageUtils {
-    public static void prepareResourcePathResponse(ResourcePathRequest request, ResourcePathResponse response) {
+    public static void prepareResourceResponse(ResourceRequest request, ResourceResponse response) {
         prepareUiSessionDestination((UiSessionOrigin) request, (UiSessionDestination) response);
-        response.setResourcePath(request.getResourcePath());
+        response.setFeedId(request.getFeedId());
+        response.setResourceId(request.getResourceId());
     }
     public static void prepareUiSessionDestination(UiSessionOrigin request, UiSessionDestination response) {
         response.setDestinationSessionId(request.getSenderSessionId());
