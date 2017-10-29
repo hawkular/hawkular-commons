@@ -54,7 +54,7 @@ rules:
 
   # DEPLOYMENTS
 
-  - pattern: "jboss.as<deployment=(.+), subdeployment=(.+), subsystem=undertow><>(.+_sessions|session_.+):"
+  - pattern: "jboss.as<deployment=(.+), subdeployment=(.+), subsystem=undertow><>(.+_sessions|sessions_.+):"
     attrNameSnakeCase: true
     name: wildfly_deployment_$3
     type: GAUGE
@@ -62,7 +62,7 @@ rules:
       name: $1
       subdeployment: $2
 
-  - pattern: "jboss.as<deployment=(.+), subsystem=undertow><>(.+_sessions|session_.+):"
+  - pattern: "jboss.as<deployment=(.+), subsystem=undertow><>(.+_sessions|sessions_.+):"
     attrNameSnakeCase: true
     name: wildfly_deployment_$2
     type: GAUGE
