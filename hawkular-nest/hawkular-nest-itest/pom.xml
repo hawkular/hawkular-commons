@@ -43,8 +43,6 @@
     <hawkular.log.bus>TRACE</hawkular.log.bus>
     <hawkular.log.cmdgw>TRACE</hawkular.log.cmdgw>
     <hawkular.log.nest>INFO</hawkular.log.nest>
-    <hawkular.log.datastax.driver>INFO</hawkular.log.datastax.driver>
-    <hawkular.log.cassandra>INFO</hawkular.log.cassandra>
 
   </properties>
 
@@ -199,9 +197,6 @@
                 -Dhawkular.log.bus=${hawkular.log.bus}
                 -Dhawkular.log.cmdgw=${hawkular.log.cmdgw}
                 -Dhawkular.log.nest=${hawkular.log.nest}
-                -Dhawkular.log.datastax.driver=${hawkular.log.datastax.driver}
-                -Dhawkular.log.cassandra=${hawkular.log.cassandra}
-                -Dhawkular.backend=embedded_cassandra
             </jboss.options>
             <shrinkwrap.maven.settings>${project.build.directory}/shrinkwrap-maven-settings.xml</shrinkwrap.maven.settings>
 
