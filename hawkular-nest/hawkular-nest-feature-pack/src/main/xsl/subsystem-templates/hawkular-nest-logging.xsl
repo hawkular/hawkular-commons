@@ -59,9 +59,6 @@
       <logger category="org.hawkular.nest">
         <level name="${{hawkular.log.nest:INFO}}" />
       </logger>
-      <logger category="com.datastax.driver">
-        <level name="${{hawkular.log.datastax.driver:INFO}}"/>
-      </logger>
     </xsl:copy>
   </xsl:template>
 
