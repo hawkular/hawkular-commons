@@ -31,11 +31,50 @@
 
   <name>Hawkular Inventory: Parent</name>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>**/.sass-cach/**,**/bower_components/**,**/dist/**,**/node_modules/**</excludes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <configuration>
+          <excludes combine.children="append">
+            <exclude>**/*.htmlhintrc</exclude>
+            <exclude>**/*.scss</exclude>
+            <exclude>**/ui/.sass-cache/**</exclude>
+            <exclude>**/ui/bower_components/**</exclude>
+            <exclude>**/ui/dist/**</exclude>
+            <exclude>**/ui/node_modules/**</exclude>
+            <exclude>**/ui/src/templates/**</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
   <modules>
     <module>hawkular-inventory-api</module>
     <module>hawkular-inventory-service</module>
-    <module>hawkular-inventory-ui</module>
     <module>hawkular-inventory-itest</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>ui</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>hawkular-inventory-ui</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>
