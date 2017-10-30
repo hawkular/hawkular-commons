@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -348,5 +349,45 @@ public class InventoryServiceIspnTest {
         assertThat(health.getInventoryStats().getNumberOfResources()).isGreaterThan(10000);
         assertThat(health.getInventoryStats().getNumberOfResourcesInMemory()).isEqualTo(5000);
         assertThat(health.getDiskStats().getInventoryTotalSpace()).isGreaterThan(4000000L);
+    }
+
+    @Test
+    public void shouldDeleteAResourceAndCheckIsNotIndexed() throws IOException {
+        String idXaDs = "itest-rest-feed~Local DMR~/subsystem=datasources/xa-data-source=testXaDs";
+        String typeIdXaDs = "XA Datasource";
+        String parentIdXaDs = "itest-rest-feed~Local DMR~~";
+        String feedId = "itest-rest-feed";
+        int numIterations = 1000;
+
+        ResourceType xaDsType = ResourceType.builder().id(typeIdXaDs).build();
+        service.addResourceType(xaDsType);
+
+        for (int i = 0; i < numIterations; i++) {
+            String idXaDsX = idXaDs + "-" + i;
+            RawResource xaDs = RawResource.builder().id(idXaDsX)
+                    .typeId(typeIdXaDs)
+                    .parentId(parentIdXaDs)
+                    .feedId(feedId)
+                    .build();
+
+            service.addResource(xaDs);
+
+            Collection<Resource> resources = service.getResources(new ResourceFilter(false, feedId, null)).getResults();
+            assertThat(resources)
+                    .extracting(Resource::getId)
+                    .contains(idXaDsX);
+
+            service.deleteResources(Arrays.asList(idXaDsX));
+
+            resources = service.getResources(new ResourceFilter(false, feedId, null)).getResults();
+            assertThat(resources)
+                    .extracting(Resource::getId)
+                    .doesNotContain(idXaDsX);
+
+            resources = service.getResources(new ResourceFilter(false, feedId, typeIdXaDs)).getResults();
+            assertThat(resources)
+                    .extracting(Resource::getId)
+                    .doesNotContain(idXaDsX);
+        }
     }
 }

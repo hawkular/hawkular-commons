@@ -544,4 +544,90 @@ public class InventoryRestTest extends AbstractInventoryITest {
         List<ResourceType> types = (List<ResourceType>) response.readEntity(ResultSet.class).getResults();
         assertThat(types).isEmpty();
     }
+
+    @Test
+    @RunAsClient
+    public void test104_shouldDeleteAResourceAndCheckIsNotIndexed() {
+        String idXaDs = "itest-rest-feed~Local DMR~/subsystem=datasources/xa-data-source=testXaDs";
+        String typeIdXaDs = "XA Datasource";
+        String parentIdXaDs = "itest-rest-feed~Local DMR~~";
+        String feedId = "itest-rest-feed";
+        int numIterations = 1000;
+
+        ResourceType xaDsType = ResourceType.builder().id(typeIdXaDs).build();
+        Inventory types = new Inventory(null, Arrays.asList(xaDsType));
+
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString()).path("import");
+        Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .post(Entity.entity(types, MediaType.APPLICATION_JSON_TYPE));
+        assertEquals(200, response.getStatus());
+
+        for (int i = 0; i < numIterations; i++) {
+            String idXaDsX = idXaDs + "-" + i;
+            RawResource xaDs = RawResource.builder().id(idXaDsX)
+                    .typeId(typeIdXaDs)
+                    .parentId(parentIdXaDs)
+                    .feedId(feedId)
+                    .build();
+
+            Inventory inventory = new Inventory(Arrays.asList(xaDs), null);
+
+            client = ClientBuilder.newClient();
+            target = client.target(baseUrl.toString()).path("import");
+            response = target
+                    .request(MediaType.APPLICATION_JSON_TYPE)
+                    .post(Entity.entity(inventory, MediaType.APPLICATION_JSON_TYPE));
+            assertEquals(200, response.getStatus());
+
+            client = ClientBuilder.newClient();
+            target = client.target(baseUrl.toString())
+                    .path("resources")
+                    .queryParam("feedId", feedId);
+            response = target
+                    .request(MediaType.APPLICATION_JSON_TYPE)
+                    .get();
+            assertEquals(200, response.getStatus());
+            List<Resource> resources = (List<Resource>) response.readEntity(ResultSet.class).getResults();
+            assertThat(resources)
+                    .extracting(Resource::getId)
+                    .contains(idXaDsX);
+
+            target = client.target(baseUrl.toString())
+                    .path("resources")
+                    .queryParam("ids", idXaDsX);
+            response = target
+                    .request(MediaType.APPLICATION_JSON_TYPE)
+                    .delete();
+            assertEquals(200, response.getStatus());
+
+            client = ClientBuilder.newClient();
+            target = client.target(baseUrl.toString())
+                    .path("resources")
+                    .queryParam("feedId", feedId);
+            response = target
+                    .request(MediaType.APPLICATION_JSON_TYPE)
+                    .get();
+            assertEquals(200, response.getStatus());
+            resources = (List<Resource>) response.readEntity(ResultSet.class).getResults();
+            assertThat(resources)
+                    .extracting(Resource::getId)
+                    .doesNotContain(idXaDs);
+
+            client = ClientBuilder.newClient();
+            target = client.target(baseUrl.toString())
+                    .path("resources")
+                    .queryParam("feedId", feedId)
+                    .queryParam("typeId", typeIdXaDs);
+            response = target
+                    .request(MediaType.APPLICATION_JSON_TYPE)
+                    .get();
+            assertEquals(200, response.getStatus());
+            resources = (List<Resource>) response.readEntity(ResultSet.class).getResults();
+            assertThat(resources)
+                    .extracting(Resource::getId)
+                    .doesNotContain(idXaDs);
+        }
+    }
 }
