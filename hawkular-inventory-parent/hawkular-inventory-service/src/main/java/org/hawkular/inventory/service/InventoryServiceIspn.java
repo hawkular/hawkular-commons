@@ -50,7 +50,6 @@ import org.hawkular.inventory.log.MsgLogger;
 import org.hawkular.inventory.service.ispn.IspnResource;
 import org.hawkular.inventory.service.ispn.IspnResourceType;
 import org.infinispan.Cache;
-import org.infinispan.context.Flag;
 import org.infinispan.query.Search;
 import org.infinispan.query.dsl.FilterConditionContextQueryBuilder;
 import org.infinispan.query.dsl.Query;
@@ -118,7 +117,7 @@ public class InventoryServiceIspn implements InventoryService {
         Map<String, IspnResource> map = resources.stream()
                 .parallel()
                 .collect(Collectors.toMap(r -> r.getId(), r -> new IspnResource(r)));
-        resource.getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES).putAll(map);
+        resource.putAll(map);
     }
 
     @Override
@@ -134,7 +133,7 @@ public class InventoryServiceIspn implements InventoryService {
         Map<String, IspnResourceType> map = resourceTypes.stream()
                 .parallel()
                 .collect(Collectors.toMap(rt -> rt.getId(), rt -> new IspnResourceType(rt)));
-        resourceType.getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES).putAll(map);
+        resourceType.putAll(map);
     }
 
     @Override
@@ -142,7 +141,7 @@ public class InventoryServiceIspn implements InventoryService {
         if (isEmpty(ids)) {
             throw new IllegalArgumentException("Ids must be not null or empty");
         }
-        ids.forEach(resource.getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES)::remove);
+        ids.forEach(resource::remove);
     }
 
     @Override
@@ -155,7 +154,7 @@ public class InventoryServiceIspn implements InventoryService {
         if (isEmpty(typeIds)) {
             throw new IllegalArgumentException("Types must be not null or empty");
         }
-        typeIds.forEach(resourceType.getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES)::remove);
+        typeIds.forEach(resourceType::remove);
     }
 
     @Override
