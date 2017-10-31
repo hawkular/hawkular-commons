@@ -52,6 +52,7 @@ import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.model.Inventory;
 import org.hawkular.inventory.api.model.InventoryHealth;
+import org.hawkular.inventory.api.model.MetricsEndpoint;
 import org.hawkular.inventory.api.model.Resource;
 import org.hawkular.inventory.api.model.ResourceNode;
 import org.hawkular.inventory.api.model.ResourceType;
@@ -236,6 +237,38 @@ public class InventoryHandlers {
                 inventoryService.addResourceType(inventory.getTypes());
             }
             return ResponseUtil.ok();
+        } catch (Exception e) {
+            return ResponseUtil.internalError(e);
+        }
+    }
+
+    @DocPath(method = "POST", path = "/register-metrics-endpoint", name = "Registers a feed metrics endpoint so it can be scraped for metric data.", notes = "This will write a configuration file for Prometheus so it can begin collecting metrics.")
+    @DocParameters(value = {
+            @DocParameter(required = true, body = true, type = MetricsEndpoint.class, description = "Describes the metrics endpoint t be registered.")
+    })
+    @DocResponses(value = {
+            @DocResponse(code = 200, message = "Success, metrics endpoint has been registered."),
+            @DocResponse(code = 500, message = "Internal server error.", response = ApiError.class)
+    })
+    @POST
+    @Path("/register-metrics-endpoint")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response registerMetricsEndpoint(final MetricsEndpoint metricsEndpoint) {
+        try {
+            boolean ok;
+            if (metricsEndpoint != null) {
+                ok = inventoryService.registerMetricsEndpoint(metricsEndpoint);
+            } else {
+                log.errorNullValue("metricsEndpoint");
+                ok = false;
+            }
+
+            if (ok) {
+                return ResponseUtil.ok();
+            } else {
+                return ResponseUtil.internalError("Cannot register metrics endpoint. Server-side logs has details.");
+            }
         } catch (Exception e) {
             return ResponseUtil.internalError(e);
         }

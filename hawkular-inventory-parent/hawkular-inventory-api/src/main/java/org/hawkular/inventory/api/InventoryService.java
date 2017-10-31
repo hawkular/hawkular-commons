@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import org.hawkular.inventory.api.model.InventoryHealth;
+import org.hawkular.inventory.api.model.MetricsEndpoint;
 import org.hawkular.inventory.api.model.RawResource;
 import org.hawkular.inventory.api.model.Resource;
 import org.hawkular.inventory.api.model.ResourceNode;
@@ -146,6 +147,13 @@ public interface InventoryService {
      * @return config file content as String, if found
      */
     Optional<String> getJMXExporterConfig(String templateName);
+
+    /**
+     * Registers a metrics endpoint that can be scraped for metric data.
+     *
+     * @return true if the registration succeeded, false otherwise.
+     */
+    boolean registerMetricsEndpoint(MetricsEndpoint metricsEndpoint);
 
     /**
      * @return true is InventoryService is Up and Running

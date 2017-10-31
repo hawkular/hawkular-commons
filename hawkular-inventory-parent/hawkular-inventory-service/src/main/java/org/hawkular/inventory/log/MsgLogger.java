@@ -69,4 +69,15 @@ public interface MsgLogger {
     @Message(id = 100009, value = "Changing polling stats interval to [%s] ms")
     void infoChangingPollingStatsInterval(long newPollingInterval);
 
+    @LogMessage(level = Level.INFO)
+    @Message(id = 100010, value = "Registered feed [%s] metrics endpoint [%s:%d]: %s")
+    void infoRegisteredMetricsEndpoint(String feedId, String host, Integer port, String fileName);
+
+    @LogMessage(level = Level.ERROR)
+    @Message(id = 100011, value = "Cannot register feed [%s] metrics endpoint [%s:%d]")
+    void errorCannotRegisterMetricsEndpoint(String feedId, String host, Integer port, @Cause Throwable throwable);
+
+    @LogMessage(level = Level.ERROR)
+    @Message(id = 100012, value = "The value of [%s] is null")
+    void errorNullValue(String variableName);
 }

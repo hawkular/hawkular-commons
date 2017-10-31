@@ -18,7 +18,9 @@ package org.hawkular.inventory.handlers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,6 +37,7 @@ import javax.ws.rs.core.Response;
 
 import org.hawkular.inventory.Resources;
 import org.hawkular.inventory.api.model.Inventory;
+import org.hawkular.inventory.api.model.MetricsEndpoint;
 import org.hawkular.inventory.api.model.RawResource;
 import org.hawkular.inventory.api.model.Resource;
 import org.hawkular.inventory.api.model.ResourceNode;
@@ -419,6 +422,32 @@ public class InventoryRestTest extends AbstractInventoryITest {
                 .get();
         assertThat(response.getStatus()).isEqualTo(204);
         assertThat(response.hasEntity()).isFalse();
+    }
+
+    @Test
+    @RunAsClient
+    public void test025_shouldRegisterMetricsEndpoint() {
+        MetricsEndpoint metricsEndpoint = MetricsEndpoint.builder()
+                .feedId("me.feedid")
+                .host("me.host")
+                .port(9779)
+                .build();
+
+        File dir = new File(System.getProperty("jboss.home"), "standalone/configuration/hawkular/prometheus");
+        File file = new File(dir, metricsEndpoint.getFeedId() + ".json");
+        // sanity checks, the directory should exist but the file should not exist yet
+        assertTrue("The config directory should already exist: " + dir, dir.isDirectory());
+        assertTrue("The test hasn't run yet, the file should not exist: " + file, !file.exists());
+
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(baseUrl.toString()).path("register-metrics-endpoint");
+        Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .post(Entity.entity(metricsEndpoint, MediaType.APPLICATION_JSON_TYPE));
+
+        assertEquals(200, response.getStatus());
+        assertTrue("The metrics endpoint was registered, file should exist: " + file, file.exists());
+        file.delete(); // just clean up
     }
 
     @Test
