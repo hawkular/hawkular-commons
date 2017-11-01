@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$scope', '$rootScope', '$q', '$modal', 'hwk.resourcesService', 'Notifications',
-  function ($scope, $rootScope, $q, $modal, resourcesService, Notifications) {
+angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$scope', '$rootScope', '$q', '$modal', '$window', 'hwk.resourcesService', 'Notifications',
+  function ($scope, $rootScope, $q, $modal, $window, resourcesService, Notifications) {
     'use strict';
 
     console.debug("[Resources] Start: " + new Date());
@@ -37,7 +37,12 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
       readOnly: false
     };
 
-    $scope.detail = "Click Resource to See Detail";
+    $scope.resource = {
+      json: "Click Resource to See Detail",
+      metrics: []
+    };
+
+    $scope.promBaseUrl = 'http://localhost:9090';
 
     var updateTree = function () {
       console.debug("[Resources] refresh tree roots at " + new Date());
@@ -77,7 +82,8 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
         },
 
         onNodeSelected: function(event, data) {
-          $scope.detail = angular.toJson(data.resource,true);
+          $scope.resource.json = angular.toJson(data.resource,true);
+          $scope.resource.metrics = data.resource.metrics;
           $scope.$apply();
         },
 
@@ -158,6 +164,26 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
 
     $scope.refreshTree = function() {
       updateTree();
+    };
+
+    $scope.showMetric = function (metric) {
+      console.log("Name=" + metric.displayName);
+      console.log("URL=" + metric.labels);
+      if ( !metric.family || !metric.labels ) {
+        console.log("Unable to show graph for metric [" + metric.displayName + "]. No family and/or no labels.");
+        return;
+      }
+
+      var family = metric.family;
+      //TODO Remove this feed-id filtering when we have everything in sync
+      var filteredLabels = new Map(labels);
+      delete filteredLabels['feed-id'];
+      var labels = angular.toJson(filteredLabels,false);
+
+      var expression = family + labels;
+      var url = $scope.promBaseUrl + "/graph?g0.range_input=1h&g0.tab=0&g0.expr=" + encodeURIComponent(expression);
+      console.log("URL:" + url);
+      $window.open(url, '_blank');
     };
 
     // initial population of root nodes
