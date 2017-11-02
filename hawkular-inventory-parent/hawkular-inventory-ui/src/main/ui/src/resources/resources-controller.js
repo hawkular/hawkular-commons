@@ -84,6 +84,11 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
         onNodeSelected: function(event, data) {
           $scope.resource.json = angular.toJson(data.resource,true);
           $scope.resource.metrics = data.resource.metrics;
+          $scope.resource.metrics.sort(
+            function(a,b) {
+              return a.displayName.localeCompare(b.displayName);
+            });
+
           $scope.$apply();
         },
 
@@ -167,8 +172,6 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
     };
 
     $scope.showMetric = function (metric) {
-      console.log("Name=" + metric.displayName);
-      console.log("URL=" + metric.labels);
       if ( !metric.family || !metric.labels ) {
         console.log("Unable to show graph for metric [" + metric.displayName + "]. No family and/or no labels.");
         return;
@@ -176,13 +179,19 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
 
       var family = metric.family;
       //TODO Remove this feed-id filtering when we have everything in sync
-      var filteredLabels = new Map(labels);
+      var filteredLabels = JSON.parse(JSON.stringify(metric.labels));
       delete filteredLabels['feed-id'];
-      var labels = angular.toJson(filteredLabels,false);
-
+      var comma = "";
+      var labels = "{";
+      for (var l in filteredLabels) {
+        if (filteredLabels.hasOwnProperty(l)) {
+          labels = labels + comma + l + "='" + filteredLabels[l] + "'";
+          comma = ",";
+        }
+      }
+      labels += "}";
       var expression = family + labels;
       var url = $scope.promBaseUrl + "/graph?g0.range_input=1h&g0.tab=0&g0.expr=" + encodeURIComponent(expression);
-      console.log("URL:" + url);
       $window.open(url, '_blank');
     };
 
