@@ -638,7 +638,7 @@ public class InventoryRestTest extends AbstractInventoryITest {
     public void test105_shouldCreateAPrometheusJsonConfig() {
         String id = "my-test-agent";
         String feedId = "my-test-feed";
-        String type = "Hawkular WildFly Agent";
+        String type = "Hawkular Java Agent";
         int numIterations = 1000;
         String testPrometheusConfig = System.getProperty("test.prometheus.config");
 
