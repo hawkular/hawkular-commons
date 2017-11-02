@@ -31,7 +31,7 @@ public class ScrapeConfigTest {
     public void testReadConfigYaml() throws Exception {
         ScrapeConfig config = JsonUtil.getYamlMapper().readValue(ScrapeConfigTest.class.getResourceAsStream("/hawkular-inventory-prometheus-scrape-config.yaml"), ScrapeConfig.class);
         assertEquals(1, config.getFilter().size());
-        assertTrue(config.getFilter().containsKey("Hawkular WildFly Agent"));
-        assertEquals("Metrics Endpoint", config.getFilter().get("Hawkular WildFly Agent"));
+        assertTrue(config.getFilter().containsKey("Hawkular Java Agent"));
+        assertEquals("Metrics Endpoint", config.getFilter().get("Hawkular Java Agent"));
     }
 }

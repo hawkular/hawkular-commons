@@ -408,7 +408,7 @@ public class InventoryServiceIspnTest {
         RawResource agent = RawResource.builder()
                 .id("my-test-agent")
                 .feedId("my-test-feed")
-                .typeId("Hawkular WildFly Agent")
+                .typeId("Hawkular Java Agent")
                 .config("Metrics Endpoint", "localhost:1234")
                 .build();
         service.addResource(agent);

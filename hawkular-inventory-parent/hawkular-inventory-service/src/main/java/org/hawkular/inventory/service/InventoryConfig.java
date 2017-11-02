@@ -127,8 +127,10 @@ public class InventoryConfig {
             File scrapeConfigFile = new File(configPath.toFile(), SCRAPE_CONFIGURATION);
             if (scrapeConfigFile.exists()) {
                 scrapeConfig = JsonUtil.getYamlMapper().readValue(scrapeConfigFile, ScrapeConfig.class);
+                log.infoUsingScrapeConfigFile(scrapeConfigFile.getAbsolutePath());
             } else {
                 scrapeConfig = JsonUtil.getYamlMapper().readValue(InventoryConfig.class.getResourceAsStream("/" + SCRAPE_CONFIGURATION), ScrapeConfig.class);
+                log.infoUsingScrapeConfigFile("internal default");
             }
             scrapeLocation = new File(configPath.toFile(), "prometheus");
             scrapeLocation.mkdirs();
