@@ -201,6 +201,7 @@
                 <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                 <logging.configuration>file:${project.build.directory}/test-classes/logging.properties</logging.configuration>
                 <jboss.home>${project.basedir}/target/wildfly-${version.org.wildfly}/</jboss.home>
+                <test.prometheus.config>${project.basedir}/target/wildfly-${version.org.wildfly}/standalone/configuration/hawkular/prometheus</test.prometheus.config>
               </systemPropertyVariables>
               <redirectTestOutputToFile>false</redirectTestOutputToFile>
             </configuration>
@@ -341,6 +342,7 @@
                 <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                 <logging.configuration>file:${project.build.directory}/test-classes/logging.properties</logging.configuration>
                 <jboss.home>${eap.home}</jboss.home>
+                <test.prometheus.config>${eap.home}/standalone/configuration/hawkular/prometheus</test.prometheus.config>
               </systemPropertyVariables>
               <redirectTestOutputToFile>false</redirectTestOutputToFile>
             </configuration>
