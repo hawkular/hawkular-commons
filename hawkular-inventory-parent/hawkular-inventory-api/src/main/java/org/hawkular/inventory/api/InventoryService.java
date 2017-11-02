@@ -155,4 +155,6 @@ public interface InventoryService {
     void buildExport(OutputStream os) throws IOException;
 
     InventoryHealth getHealthStatus();
+
+    void buildMetricsEndpoints();
 }

@@ -80,4 +80,8 @@ public interface MsgLogger {
     @LogMessage(level = Level.ERROR)
     @Message(id = 100012, value = "Cannot register feed [%s] metrics endpoint [%s]")
     void errorCannotRegisterMetricsEndpoint(String feedId, String metricsEndpoint, @Cause Throwable throwable);
+
+    @LogMessage(level = Level.INFO)
+    @Message(id = 100013, value = "Rebuild registered metrics endpoints")
+    void infoRebuildRegisteredMetricsEndpoints();
 }

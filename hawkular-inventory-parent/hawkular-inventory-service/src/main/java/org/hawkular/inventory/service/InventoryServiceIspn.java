@@ -115,6 +115,7 @@ public class InventoryServiceIspn implements InventoryService {
         this.scrapeLocation = scrapeLocation;
     }
 
+
     @Override
     public void addResource(RawResource r) {
         addResource(Collections.singletonList(r));
@@ -384,29 +385,53 @@ public class InventoryServiceIspn implements InventoryService {
         return inventoryStatsMBean.lastHealth();
     }
 
-    private void checkAgent(RawResource rawResource) {
-        if (scrapeConfig.filter(rawResource)) {
-            String feedId = rawResource.getFeedId();
-            String metricsEndpoint = rawResource.getConfig().get(scrapeConfig.getFilter().get(rawResource.getTypeId()));
-
-            if (isEmpty(feedId) || isEmpty(metricsEndpoint)) {
-                log.errorMissingInfoInAgentRegistration(rawResource.getId());
-                return;
-            }
-
-            // Prometheus file format. See: https://prometheus.io/docs/operating/configuration/#<file_sd_config>
-            String content = String.format("[ { \"targets\": [ \"%s\" ], \"labels\": { \"feed-id\": \"%s\" } } ]",
-                    metricsEndpoint,
-                    feedId);
-            try {
-                File newScrapeConfig = new File(scrapeLocation, feedId + ".json");
-                Files.write(newScrapeConfig.toPath(), content.getBytes(StandardCharsets.UTF_8));
-                log.infoRegisteredMetricsEndpoint(feedId, metricsEndpoint, newScrapeConfig.toString());
-            } catch (Exception e) {
-                log.errorCannotRegisterMetricsEndpoint(feedId, metricsEndpoint, e);
-            }
+    @Override
+    public void buildMetricsEndpoints() {
+        for (Map.Entry<String, String> filter : scrapeConfig.getFilter().entrySet()) {
+            int nResults, offSet = 0;
+            do {
+                Query qb = qResource.from(IspnResource.class)
+                        .having("typeId")
+                        .equal(filter.getKey())
+                        .startOffset(offSet)
+                        .maxResults(MAX_RESULTS)
+                        .build();
+                nResults = qb.getResultSize();
+                List<IspnResource> results = qb.list();
+                offSet = results.size();
+                results.forEach(r -> writeMetricsEndpoint(r.getRawResource()));
+            } while (offSet < nResults);
         }
     }
+
+    private void checkAgent(RawResource rawResource) {
+        if (scrapeConfig.filter(rawResource)) {
+            writeMetricsEndpoint(rawResource);
+        }
+    }
+
+    private void writeMetricsEndpoint(RawResource rawResource) {
+        String feedId = rawResource.getFeedId();
+        String metricsEndpoint = rawResource.getConfig().get(scrapeConfig.getFilter().get(rawResource.getTypeId()));
+
+        if (isEmpty(feedId) || isEmpty(metricsEndpoint)) {
+            log.errorMissingInfoInAgentRegistration(rawResource.getId());
+            return;
+        }
+
+        // Prometheus file format. See: https://prometheus.io/docs/operating/configuration/#<file_sd_config>
+        String content = String.format("[ { \"targets\": [ \"%s\" ], \"labels\": { \"feed-id\": \"%s\" } } ]",
+                metricsEndpoint,
+                feedId);
+        try {
+            File newScrapeConfig = new File(scrapeLocation, feedId + ".json");
+            Files.write(newScrapeConfig.toPath(), content.getBytes(StandardCharsets.UTF_8));
+            log.infoRegisteredMetricsEndpoint(feedId, metricsEndpoint, newScrapeConfig.toString());
+        } catch (Exception e) {
+            log.errorCannotRegisterMetricsEndpoint(feedId, metricsEndpoint, e);
+        }
+    }
+
 
 
 }

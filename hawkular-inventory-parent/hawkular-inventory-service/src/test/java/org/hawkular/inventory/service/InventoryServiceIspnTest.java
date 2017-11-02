@@ -412,6 +412,11 @@ public class InventoryServiceIspnTest {
                 .config("Metrics Endpoint", "localhost:1234")
                 .build();
         service.addResource(agent);
-        Assert.assertTrue(new File(PROMETHEUS_SCRAPE_CONFIG, "my-test-feed.json").exists());
+        File testFile = new File(PROMETHEUS_SCRAPE_CONFIG, "my-test-feed.json");
+        Assert.assertTrue(testFile.exists());
+        testFile.delete();
+        Assert.assertFalse(testFile.exists());
+        service.buildMetricsEndpoints();
+        Assert.assertTrue(testFile.exists());
     }
 }
