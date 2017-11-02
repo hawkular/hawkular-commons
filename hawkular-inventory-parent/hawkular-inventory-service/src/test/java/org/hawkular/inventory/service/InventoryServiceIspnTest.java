@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import org.hawkular.commons.json.JsonUtil;
 import org.hawkular.inventory.Resources;
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.model.Inventory;
@@ -43,6 +44,7 @@ import org.infinispan.Cache;
 import org.infinispan.configuration.cache.SingleFileStoreConfiguration;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -56,6 +58,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class InventoryServiceIspnTest {
 
     private static final String ISPN_CONFIG_LOCAL = "/hawkular-inventory-ispn-test.xml";
+    private static final String SCRAPE_CONFIG_LOCAL = "/hawkular-inventory-prometheus-scrape-config.yaml";
+    private static final String PROMETHEUS_SCRAPE_CONFIG = "target/prometheus";
     private static EmbeddedCacheManager CACHE_MANAGER;
     private final InventoryServiceIspn service;
     private final InventoryStats inventoryStats;
@@ -87,7 +91,15 @@ public class InventoryServiceIspnTest {
                         .iterator()
                         .next()).location()));
         inventoryStats.init();
-        service = new InventoryServiceIspn(resource, resourceType, getClass().getClassLoader().getResource("").getPath(), inventoryStats);
+        ScrapeConfig scrapeConfig = null;
+        try {
+            scrapeConfig = JsonUtil.getYamlMapper().readValue(InventoryServiceIspn.class.getResourceAsStream(SCRAPE_CONFIG_LOCAL), ScrapeConfig.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        File scrapeLocation = new File(PROMETHEUS_SCRAPE_CONFIG);
+        scrapeLocation.mkdirs();
+        service = new InventoryServiceIspn(resource, resourceType, getClass().getClassLoader().getResource("").getPath(), inventoryStats, scrapeConfig, scrapeLocation);
     }
 
     @Before
@@ -389,5 +401,22 @@ public class InventoryServiceIspnTest {
                     .extracting(Resource::getId)
                     .doesNotContain(idXaDsX);
         }
+    }
+
+    @Test
+    public void shouldGenerateScrapeConfig() {
+        RawResource agent = RawResource.builder()
+                .id("my-test-agent")
+                .feedId("my-test-feed")
+                .typeId("Hawkular WildFly Agent")
+                .config("Metrics Endpoint", "localhost:1234")
+                .build();
+        service.addResource(agent);
+        File testFile = new File(PROMETHEUS_SCRAPE_CONFIG, "my-test-feed.json");
+        Assert.assertTrue(testFile.exists());
+        testFile.delete();
+        Assert.assertFalse(testFile.exists());
+        service.buildMetricsEndpoints();
+        Assert.assertTrue(testFile.exists());
     }
 }

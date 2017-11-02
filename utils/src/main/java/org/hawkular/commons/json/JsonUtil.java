@@ -26,6 +26,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 /**
  * Json serialization/deserialization utility using Jackson implementation.
@@ -36,6 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public final class JsonUtil {
 
     private static ObjectMapper MAPPER = new ObjectMapper();
+    private static ObjectMapper YAML_MAPPER = new ObjectMapper(new YAMLFactory());
 
     private JsonUtil() {
     }
@@ -77,5 +79,9 @@ public final class JsonUtil {
         JsonGenerator jsonGen = new JsonFactory().createGenerator(os, JsonEncoding.UTF8);
         jsonGen.setCodec(MAPPER);
         return jsonGen;
+    }
+
+    public static ObjectMapper getYamlMapper() {
+        return YAML_MAPPER;
     }
 }

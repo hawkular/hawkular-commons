@@ -18,7 +18,9 @@ package org.hawkular.inventory.handlers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -628,6 +630,35 @@ public class InventoryRestTest extends AbstractInventoryITest {
             assertThat(resources)
                     .extracting(Resource::getId)
                     .doesNotContain(idXaDs);
+        }
+    }
+
+    @Test
+    @RunAsClient
+    public void test105_shouldCreateAPrometheusJsonConfig() {
+        String id = "my-test-agent";
+        String feedId = "my-test-feed";
+        String type = "Hawkular WildFly Agent";
+        int numIterations = 1000;
+        String testPrometheusConfig = System.getProperty("test.prometheus.config");
+
+        for (int i = 0; i < numIterations; i++) {
+            RawResource agent = RawResource.builder()
+                    .id(id + "-" + i)
+                    .feedId(feedId + "-" + i)
+                    .typeId(type)
+                    .config("Metrics Endpoint", "localhost:1234")
+                    .build();
+
+            Inventory inventory = new Inventory(Arrays.asList(agent), null);
+
+            Client client = ClientBuilder.newClient();
+            WebTarget target = client.target(baseUrl.toString()).path("import");
+            Response response = target
+                    .request(MediaType.APPLICATION_JSON_TYPE)
+                    .post(Entity.entity(inventory, MediaType.APPLICATION_JSON_TYPE));
+            assertEquals(200, response.getStatus());
+            assertTrue(new File(testPrometheusConfig, feedId + "-" + i + ".json").exists());
         }
     }
 }
