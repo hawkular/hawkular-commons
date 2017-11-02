@@ -59,7 +59,7 @@ rules:
     name: wildfly_deployment_$3
     type: GAUGE
     labels:
-      name: $1
+      deployment: $1
       subdeployment: $2
 
   - pattern: "jboss.as<deployment=(.+), subsystem=undertow><>(.+_sessions|sessions_.+):"
@@ -67,7 +67,7 @@ rules:
     name: wildfly_deployment_$2
     type: GAUGE
     labels:
-      name: $1
+      deployment: $1
 
   - pattern: "^jboss.as<deployment=(.+)><>status: OK"
     attrNameSnakeCase: true
@@ -75,7 +75,7 @@ rules:
     value: 1
     type: GAUGE
     labels:
-      name: $1
+      deployment: $1
 
   - pattern: "^jboss.as<deployment=(.+)><>status: (FAILED|STOPPED)"
     attrNameSnakeCase: true
@@ -83,7 +83,7 @@ rules:
     value: 0
     type: GAUGE
     labels:
-      name: $1
+      deployment: $1
 
   # MESSAGING
 
@@ -119,8 +119,8 @@ rules:
     type: GAUGE
     labels:
       server: $1
-      listener: $3
       protocol: $2
+      listener: $3
 
   # SERVLET
 
@@ -129,17 +129,17 @@ rules:
     name: wildfly_servlet_$4
     type: GAUGE
     labels:
-      name: $3
       deployment: $1
       subdeployment: $2
+      name: $3
 
   - pattern: "jboss.as<deployment=(.+), subsystem=undertow, servlet=(.+)><>(.+_time|.+_count):"
     attrNameSnakeCase: true
     name: wildfly_servlet_$3
     type: GAUGE
     labels:
-      name: $2
       deployment: $1
+      name: $2
 
   # EJB
 
@@ -148,16 +148,16 @@ rules:
     name: wildfly_ejb_$5
     type: GAUGE
     labels:
-      name: $4
-      type: $3
       deployment: $1
       subdeployment: $2
+      type: $3
+      name: $4
 
   - pattern: "jboss.as<deployment=(.+), subsystem=ejb3, (stateless-session|stateful-session|message-driven|singleton)-bean=(.+)><>(.+):"
     attrNameSnakeCase: true
     name: wildfly_ejb_$4
     type: GAUGE
     labels:
-      name: $3
-      type: $2
       deployment: $1
+      type: $2
+      name: $3
