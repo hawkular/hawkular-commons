@@ -426,7 +426,7 @@ public class InventoryServiceIspn implements InventoryService {
         }
 
         // Prometheus file format. See: https://prometheus.io/docs/operating/configuration/#<file_sd_config>
-        String content = String.format("[ { \"targets\": [ \"%s\" ], \"labels\": { \"feed-id\": \"%s\" } } ]",
+        String content = String.format("[ { \"targets\": [ \"%s\" ], \"labels\": { \"feed_id\": \"%s\" } } ]",
                 metricsEndpoint,
                 feedId);
         try {
