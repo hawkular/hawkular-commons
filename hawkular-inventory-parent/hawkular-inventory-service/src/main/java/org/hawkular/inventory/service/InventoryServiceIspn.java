@@ -273,8 +273,10 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     private Optional<String> getConfig(String fileName) {
-        // TODO: maybe some defensive check against file traversal attack?
-        //  Or check that "resourceType" is in a whitelist of types?
+        if (fileName.contains("..")) {
+            throw new IllegalArgumentException("Cannot get file with '..' in path: " + fileName);
+        }
+
         try {
             byte[] encoded = Files.readAllBytes(configPath.resolve(fileName));
             return Optional.of(new String(encoded, StandardCharsets.UTF_8.name()));
@@ -419,8 +421,12 @@ public class InventoryServiceIspn implements InventoryService {
             return;
         }
 
+        if (feedId.contains("..")) {
+            throw new IllegalArgumentException("Cannot write metrics endpoint file with '..' in path: " + feedId);
+        }
+
         // Prometheus file format. See: https://prometheus.io/docs/operating/configuration/#<file_sd_config>
-        String content = String.format("[ { \"targets\": [ \"%s\" ], \"labels\": { \"feed-id\": \"%s\" } } ]",
+        String content = String.format("[ { \"targets\": [ \"%s\" ], \"labels\": { \"feed_id\": \"%s\" } } ]",
                 metricsEndpoint,
                 feedId);
         try {

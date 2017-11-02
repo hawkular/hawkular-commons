@@ -18,4 +18,4 @@
 ---
 filter:
   # <RawResource type to filter>: <RawResource.config key where Metrics Endpoint in format <host:port> can be found
-  Hawkular WildFly Agent: Metrics Endpoint
+  Hawkular Java Agent: Metrics Endpoint

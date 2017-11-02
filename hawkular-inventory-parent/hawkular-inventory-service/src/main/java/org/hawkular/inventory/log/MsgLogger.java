@@ -84,4 +84,8 @@ public interface MsgLogger {
     @LogMessage(level = Level.INFO)
     @Message(id = 100013, value = "Rebuild registered metrics endpoints")
     void infoRebuildRegisteredMetricsEndpoints();
+
+    @LogMessage(level = Level.INFO)
+    @Message(id = 100014, value = "Using scrape config file [%s]")
+    void infoUsingScrapeConfigFile(String file);
 }
