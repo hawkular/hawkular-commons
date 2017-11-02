@@ -16,6 +16,7 @@
  */
 package org.hawkular.inventory.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -70,7 +71,9 @@ public class InventoryServiceIspn implements InventoryService {
     // TODO [lponce] this should be configurable
     private static final int MAX_RESULTS = 100;
 
-    private final Path configPath;
+    @Inject
+    @InventoryConfigPath
+    private Path configPath;
 
     @Inject
     @InventoryResource
@@ -91,17 +94,25 @@ public class InventoryServiceIspn implements InventoryService {
     @EJB
     private InventoryStatsMBean inventoryStatsMBean;
 
+    @Inject
+    private ScrapeConfig scrapeConfig;
+
+    @Inject
+    @ScrapeLocation
+    private File scrapeLocation;
+
     public InventoryServiceIspn() {
-        configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
     }
 
-    InventoryServiceIspn(Cache<String, Object> resource, Cache<String, Object> resourceType, String configPath, InventoryStatsMBean inventoryStatsMBean) {
+    InventoryServiceIspn(Cache<String, Object> resource, Cache<String, Object> resourceType, String configPath, InventoryStatsMBean inventoryStatsMBean, ScrapeConfig scrapeConfig, File scrapeLocation) {
         this.resource = resource;
         this.resourceType = resourceType;
         qResource = Search.getQueryFactory(resource);
         qResourceType = Search.getQueryFactory(resourceType);
         this.configPath = Paths.get(configPath);
         this.inventoryStatsMBean = inventoryStatsMBean;
+        this.scrapeConfig = scrapeConfig;
+        this.scrapeLocation = scrapeLocation;
     }
 
     @Override
@@ -116,6 +127,7 @@ public class InventoryServiceIspn implements InventoryService {
         }
         Map<String, IspnResource> map = resources.stream()
                 .parallel()
+                .peek(this::checkAgent)
                 .collect(Collectors.toMap(r -> r.getId(), r -> new IspnResource(r)));
         resource.putAll(map);
     }
@@ -371,4 +383,30 @@ public class InventoryServiceIspn implements InventoryService {
     public InventoryHealth getHealthStatus() {
         return inventoryStatsMBean.lastHealth();
     }
+
+    private void checkAgent(RawResource rawResource) {
+        if (scrapeConfig.filter(rawResource)) {
+            String feedId = rawResource.getFeedId();
+            String metricsEndpoint = rawResource.getConfig().get(scrapeConfig.getFilter().get(rawResource.getTypeId()));
+
+            if (isEmpty(feedId) || isEmpty(metricsEndpoint)) {
+                log.errorMissingInfoInAgentRegistration(rawResource.getId());
+                return;
+            }
+
+            // Prometheus file format. See: https://prometheus.io/docs/operating/configuration/#<file_sd_config>
+            String content = String.format("[ { \"targets\": [ \"%s\" ], \"labels\": { \"feed-id\": \"%s\" } } ]",
+                    metricsEndpoint,
+                    feedId);
+            try {
+                File newScrapeConfig = new File(scrapeLocation, feedId + ".json");
+                Files.write(newScrapeConfig.toPath(), content.getBytes(StandardCharsets.UTF_8));
+                log.infoRegisteredMetricsEndpoint(feedId, metricsEndpoint, newScrapeConfig.toString());
+            } catch (Exception e) {
+                log.errorCannotRegisterMetricsEndpoint(feedId, metricsEndpoint, e);
+            }
+        }
+    }
+
+
 }

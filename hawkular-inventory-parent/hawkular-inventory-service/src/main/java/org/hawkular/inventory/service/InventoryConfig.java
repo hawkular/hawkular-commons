@@ -27,6 +27,7 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.enterprise.inject.Produces;
 
+import org.hawkular.commons.json.JsonUtil;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
 import org.infinispan.Cache;
@@ -50,6 +51,7 @@ public class InventoryConfig {
     public static final String CACHE_CONFIGURATION = "hawkular-inventory-ispn.xml";
     public static final String RESOURCE_CACHE_NAME = "resource";
     public static final String RESOURCE_TYPE_CACHE_NAME = "resource_type";
+    public static final String SCRAPE_CONFIGURATION = "hawkular-inventory-prometheus-scrape-config.yaml";
 
     private static final MsgLogger log = InventoryLoggers.getLogger(InventoryConfig.class);
 
@@ -64,6 +66,9 @@ public class InventoryConfig {
     private final Path configPath;
 
     private File inventoryLocation;
+    private File scrapeLocation;
+
+    private ScrapeConfig scrapeConfig;
 
     public InventoryConfig() {
         configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
@@ -119,6 +124,14 @@ public class InventoryConfig {
                     .stores()
                     .iterator()
                     .next()).location());
+            File scrapeConfigFile = new File(configPath.toFile(), SCRAPE_CONFIGURATION);
+            if (scrapeConfigFile.exists()) {
+                scrapeConfig = JsonUtil.getYamlMapper().readValue(scrapeConfigFile, ScrapeConfig.class);
+            } else {
+                scrapeConfig = JsonUtil.getYamlMapper().readValue(InventoryConfig.class.getResourceAsStream("/" + SCRAPE_CONFIGURATION), ScrapeConfig.class);
+            }
+            scrapeLocation = new File(configPath.toFile(), "prometheus");
+            scrapeLocation.mkdirs();
             log.infoInventoryAppStarted();
         } catch (IOException e) {
             log.errorInventoryCacheConfigurationNotFound(e);
@@ -155,5 +168,22 @@ public class InventoryConfig {
     @InventoryLocation
     public File getInventoryLocation() {
         return inventoryLocation;
+    }
+
+    @Produces
+    public ScrapeConfig getScrapeConfig() {
+        return scrapeConfig;
+    }
+
+    @Produces
+    @ScrapeLocation
+    public File getScrapeLocation() {
+        return scrapeLocation;
+    }
+
+    @Produces
+    @InventoryConfigPath
+    public Path getConfigPath() {
+        return configPath;
     }
 }
