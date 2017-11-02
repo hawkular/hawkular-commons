@@ -16,6 +16,7 @@
  */
 package org.hawkular.inventory.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,6 +41,7 @@ import org.hawkular.commons.json.JsonUtil;
 import org.hawkular.inventory.api.InventoryService;
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.model.InventoryHealth;
+import org.hawkular.inventory.api.model.MetricsEndpoint;
 import org.hawkular.inventory.api.model.RawResource;
 import org.hawkular.inventory.api.model.Resource;
 import org.hawkular.inventory.api.model.ResourceNode;
@@ -70,6 +72,9 @@ public class InventoryServiceIspn implements InventoryService {
     // TODO [lponce] this should be configurable
     private static final int MAX_RESULTS = 100;
 
+    private static final String hawkularConfigDirName = "hawkular";
+    private static final String prometheusConfigDirName = "prometheus";
+
     private final Path configPath;
 
     @Inject
@@ -92,7 +97,10 @@ public class InventoryServiceIspn implements InventoryService {
     private InventoryStatsMBean inventoryStatsMBean;
 
     public InventoryServiceIspn() {
-        configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
+        configPath = Paths.get(System.getProperty("jboss.server.config.dir"), hawkularConfigDirName);
+
+        // ensure dirs exist
+        new File(this.configPath.toFile(), prometheusConfigDirName).mkdirs();
     }
 
     InventoryServiceIspn(Cache<String, Object> resource, Cache<String, Object> resourceType, String configPath, InventoryStatsMBean inventoryStatsMBean) {
@@ -102,6 +110,9 @@ public class InventoryServiceIspn implements InventoryService {
         qResourceType = Search.getQueryFactory(resourceType);
         this.configPath = Paths.get(configPath);
         this.inventoryStatsMBean = inventoryStatsMBean;
+
+        // ensure dirs exist
+        new File(this.configPath.toFile(), prometheusConfigDirName).mkdirs();
     }
 
     @Override
@@ -247,6 +258,35 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     @Override
+    public boolean registerMetricsEndpoint(MetricsEndpoint metricsEndpoint) {
+        String newFile = null;
+        String fileName = prometheusConfigDirName + "/" + metricsEndpoint.getFeedId() + ".json";
+
+        // Prometheus file format. See: https://prometheus.io/docs/operating/configuration/#<file_sd_config>
+        String content = String.format(
+                "[ { \"targets\": [ \"%s:%d\" ], \"labels\": { \"feed-id\": \"%s\" } } ]",
+                metricsEndpoint.getHost(),
+                metricsEndpoint.getPort(),
+                metricsEndpoint.getFeedId());
+
+        try {
+            newFile = writeConfig(fileName, content);
+            log.infoRegisteredMetricsEndpoint(
+                    metricsEndpoint.getFeedId(),
+                    metricsEndpoint.getHost(),
+                    metricsEndpoint.getPort(),
+                    newFile);
+        } catch (Exception e) {
+            log.errorCannotRegisterMetricsEndpoint(
+                    metricsEndpoint.getFeedId(),
+                    metricsEndpoint.getHost(),
+                    metricsEndpoint.getPort(), e);
+        }
+
+        return newFile != null;
+    }
+
+    @Override
     public boolean isRunning() {
         if (resource != null
                 && resourceType != null
@@ -260,8 +300,11 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     private Optional<String> getConfig(String fileName) {
-        // TODO: maybe some defensive check against file traversal attack?
-        //  Or check that "resourceType" is in a whitelist of types?
+        if (fileName.contains("..")) {
+            throw new IllegalArgumentException("Cannot write config files with '..' in path");
+        }
+
+        // TODO: check that "resourceType" is in a whitelist of types?
         try {
             byte[] encoded = Files.readAllBytes(configPath.resolve(fileName));
             return Optional.of(new String(encoded, StandardCharsets.UTF_8.name()));
@@ -280,6 +323,16 @@ public class InventoryServiceIspn implements InventoryService {
                 return Optional.empty();
             }
         }
+    }
+
+    private String writeConfig(String fileName, String content) throws Exception {
+        if (fileName.contains("..")) {
+            throw new IllegalArgumentException("Cannot write config files with '..' in path");
+        }
+
+        Path resolvedPath = configPath.resolve(fileName);
+        Files.write(resolvedPath, content.getBytes(StandardCharsets.UTF_8));
+        return resolvedPath.toString();
     }
 
     @Override
