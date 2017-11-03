@@ -46,6 +46,7 @@ import org.infinispan.query.dsl.QueryFactory;
  */
 @Startup
 @Singleton
+@AccessTimeout(value = 300, unit = TimeUnit.SECONDS)
 public class InventoryConfig {
 
     private static final String ISPN_REINDEX = "hawkular-inventory.reindex";
@@ -66,6 +67,7 @@ public class InventoryConfig {
     private QueryFactory queryResourceType;
 
     private final Path configPath;
+    private final Path dataPath;
 
     private File inventoryLocation;
     private File scrapeLocation;
@@ -73,8 +75,12 @@ public class InventoryConfig {
     private ScrapeConfig scrapeConfig;
 
     public InventoryConfig() {
-        configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
         ispnReindex = Boolean.parseBoolean(System.getProperty(ISPN_REINDEX, ISPN_REINDEX_DEFAULT));
+        configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
+        configPath.toFile().mkdirs();
+        dataPath = Paths.get(System.getProperty("jboss.server.data.dir"));
+        scrapeLocation = new File(dataPath.toFile(), "prometheus");
+        scrapeLocation.mkdirs();
     }
 
     @PostConstruct
@@ -134,8 +140,6 @@ public class InventoryConfig {
                 scrapeConfig = JsonUtil.getYamlMapper().readValue(InventoryConfig.class.getResourceAsStream("/" + SCRAPE_CONFIGURATION), ScrapeConfig.class);
                 log.infoUsingScrapeConfigFile("internal default");
             }
-            scrapeLocation = new File(configPath.toFile(), "prometheus");
-            scrapeLocation.mkdirs();
             log.infoInventoryAppStarted();
         } catch (IOException e) {
             log.errorInventoryCacheConfigurationNotFound(e);
@@ -187,7 +191,6 @@ public class InventoryConfig {
 
     @Produces
     @InventoryConfigPath
-    @AccessTimeout(value = 300, unit = TimeUnit.SECONDS)
     public Path getConfigPath() {
         return configPath;
     }
