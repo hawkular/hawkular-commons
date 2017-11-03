@@ -177,20 +177,17 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
         return;
       }
 
-      var family = metric.family;
-      //TODO Remove this feed-id filtering when we have everything in sync
-      var filteredLabels = JSON.parse(JSON.stringify(metric.labels));
-      delete filteredLabels['feed-id'];
-      var comma = "";
+      // construct the prometheus expression
       var labels = "{";
-      for (var l in filteredLabels) {
-        if (filteredLabels.hasOwnProperty(l)) {
-          labels = labels + comma + l + "='" + filteredLabels[l] + "'";
+      var comma = "";
+      for (var l in metric.labels) {
+        if (metric.labels.hasOwnProperty(l)) {
+          labels = labels + comma + l + "='" + metric.labels[l] + "'";
           comma = ",";
         }
       }
       labels += "}";
-      var expression = family + labels;
+      var expression = metric.family + labels;
       var url = $scope.promBaseUrl + "/graph?g0.range_input=1h&g0.tab=0&g0.expr=" + encodeURIComponent(expression);
       $window.open(url, '_blank');
     };
