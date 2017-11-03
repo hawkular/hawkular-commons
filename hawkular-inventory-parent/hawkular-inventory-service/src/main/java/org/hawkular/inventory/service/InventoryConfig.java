@@ -21,8 +21,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
+import javax.ejb.AccessTimeout;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.enterprise.inject.Produces;
@@ -185,6 +187,7 @@ public class InventoryConfig {
 
     @Produces
     @InventoryConfigPath
+    @AccessTimeout(value = 300, unit = TimeUnit.SECONDS)
     public Path getConfigPath() {
         return configPath;
     }
