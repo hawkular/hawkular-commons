@@ -44,34 +44,62 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
 
     $scope.promBaseUrl = 'http://localhost:9090';
 
+    $scope.filter = {
+      feedId: 'All Feeds',
+      feedIds: ['All Feeds']
+    };
+
     var updateTree = function () {
       console.debug("[Resources] refresh tree roots at " + new Date());
 
-      // fetch root resources
-      var promise1 = resourcesService.Roots().query();
+      // fetch root resources with possible feed filter
+      var criteria = {
+        root:true
+      };
+      if ( $scope.filter.feedId && $scope.filter.feedId !== 'All Feeds' ) {
+        criteria.feedId = $scope.filter.feedId;
+      }
+
+      var promise1 = resourcesService.Resources(criteria).query();
       $q.all([promise1.$promise]).then(function (result) {
         var resources = result[0].results;
-        resources.sort(function(a,b) {
-          return sortResource(a,b);
-        });
 
-        $scope.tree = [];
-        for (var i = 0; i < resources.length; ++i) {
-          var resource = resources[i];
-          var text = '[' + resource.type.id + '] ' + resource.name;
-          $scope.tree.push({
-            checkable: false,
-            lazyLoad: true,
-            selectable: true,
-            text: text,
-            // store entire resource json as custom prop
-            resource: resource
-          });
-        }
-
+        updateRootFeedIds(resources);
+        updateRootResources(resources);
         refreshTreeView();
 
       }, toastError);
+    };
+
+    var updateRootFeedIds = function (resources) {
+      var uniqueFeedIds = new Set();
+      for (var i = 0; i < resources.length; ++i) {
+        uniqueFeedIds.add(resources[i].feedId);
+      }
+
+      $scope.filter.feedIds = Array.from(uniqueFeedIds);
+      $scope.filter.feedIds.sort();
+      $scope.filter.feedIds.unshift('All Feeds');
+    };
+
+    var updateRootResources = function (resources) {
+      resources.sort(function(a,b) {
+        return sortRootResource(a,b);
+      });
+
+      $scope.tree = [];
+      for (var i = 0; i < resources.length; ++i) {
+        var resource = resources[i];
+        var text = '[' + resource.feedId + '] [' + resource.type.id + '] ' + resource.name;
+        $scope.tree.push({
+          checkable: false,
+          lazyLoad: true,
+          selectable: true,
+          text: text,
+          // store entire resource json as custom prop
+          resource: resource
+        });
+      }
     };
 
     var refreshTreeView = function () {
@@ -128,6 +156,12 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
         }
         expanderFunc(branch);
       }, toastError);
+    };
+
+    var sortRootResource = function (r1,r2) {
+      return r1.feedId.localeCompare(r2.feedId)
+        || r1.type.id.localeCompare(r2.type.id)
+        || r1.name.localeCompare(r2.name);
     };
 
     var sortResource = function (r1,r2) {

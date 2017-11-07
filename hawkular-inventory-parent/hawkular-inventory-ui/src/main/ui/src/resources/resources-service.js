@@ -18,10 +18,8 @@ angular.module('hwk.resourcesModule').service('hwk.resourcesService', ['$resourc
   function ($resource, $rootScope) {
     'use strict';
 
-    this.Roots = function () {
-      return $resource($rootScope.appConfig.server.baseUrl + '/resources', {
-        root: true
-      }, {
+    this.Resources = function (criteria) {
+      return $resource($rootScope.appConfig.server.baseUrl + '/resources', criteria, {
         query: {
           method: 'GET',
           isArray: false
