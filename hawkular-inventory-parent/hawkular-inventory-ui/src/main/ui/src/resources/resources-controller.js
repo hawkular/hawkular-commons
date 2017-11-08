@@ -72,6 +72,11 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
     };
 
     var updateRootFeedIds = function (resources) {
+      // only update the feed filter if we have just fetched all of the root resources
+      if ( $scope.filter.feedId !== 'All Feeds') {
+        return;
+      }
+
       var uniqueFeedIds = new Set();
       for (var i = 0; i < resources.length; ++i) {
         uniqueFeedIds.add(resources[i].feedId);
