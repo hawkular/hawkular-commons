@@ -115,7 +115,6 @@ public class InventoryServiceIspn implements InventoryService {
         this.scrapeLocation = scrapeLocation;
     }
 
-
     @Override
     public void addResource(RawResource r) {
         addResource(Collections.singletonList(r));
@@ -128,7 +127,7 @@ public class InventoryServiceIspn implements InventoryService {
         }
         Map<String, IspnResource> map = resources.stream()
                 .parallel()
-                .peek(this::checkAgent)
+                .peek(this::checkAddingAgent)
                 .collect(Collectors.toMap(r -> r.getId(), r -> new IspnResource(r)));
         resource.putAll(map);
     }
@@ -154,7 +153,9 @@ public class InventoryServiceIspn implements InventoryService {
         if (isEmpty(ids)) {
             throw new IllegalArgumentException("Ids must be not null or empty");
         }
-        ids.forEach(resource::remove);
+        ids.stream().parallel()
+                .peek(this::checkRemovingAgent)
+                .forEach(resource::remove);
     }
 
     @Override
@@ -406,7 +407,7 @@ public class InventoryServiceIspn implements InventoryService {
         }
     }
 
-    private void checkAgent(RawResource rawResource) {
+    private void checkAddingAgent(RawResource rawResource) {
         if (scrapeConfig.filter(rawResource)) {
             writeMetricsEndpoint(rawResource);
         }
@@ -438,6 +439,21 @@ public class InventoryServiceIspn implements InventoryService {
         }
     }
 
+    private void checkRemovingAgent(String id) {
+        getRawResource(id)
+                .filter(scrapeConfig::filter)
+                .map(RawResource::getFeedId)
+                .ifPresent(feedId -> {
+                    if (feedId.contains("..")) {
+                        throw new IllegalArgumentException("Cannot write metrics endpoint file with '..' in path: " + feedId);
+                    }
 
-
+                    File scrapeConfig = new File(scrapeLocation, feedId + ".json");
+                    if (scrapeConfig.delete()) {
+                        log.infoUnregisteredMetricsEndpoint(feedId);
+                    } else {
+                        log.errorCannotUnregisterMetricsEndpoint(feedId);
+                    }
+                });
+    }
 }

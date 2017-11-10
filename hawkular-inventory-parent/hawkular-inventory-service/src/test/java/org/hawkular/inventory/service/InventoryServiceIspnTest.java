@@ -419,4 +419,19 @@ public class InventoryServiceIspnTest {
         service.buildMetricsEndpoints();
         Assert.assertTrue(testFile.exists());
     }
+
+    @Test
+    public void shouldRemoveScrapeConfig() {
+        RawResource agent = RawResource.builder()
+                .id("my-test-agent")
+                .feedId("my-test-feed")
+                .typeId("Hawkular Java Agent")
+                .config("Metrics Endpoint", "localhost:1234")
+                .build();
+        service.addResource(agent);
+        File testFile = new File(PROMETHEUS_SCRAPE_CONFIG, "my-test-feed.json");
+        Assert.assertTrue(testFile.exists());
+        service.deleteResources(Collections.singleton(agent.getId()));
+        Assert.assertFalse(testFile.exists());
+    }
 }
