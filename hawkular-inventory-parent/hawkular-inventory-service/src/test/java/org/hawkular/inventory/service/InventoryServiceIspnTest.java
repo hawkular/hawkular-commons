@@ -247,7 +247,7 @@ public class InventoryServiceIspnTest {
     public void shouldGetJMXExporterConfig() throws IOException {
         assertThat(service.getJMXExporterConfig("test")).isPresent()
                 .hasValueSatisfying(s -> assertThat(s).contains("JMX EXPORTER TEST"));
-        assertThat(service.getJMXExporterConfig("wildfly-10")).isPresent()
+        assertThat(service.getJMXExporterConfig("WF10")).isPresent()
                 .hasValueSatisfying(s -> assertThat(s).contains("- pattern:"));
     }
 
