@@ -88,4 +88,12 @@ public interface MsgLogger {
     @LogMessage(level = Level.INFO)
     @Message(id = 100014, value = "Using scrape config file [%s]")
     void infoUsingScrapeConfigFile(String file);
+
+    @LogMessage(level = Level.INFO)
+    @Message(id = 100015, value = "Unregistered feed [%s] metrics endpoint")
+    void infoUnregisteredMetricsEndpoint(String feedId);
+
+    @LogMessage(level = Level.ERROR)
+    @Message(id = 100016, value = "Cannot unregister feed [%s] metrics endpoint")
+    void errorCannotUnregisterMetricsEndpoint(String feedId);
 }
