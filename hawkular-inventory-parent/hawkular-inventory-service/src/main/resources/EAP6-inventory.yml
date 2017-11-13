@@ -1161,6 +1161,61 @@ metric-set-jmx:
     metric-type:  gauge
     metric-family: jvm_memory_pool_bytes_max
 
+- name: Platform Operating System Metrics
+  metric-jmx:
+  - name: System CPU Load
+    attribute:     System CPU Load
+    metric-type:   gauge
+    metric-family: hawkular_platform_operatingsystem_system_cpu_load
+  - name: System Load Average
+    attribute:     System Load Average
+    metric-type:   gauge
+    metric-family: hawkular_platform_operatingsystem_system_load_average
+  - name: Process Count
+    attribute:     Process Count
+    metric-type:   gauge
+    metric-family: hawkular_platform_operatingsystem_process_count
+
+- name: Platform File Store Metrics
+  metric-jmx:
+  - name: Usable Space
+    attribute:     Usable Space
+    metric-type:   gauge
+    metric-family: hawkular_platform_filestore_usable_space
+  - name: Total Space
+    attribute:     Total Space
+    metric-type:   gauge
+    metric-family: hawkular_platform_filestore_total_space
+
+- name: Platform Memory Metrics
+  metric-jmx:
+  - name: Available Memory
+    attribute:     Available Memory
+    metric-type:   gauge
+    metric-family: hawkular_platform_memory_available_memory
+  - name: Total Memory
+    attribute:     Total Memory
+    metric-type:   gauge
+    metric-family: hawkular_platform_memory_total_memory
+
+- name: Platform Processor Metrics
+  metric-jmx:
+  - name: CPU Usage
+    attribute:     CPU Usage
+    metric-type:   gauge
+    metric-family: hawkular_platform_processor_cpu_usage
+
+- name: Platform Power Source Metrics
+  metric-jmx:
+  - name: Remaining Capacity
+    attribute:     Remaining Capacity
+    metric-type:   gauge
+    metric-family: hawkular_platform_powersource_remaining_capacity
+  - name: Time Remaining
+    attribute:     Time Remaining
+    metric-type:   gauge
+    metric-family: hawkular_platform_powersource_time_remaining
+
 resource-type-set-jmx:
 - name: Main
   resource-type-jmx:
@@ -1201,6 +1256,8 @@ resource-type-set-jmx:
       attribute: InContainer
     - name: Metrics Endpoint
       attribute: MetricsEndpoint
+    - name: Version
+      attribute: Version
     operation-jmx:
     - name: Start
       internal-name: start
@@ -1212,3 +1269,52 @@ resource-type-set-jmx:
       internal-name: fullDiscoveryScan
     - name: Inventory Report
       internal-name: inventoryReport
+
+- name: Platform
+  resource-type-jmx:
+  - name: Platform Operating System
+    resource-name-template: Platform Operating System
+    object-name: "org.hawkular.agent:type=platform,subtype=operatingsystem"
+    resource-config-jmx:
+    - name: Machine Id
+      attribute: Machine Id
+    - name: Container Id
+      attribute: Container Id
+    - name: Version
+      attribute: Version
+    metric-sets:
+    - Platform Operating System Metrics
+  - name: Platform File Store
+    parents:
+    - Platform Operating System
+    resource-name-template: "%name%"
+    object-name: "org.hawkular.agent:type=platform,subtype=filestore,name=*"
+    metric-sets:
+    - Platform File Store Metrics
+    metric-labels:
+      name: "%name%"
+  - name: Platform Memory
+    parents:
+    - Platform Operating System
+    resource-name-template: Platform Memory
+    object-name: "org.hawkular.agent:type=platform,subtype=memory"
+    metric-sets:
+    - Platform Memory Metrics
+  - name: Platform Processor
+    parents:
+    - Platform Operating System
+    resource-name-template: "%name%"
+    object-name: "org.hawkular.agent:type=platform,subtype=processor,name=*"
+    metric-sets:
+    - Platform Processor Metrics
+    metric-labels:
+      name: "%name%"
+  - name: Platform Power Source
+    parents:
+    - Platform Operating System
+    resource-name-template: "%name%"
+    object-name: "org.hawkular.agent:type=platform,subtype=powersource,name=*"
+    metric-sets:
+    - Platform Power Source Metrics
+    metric-labels:
+      name: "%name%"
