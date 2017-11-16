@@ -110,9 +110,9 @@ public class Metric implements Serializable {
     @JsonInclude(Include.NON_NULL)
     private final MetricUnit unit;
 
-    @DocModelProperty(description = "Metric expression used to evaluate the metric value. If not set, assume $metric.",
+    @DocModelProperty(description = "Metric expression used to evaluate the metric value.",
             position = 3,
-            required = false,
+            required = true,
             defaultValue = "NONE")
     @JsonInclude(Include.NON_NULL)
     private final String expression;
