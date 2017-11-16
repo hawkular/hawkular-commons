@@ -38,11 +38,12 @@ public class Metric implements Serializable {
         private String displayName;
         private String family;
         private MetricUnit unit;
+        private String expression;
         private Map<String, String> labels = new HashMap<>();
         private Map<String, String> properties = new HashMap<>();
 
         public Metric build() {
-            return new Metric(displayName, family, unit, labels, properties);
+            return new Metric(displayName, family, unit, expression, labels, properties);
         }
 
         public Builder displayName(String displayName) {
@@ -57,6 +58,11 @@ public class Metric implements Serializable {
 
         public Builder unit(MetricUnit unit) {
             this.unit = unit;
+            return this;
+        }
+
+        public Builder expression(String expression) {
+            this.expression = expression;
             return this;
         }
 
@@ -104,14 +110,21 @@ public class Metric implements Serializable {
     @JsonInclude(Include.NON_NULL)
     private final MetricUnit unit;
 
-    @DocModelProperty(description = "Metric labels.",
+    @DocModelProperty(description = "Metric expression used to evaluate the metric value.",
             position = 3,
+            required = true,
+            defaultValue = "NONE")
+    @JsonInclude(Include.NON_NULL)
+    private final String expression;
+
+    @DocModelProperty(description = "Metric labels.",
+            position = 4,
             required = false)
     @JsonInclude(Include.NON_NULL)
     private final Map<String, String> labels;   // Ex: Prometheus labels
 
     @DocModelProperty(description = "Metric properties.",
-            position = 4,
+            position = 5,
             required = false)
     @JsonInclude(Include.NON_NULL)
     private final Map<String, String> properties;
@@ -119,11 +132,13 @@ public class Metric implements Serializable {
     public Metric(@JsonProperty("displayName") String displayName,
                   @JsonProperty("family") String family,
                   @JsonProperty("unit") MetricUnit unit,
+                  @JsonProperty("expression") String expression,
                   @JsonProperty("labels") Map<String, String> labels,
                   @JsonProperty("properties") Map<String, String> properties) {
         this.displayName = displayName;
         this.family = family;
         this.unit = unit;
+        this.expression = expression;
         this.labels = labels;
         this.properties = properties;
     }
@@ -140,6 +155,10 @@ public class Metric implements Serializable {
         return unit;
     }
 
+    public String getExpression() {
+        return expression;
+    }
+
     public Map<String, String> getLabels() {
         return Collections.unmodifiableMap(labels);
     }
@@ -154,6 +173,7 @@ public class Metric implements Serializable {
                 "displayName='" + displayName + '\'' +
                 ", family='" + family + '\'' +
                 ", unit=" + unit +
+                ", expression='" + expression + '\'' +
                 ", labels=" + labels +
                 ", properties=" + properties +
                 '}';
