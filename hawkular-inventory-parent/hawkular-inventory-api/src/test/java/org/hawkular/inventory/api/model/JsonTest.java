@@ -82,7 +82,8 @@ public class JsonTest {
     public void deserializeRawResource() throws Exception {
         RawResource resource = new RawResource("ID", "FOO", "FEED", "BAR", null,
                 Collections.singletonList(
-                        new Metric("metric", "m.metric", MetricUnit.BYTES, new HashMap<>(), new HashMap<>())),
+                        new Metric("metric", "m.metric", MetricUnit.BYTES, "sum($metric)", new HashMap<>(),
+                                new HashMap<>())),
                 Collections.singletonMap("r.prop", "r.val1"),
                 Collections.singletonMap("r.cfg", "r.val2"));
 
@@ -93,6 +94,7 @@ public class JsonTest {
         assertThat(deserialized).isNotNull();
         assertThat(deserialized.getId()).isEqualTo("ID");
         assertThat(deserialized.getMetrics()).extracting(Metric::getDisplayName).containsExactly("metric");
+        assertThat(deserialized.getMetrics()).extracting(Metric::getExpression).containsExactly("sum($metric)");
         assertThat(deserialized.getProperties()).containsOnly(entry("r.prop", "r.val1"));
         assertThat(deserialized.getConfig()).containsOnly(entry("r.cfg", "r.val2"));
     }

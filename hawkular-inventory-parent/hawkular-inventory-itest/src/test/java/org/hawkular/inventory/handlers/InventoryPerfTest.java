@@ -124,7 +124,8 @@ public class InventoryPerfTest extends AbstractInventoryITest {
 
             List<Metric> metricsResource = new ArrayList<>();
             for (int k = 0; k < metrics; k++) {
-                Metric metricX = new Metric("Metric " + k, "metric-" + k, MetricUnit.BYTES, new HashMap<>(), new HashMap<>());
+                Metric metricX = new Metric("Metric " + k, "metric-" + k, MetricUnit.BYTES, null, new HashMap<>(),
+                        new HashMap<>());
                 metricsResource.add(metricX);
             }
 
