@@ -211,22 +211,28 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
     };
 
     $scope.showMetric = function (metric) {
-      if ( !metric.family || !metric.labels ) {
-        console.log("Unable to show graph for metric [" + metric.displayName + "]. No family and/or no labels.");
+      var expression;
+      if ( metric.expression) {
+        expression = metric.expression;
+
+      } else if ( metric.family && metric.labels ) {
+        // construct the prometheus expression
+        var labels = "{";
+        var comma = "";
+        for (var l in metric.labels) {
+          if (metric.labels.hasOwnProperty(l)) {
+            labels = labels + comma + l + "='" + metric.labels[l] + "'";
+            comma = ",";
+          }
+        }
+        labels += "}";
+        expression = metric.family + labels;
+
+      } else {
+        console.log("Unable to show graph for metric [" + metric.displayName + "]. No expression or family and labels.");
         return;
       }
 
-      // construct the prometheus expression
-      var labels = "{";
-      var comma = "";
-      for (var l in metric.labels) {
-        if (metric.labels.hasOwnProperty(l)) {
-          labels = labels + comma + l + "='" + metric.labels[l] + "'";
-          comma = ",";
-        }
-      }
-      labels += "}";
-      var expression = metric.family + labels;
       var url = $scope.promBaseUrl + "/graph?g0.range_input=1h&g0.tab=0&g0.expr=" + encodeURIComponent(expression);
       $window.open(url, '_blank');
     };
