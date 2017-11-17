@@ -20,6 +20,7 @@ startDelaySeconds: 1
 lowercaseOutputName: true
 lowercaseOutputLabelNames: true
 whitelistObjectNames: [
+  "org.hawkular.agent:type=platform,subtype=*",
   "org.hawkular.agent:type=platform,subtype=*,name=*",
   "jboss.as:path=*",
   "jboss.as:deployment=*,subsystem=ejb3,stateless-session-bean=*",
@@ -45,7 +46,12 @@ rules:
 
   # HAWKULAR PLATFORM MBEANS
 
-  - pattern: "org.hawkular.agent<type=platform, subtype=(.+), name=(.+)><>platform_(?:operating system|file store|memory|processor|power source)_(.+):"
+  - pattern: "org.hawkular.agent<type=platform, subtype=(.+)><>(?:operating system|memory)_(.+):"
+    attrNameSnakeCase: true
+    name: hawkular_platform_$1_$2
+    type: GAUGE
+
+  - pattern: "org.hawkular.agent<type=platform, subtype=(.+), name=(.+)><>(?:file store|processor|power source)_(.+):"
     attrNameSnakeCase: true
     name: hawkular_platform_$1_$3
     type: GAUGE

@@ -314,7 +314,7 @@ public class InventoryRestTest extends AbstractInventoryITest {
         assertThat(response.readEntity(new GenericType<String>() {}))
                 .contains("AGENT CONFIG TEST");
 
-        target = client.target(baseUrl.toString()).path("get-jmx-exporter-config/wildfly-10");
+        target = client.target(baseUrl.toString()).path("get-jmx-exporter-config/WF10");
         response = target
                 .request(MediaType.TEXT_PLAIN)
                 .get();
