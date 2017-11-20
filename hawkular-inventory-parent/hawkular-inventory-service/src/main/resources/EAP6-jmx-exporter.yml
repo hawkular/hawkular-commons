@@ -23,6 +23,7 @@ whitelistObjectNames: [
   "org.hawkular.agent:type=platform,subtype=*",
   "org.hawkular.agent:type=platform,subtype=*,name=*",
   "jboss.as:path=*",
+  "jboss.as:deployment=*",
   "jboss.as:deployment=*,subsystem=ejb3,stateless-session-bean=*",
   "jboss.as:deployment=*,subsystem=ejb3,stateful-session-bean=*",
   "jboss.as:deployment=*,subsystem=ejb3,message-driven-bean=*",
@@ -84,7 +85,7 @@ rules:
     labels:
       deployment: $1
 
-  - pattern: "^jboss.as<deployment=(.+)><>status: OK"
+  - pattern: "jboss.as<deployment=(.+)><>status: OK"
     attrNameSnakeCase: true
     name: wildfly_deployment_availability
     value: 1
@@ -92,7 +93,7 @@ rules:
     labels:
       deployment: $1
 
-  - pattern: "^jboss.as<deployment=(.+)><>status: (FAILED|STOPPED)"
+  - pattern: "jboss.as<deployment=(.+)><>status: (FAILED|STOPPED)"
     attrNameSnakeCase: true
     name: wildfly_deployment_availability
     value: 0
