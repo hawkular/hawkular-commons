@@ -518,6 +518,24 @@ metric-set-dmr:
     attribute:    status
     metric-family: wildfly_deployment_availability
 
+- name: Server Availability
+  metric-dmr:
+  - name: Server Availability
+    attribute:    server-status
+    metric-family: wildfly_server_availability
+
+- name: Domain Host Availability
+  metric-dmr:
+  - name: Domain Host Availability
+    attribute:    host-state
+    metric-family: wildfly_domain_host_availability
+
+- name: Domain Server Availability
+  metric-dmr:
+  - name: Domain Server Availability
+    attribute:    status
+    metric-family: wildfly_domain_host_server_availability
+
 resource-type-set-dmr:
 - name: Standalone Environment
   resource-type-dmr:
@@ -529,6 +547,7 @@ resource-type-set-dmr:
     - WildFly Memory Metrics
     - WildFly Threading Metrics
     - WildFly Aggregated Web Metrics
+    - Server Availability
     resource-config-dmr:
     - name: Name
       attribute: name
@@ -670,6 +689,9 @@ resource-type-set-dmr:
     metric-sets:
     - WildFly Memory Metrics
     - WildFly Threading Metrics
+    - Domain Host Availability
+    metric-labels:
+      host: "%host%"
     resource-config-dmr:
     - name: Name
       attribute: name
@@ -711,6 +733,10 @@ resource-type-set-dmr:
     - WildFly Memory Metrics
     - WildFly Threading Metrics
     - WildFly Aggregated Web Metrics
+    - Domain Server Availability
+    metric-labels:
+      host: "%host%"
+      server: "%server%"
     resource-config-dmr:
     - name: Name
       attribute: name
