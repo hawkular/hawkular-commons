@@ -1,0 +1,681 @@
+#
+# Copyright 2014-2017 Red Hat, Inc. and/or its affiliates
+# and other contributors as indicated by the @author tags.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+---
+subsystem:
+  type-version: WF10-DOMAIN
+
+# DMR
+
+metric-set-dmr:
+- name: Scrape Endpoint Availability
+  metric-dmr:
+  - name: up
+    metric-type: gauge
+    attribute: up
+    metric-family: up
+
+- name: WildFly Memory Metrics
+  metric-dmr:
+  - name: Heap Used
+    metric-units: bytes
+    metric-type: gauge
+    path: /core-service=platform-mbean/type=memory
+    attribute: heap-memory-usage#used
+    metric-family: jvm_memory_bytes_used
+    metric-labels:
+      area: heap
+  - name: Heap Committed
+    metric-units: bytes
+    metric-type: gauge
+    path: /core-service=platform-mbean/type=memory
+    attribute: heap-memory-usage#committed
+    metric-family: jvm_memory_bytes_committed
+    metric-labels:
+      area: heap
+  - name: Heap Max
+    metric-units: bytes
+    metric-type: gauge
+    path: /core-service=platform-mbean/type=memory
+    attribute: heap-memory-usage#max
+    metric-family: jvm_memory_bytes_max
+    metric-labels:
+      area: heap
+  - name: NonHeap Used
+    metric-units: bytes
+    path: /core-service=platform-mbean/type=memory
+    attribute: non-heap-memory-usage#used
+    metric-family: jvm_memory_bytes_used
+    metric-labels:
+      area: nonheap
+  - name: NonHeap Committed
+    metric-units: bytes
+    path: /core-service=platform-mbean/type=memory
+    attribute: non-heap-memory-usage#committed
+    metric-family: jvm_memory_bytes_committed
+    metric-labels:
+      area: nonheap
+  - name: NonHeap Max
+    metric-units: bytes
+    path: /core-service=platform-mbean/type=memory
+    attribute: non-heap-memory-usage#max
+    metric-family: jvm_memory_bytes_max
+    metric-labels:
+      area: nonheap
+  - name: Accumulated GC Duration
+    metric-units: seconds
+    metric-type: counter
+    path: "/core-service=platform-mbean/type=garbage-collector/name=*"
+    attribute: collection-time
+    metric-family: jvm_gc_collection_seconds_sum
+    metric-expression: sum($metric)
+    # no metric-labels because we want to aggregate across all of them
+
+- name: WildFly Threading Metrics
+  metric-dmr:
+  - name: Thread Count
+    metric-type: gauge
+    path: /core-service=platform-mbean/type=threading
+    attribute: thread-count
+    metric-family: jvm_threads_current
+
+- name: Domain Host Availability
+  metric-dmr:
+  - name: Domain Host Availability
+    attribute: host-state
+    metric-family: wildfly_domain_host_availability
+
+- name: Domain Server Availability
+  metric-dmr:
+  - name: Domain Server Availability
+    attribute: status
+    metric-family: wildfly_domain_host_server_availability
+
+resource-type-set-dmr:
+- name: Domain Environment
+  resource-type-dmr:
+  - name: Host Controller
+    resource-name-template: "%ManagedServerName"
+    notification-dmr:
+    - name: resource-added
+    metric-sets:
+    - Scrape Endpoint Availability
+    - WildFly Memory Metrics
+    - WildFly Threading Metrics
+    resource-config-dmr:
+    - name: Product Name
+      attribute: product-name
+    - name: Version
+      attribute: product-version
+    - name: Process Type
+      attribute: process-type
+    - name: Local Host Name
+      attribute: local-host-name
+    operation-dmr:
+    - name: Reload Servers
+      internal-name: reload-servers
+      modifies: true
+      params:
+      - name: blocking
+        type: bool
+        description: Wait until the servers are stopped before returning from the operation.
+    - name: Restart Servers
+      internal-name: restart-servers
+      modifies: true
+      params:
+      - name: blocking
+        type: bool
+        description: Wait until the servers are stopped before returning from the operation.
+    - name: Resume Servers
+      internal-name: resume-servers
+      modifies: true
+    - name: Start Servers
+      internal-name: start-servers
+      modifies: true
+      params:
+      - name: blocking
+        type: bool
+        description: Wait until the servers are stopped before returning from the operation.
+    - name: Stop Servers
+      internal-name: stop-servers
+      modifies: true
+      params:
+      - name: blocking
+        type: bool
+        description: Wait until the servers are stopped before returning from the operation.
+      - name: timeout
+        type: int
+        default-value: "0"
+        description: Timeout in seconds to allow active connections to drain
+    - name: Suspend Servers
+      internal-name: suspend-servers
+      modifies: true
+      params:
+      - name: timeout
+        type: int
+        default-value: "0"
+        description: Timeout in seconds to allow active connections to drain
+    - name: Deploy
+      internal-name: deploy
+      modifies: true
+    - name: Undeploy
+      internal-name: undeploy
+      modifies: true
+    - name: Enable Deployment
+      internal-name: enable-deployment
+      modifies: true
+    - name: Disable Deployment
+      internal-name: disable-deployment
+      modifies: true
+    - name: Restart Deployment
+      internal-name: restart-deployment
+      modifies: true
+
+  - name: Domain Profile
+    resource-name-template: "%-"
+    path: "/profile=*"
+    parents:
+    - Host Controller
+    resource-config-dmr:
+    - name: Name
+      attribute: name
+
+  - name: Domain Server Group
+    resource-name-template: "%-"
+    path: "/server-group=*"
+    parents:
+    - Host Controller
+    resource-config-dmr:
+    - name: Profile
+      attribute: profile
+    operation-dmr:
+    - name: Reload Servers
+      internal-name: reload-servers
+      modifies: true
+      params:
+      - name: blocking
+        type: bool
+        default-value: false
+        description: Wait until the servers are stopped before returning from the operation.
+    - name: Restart Servers
+      internal-name: restart-servers
+      modifies: true
+      params:
+      - name: blocking
+        type: bool
+        default-value: false
+        description: Wait until the servers are stopped before returning from the operation.
+    - name: Resume Servers
+      internal-name: resume-servers
+      modifies: true
+    - name: Start Servers
+      internal-name: start-servers
+      modifies: true
+      params:
+      - name: blocking
+        type: bool
+        default-value: false
+        description: Wait until the servers are stopped before returning from the operation.
+    - name: Stop Servers
+      internal-name: stop-servers
+      modifies: true
+      params:
+      - name: blocking
+        type: bool
+        default-value: false
+        description: Wait until the servers are stopped before returning from the operation.
+      - name: timeout
+        type: int
+        description: Timeout in seconds to allow active connections to drain
+    - name: Suspend Servers
+      internal-name: suspend-servers
+      modifies: true
+      params:
+      - name: timeout
+        type: int
+        description: Timeout in seconds to allow active connections to drain
+
+  - name: Domain Host
+    resource-name-template: "%-"
+    path: "/host=*"
+    parents:
+    - Host Controller
+    notification-dmr:
+    - name: resource-added
+    metric-sets:
+    - Domain Host Availability
+    metric-labels:
+      host: "%host%"
+    resource-config-dmr:
+    - name: Name
+      attribute: name
+    - name: Product Name
+      attribute: product-name
+    - name: Version
+      attribute: product-version
+    - name: Is Domain Controller
+      attribute: master
+    - name: Host State
+      attribute: host-state
+    - name: Running Mode
+      attribute: running-mode
+    - name: Server State
+      attribute: server-state
+    - name: Suspend State
+      attribute: suspend-state
+    - name: UUID
+      attribute: uuid
+    - name: Home Directory
+      attribute: home-dir
+      path: /core-service=server-environment
+    operation-dmr:
+    - name: Reload
+      internal-name: reload
+      modifies: true
+    - name: Shutdown
+      internal-name: shutdown
+      modifies: true
+      params:
+      - name: restart
+        type: bool
+        description: If true, once shutdown the host controller will be restarted again.
+
+  - name: Domain WildFly Server
+    resource-name-template: "%-"
+    path: "/server=*"
+    parents:
+    - Domain Host
+    notification-dmr:
+    - name: resource-added
+    metric-sets:
+    - Domain Server Availability
+    metric-labels:
+      host: "%host%"
+      server: "%server%"
+    resource-config-dmr:
+    - name: Name
+      attribute: name
+    - name: Host
+      attribute: host
+    - name: Product Name
+      attribute: product-name
+    - name: Version
+      attribute: product-version
+    - name: Profile Name
+      attribute: profile-name
+    - name: Server Group
+      attribute: server-group
+    - name: Running Mode
+      attribute: running-mode
+    - name: Server State
+      attribute: server-state
+    - name: Suspend State
+      attribute: suspend-state
+    - name: UUID
+      attribute: uuid
+    - name: Hostname
+      attribute: qualified-host-name
+      path: /core-service=server-environment
+    - name: Node Name
+      attribute: node-name
+      path: /core-service=server-environment
+    - name: Initial Running Mode
+      attribute: initial-running-mode
+      path: /core-service=server-environment
+    - name: Base Directory
+      attribute: base-dir
+      path: /core-service=server-environment
+    - name: Bound Address
+      attribute: bound-address
+      path: /socket-binding-group=full-sockets/socket-binding=http
+    operation-dmr:
+    - name: JDR
+      internal-name: generate-jdr-report
+      path: /subsystem=jdr
+
+  - name: Domain WildFly Server Controller
+    resource-name-template: "%-"
+    path: "/server-config=*"
+    parents:
+    - Domain Host
+    notification-dmr:
+    - name: resource-added
+    resource-config-dmr:
+    - name: Name
+      attribute: name
+    - name: Server Group
+      attribute: group
+    - name: Auto Start
+      attribute: auto-start
+    - name: Status
+      attribute: status
+    operation-dmr:
+    - name: Destroy
+      internal-name: destroy
+      modifies: true
+    - name: Kill
+      internal-name: kill
+      modifies: true
+    - name: Reload
+      internal-name: reload
+      modifies: true
+      params:
+      - name: server
+        description: The name of the server.
+      - name: blocking
+        type: bool
+        default-value: "false"
+        description: Wait until the servers are stopped before returning from the operation.
+    - name: Restart
+      internal-name: restart
+      modifies: true
+      params:
+      - name: server
+        description: The name of the server.
+      - name: blocking
+        type: bool
+        default-value: "false"
+        description: Wait until the servers are stopped before returning from the operation.
+    - name: Resume
+      internal-name: resume
+      modifies: true
+    - name: Start
+      internal-name: start
+      modifies: true
+      params:
+      - name: server
+        description: The name of the server.
+      - name: blocking
+        type: bool
+        default-value: "false"
+        description: Wait until the servers are stopped before returning from the operation.
+    - name: Stop
+      internal-name: stop
+      modifies: true
+      params:
+      - name: server
+        description: The name of the server.
+      - name: blocking
+        type: bool
+        default-value: "false"
+        description: Wait until the servers are stopped before returning from the operation.
+      - name: timeout
+        type: int
+        description: Timeout in seconds to allow active connections to drain
+    - name: Suspend
+      internal-name: suspend
+      modifies: true
+      params:
+      - name: timeout
+        type: int
+        description: Timeout in seconds to allow active connections to drain
+
+- name: Deployment
+  resource-type-dmr:
+  - name: Deployment
+    resource-name-template: "%-"
+    path: "/deployment=*"
+    parents:
+    - Domain Server Group
+    resource-config-dmr:
+    - name: Enabled
+      attribute: enabled
+
+- name: Socket Binding Group
+  resource-type-dmr:
+  - name: Socket Binding Group
+    resource-name-template: "%-"
+    path: "/socket-binding-group=*"
+    parents:
+    - Host Controller
+    resource-config-dmr:
+    - name: Name
+      attribute: name
+    - name: Port Offset
+      attribute: port-offset
+      resolve-expressions: true
+    - name: Default Interface
+      attribute: default-interface
+  - name: Socket Binding
+    resource-name-template: "%-"
+    path: "/socket-binding=*"
+    parents:
+    - Socket Binding Group
+    resource-config-dmr:
+    - name: Name
+      attribute: name
+    - name: Interface
+      attribute: interface
+    - name: Port
+      attribute: port
+      resolve-expressions: true
+    - name: Multicast Address
+      attribute: multicast-address
+      resolve-expressions: true
+    - name: Multicast Port
+      attribute: multicast-port
+  - name: Remote Destination Outbound Socket Binding
+    resource-name-template: "%-"
+    path: "/remote-destination-outbound-socket-binding=*"
+    parents:
+    - Socket Binding Group
+    resource-config-dmr:
+    - name: Host
+      attribute: host
+    - name: Port
+      attribute: port
+
+# JMX
+
+metric-set-jmx:
+- name: Runtime Metrics
+  metric-jmx:
+  - name: Used Heap Memory
+    object-name: java.lang:type=Memory
+    attribute: HeapMemoryUsage#used
+    metric-units: bytes
+    metric-type: gauge
+    metric-family: jvm_memory_bytes_used
+    metric-labels:
+      area: heap
+  - name: Aggregate GC Collection Time
+    object-name: "java.lang:type=GarbageCollector,name=*"
+    attribute: CollectionTime
+    metric-units: seconds
+    metric-family: jvm_gc_collection_seconds_sum
+    metric-expression: sum($metric)
+
+- name: Memory Pool Metrics
+  metric-jmx:
+  - name: Initial
+    attribute: Usage#init
+    metric-units: bytes
+    metric-type: gauge
+    metric-family: jvm_memory_pool_bytes_init
+  - name: Used
+    attribute: Usage#used
+    metric-units: bytes
+    metric-type: gauge
+    metric-family: jvm_memory_pool_bytes_used
+  - name: Committed
+    attribute: Usage#committed
+    metric-units: bytes
+    metric-type: gauge
+    metric-family: jvm_memory_pool_bytes_committed
+  - name: Max
+    attribute: Usage#max
+    metric-units: bytes
+    metric-type: gauge
+    metric-family: jvm_memory_pool_bytes_max
+
+- name: Platform Operating System Metrics
+  metric-jmx:
+  - name: System CPU Load
+    attribute: System CPU Load
+    metric-type: gauge
+    metric-family: hawkular_platform_operatingsystem_system_cpu_load
+  - name: System Load Average
+    attribute: System Load Average
+    metric-type: gauge
+    metric-family: hawkular_platform_operatingsystem_system_load_average
+  - name: Process Count
+    attribute: Process Count
+    metric-type: gauge
+    metric-family: hawkular_platform_operatingsystem_process_count
+
+- name: Platform File Store Metrics
+  metric-jmx:
+  - name: Usable Space
+    attribute: Usable Space
+    metric-type: gauge
+    metric-family: hawkular_platform_filestore_usable_space
+  - name: Total Space
+    attribute: Total Space
+    metric-type: gauge
+    metric-family: hawkular_platform_filestore_total_space
+
+- name: Platform Memory Metrics
+  metric-jmx:
+  - name: Available Memory
+    attribute: Available Memory
+    metric-type: gauge
+    metric-family: hawkular_platform_memory_available_memory
+  - name: Total Memory
+    attribute: Total Memory
+    metric-type: gauge
+    metric-family: hawkular_platform_memory_total_memory
+
+- name: Platform Processor Metrics
+  metric-jmx:
+  - name: CPU Usage
+    attribute: CPU Usage
+    metric-type: gauge
+    metric-family: hawkular_platform_processor_cpu_usage
+
+- name: Platform Power Source Metrics
+  metric-jmx:
+  - name: Remaining Capacity
+    attribute: Remaining Capacity
+    metric-type: gauge
+    metric-family: hawkular_platform_powersource_remaining_capacity
+  - name: Time Remaining
+    attribute: Time Remaining
+    metric-type: gauge
+    metric-family: hawkular_platform_powersource_time_remaining
+
+resource-type-set-jmx:
+- name: Main
+  resource-type-jmx:
+  - name: Runtime MBean
+    resource-name-template: JMX [%_ManagedServerName%][%type%]
+    object-name: java.lang:type=Runtime
+    metric-sets:
+    - Runtime Metrics
+    resource-config-jmx:
+    - name: OS Name
+      attribute: Name
+      object-name: java.lang:type=OperatingSystem
+    - name: Java VM Name
+      attribute: VmName
+
+- name: Memory Pool
+  resource-type-jmx:
+  - name: Memory Pool MBean
+    parents:
+    - Runtime MBean
+    resource-name-template: JMX [%_ManagedServerName%] %type% %name%
+    object-name: "java.lang:type=MemoryPool,name=*"
+    metric-sets:
+    - Memory Pool Metrics
+    resource-config-jmx:
+    - name: Type
+      attribute: Type
+
+- name: Hawkular
+  resource-type-jmx:
+  - name: Hawkular Java Agent
+    resource-name-template: Hawkular Java Agent
+    object-name: org.hawkular.agent:type=hawkular-javaagent
+    resource-config-jmx:
+    - name: Immutable
+      attribute: Immutable
+    - name: In Container
+      attribute: InContainer
+    - name: Metrics Endpoint
+      attribute: MetricsEndpoint
+    - name: Version
+      attribute: Version
+    operation-jmx:
+    - name: Start
+      internal-name: start
+    - name: Stop
+      internal-name: stop
+    - name: Status
+      internal-name: status
+    - name: Inventory Discovery Scan
+      internal-name: fullDiscoveryScan
+    - name: Inventory Report
+      internal-name: inventoryReport
+
+- name: Platform
+  resource-type-jmx:
+  - name: Platform Operating System
+    resource-name-template: Platform Operating System
+    object-name: org.hawkular.agent:type=platform,subtype=operatingsystem
+    resource-config-jmx:
+    - name: Machine Id
+      attribute: Machine Id
+    - name: Container Id
+      attribute: Container Id
+    - name: Version
+      attribute: Version
+    metric-sets:
+    - Platform Operating System Metrics
+  - name: Platform File Store
+    parents:
+    - Platform Operating System
+    resource-name-template: "%name%"
+    object-name: "org.hawkular.agent:type=platform,subtype=filestore,name=*"
+    metric-sets:
+    - Platform File Store Metrics
+    metric-labels:
+      name: "%name%"
+  - name: Platform Memory
+    parents:
+    - Platform Operating System
+    resource-name-template: Platform Memory
+    object-name: org.hawkular.agent:type=platform,subtype=memory
+    metric-sets:
+    - Platform Memory Metrics
+  - name: Platform Processor
+    parents:
+    - Platform Operating System
+    resource-name-template: "%name%"
+    object-name: "org.hawkular.agent:type=platform,subtype=processor,name=*"
+    metric-sets:
+    - Platform Processor Metrics
+    metric-labels:
+      name: "%name%"
+  - name: Platform Power Source
+    parents:
+    - Platform Operating System
+    resource-name-template: "%name%"
+    object-name: "org.hawkular.agent:type=platform,subtype=powersource,name=*"
+    metric-sets:
+    - Platform Power Source Metrics
+    metric-labels:
+      name: "%name%"

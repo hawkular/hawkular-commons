@@ -83,8 +83,6 @@ rules:
     type: GAUGE
     value: 0
 
-  # DOMAIN AVAILABILITY IS UNSUPPORTED
-
   # DEPLOYMENTS
 
   - pattern: "jboss.as<deployment=(.+), subdeployment=(.+), subsystem=web><>(.+_sessions|sessions_.+):"
