@@ -144,7 +144,7 @@ metric-set-dmr:
 - name: Web Metrics
   metric-dmr:
   - name: Active Sessions
-    path: "/subsystem=we/subsystem=web
+    path: /subsystem=web
     attribute: active-sessions
     metric-family: wildfly_deployment_active_sessions
   - name: Sessions Created
