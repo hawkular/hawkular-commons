@@ -198,10 +198,11 @@
             <configuration>
               <skip>false</skip>
               <systemPropertyVariables>
+                <project.basedir>${project.basedir}</project.basedir>
                 <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                 <logging.configuration>file:${project.build.directory}/test-classes/logging.properties</logging.configuration>
                 <jboss.home>${project.basedir}/target/wildfly-${version.org.wildfly}/</jboss.home>
-                <test.prometheus.config>${project.basedir}/target/wildfly-${version.org.wildfly}/standalone/data/prometheus</test.prometheus.config>
+                <test.prometheus.config>${project.basedir}/target/prometheus</test.prometheus.config>
               </systemPropertyVariables>
               <redirectTestOutputToFile>false</redirectTestOutputToFile>
             </configuration>
@@ -339,10 +340,11 @@
             <configuration>
               <skip>false</skip>
               <systemPropertyVariables>
+                <project.basedir>${project.basedir}</project.basedir>
                 <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                 <logging.configuration>file:${project.build.directory}/test-classes/logging.properties</logging.configuration>
                 <jboss.home>${eap.home}</jboss.home>
-                <test.prometheus.config>${eap.home}/standalone/data/prometheus</test.prometheus.config>
+                <test.prometheus.config>${project.basedir}/target/prometheus</test.prometheus.config>
               </systemPropertyVariables>
               <redirectTestOutputToFile>false</redirectTestOutputToFile>
             </configuration>
