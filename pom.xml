@@ -132,6 +132,7 @@
         <configuration>
           <excludes combine.children="append">
             <exclude>**/*.log</exclude>
+            <exclude>**/.*.sw*</exclude>
             <exclude>hawkular-rest-status/src/test/resources/manifests/*.txt</exclude>
           </excludes>
         </configuration>
