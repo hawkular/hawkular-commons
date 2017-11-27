@@ -374,59 +374,59 @@ metric-set-dmr:
   - name: Active Count
     path: /statistics=pool
     attribute: ActiveCount
-    metric-family: wildfly_datasorce_pool_active_count
+    metric-family: wildfly_datasource_pool_active_count
   - name: Available Count
     path: /statistics=pool
     attribute: AvailableCount
-    metric-family: wildfly_datasorce_pool_available_count
+    metric-family: wildfly_datasource_pool_available_count
   - name: Average Blocking Time
     path: /statistics=pool
     attribute: AverageBlockingTime
-    metric-family: wildfly_datasorce_pool_average_blocking_time
+    metric-family: wildfly_datasource_pool_average_blocking_time
   - name: Average Creation Time
     path: /statistics=pool
     attribute: AverageCreationTime
-    metric-family: wildfly_datasorce_pool_average_creation_time
+    metric-family: wildfly_datasource_pool_average_creation_time
   - name: Created Count
     path: /statistics=pool
     attribute: CreatedCount
-    metric-family: wildfly_datasorce_pool_created_count
+    metric-family: wildfly_datasource_pool_created_count
   - name: Destroyed Count
     path: /statistics=pool
     attribute: DestroyedCount
-    metric-family: wildfly_datasorce_pool_destroyed_count
+    metric-family: wildfly_datasource_pool_destroyed_count
   - name: In Use Count
     path: /statistics=pool
     attribute: InUseCount
-    metric-family: wildfly_datasorce_pool_in_use_count
+    metric-family: wildfly_datasource_pool_in_use_count
   - name: Max Creation Time
     path: /statistics=pool
     attribute: MaxCreationTime
-    metric-family: wildfly_datasorce_pool_max_creation_time
+    metric-family: wildfly_datasource_pool_max_creation_time
   - name: Max Used Count
     path: /statistics=pool
     attribute: MaxUsedCount
-    metric-family: wildfly_datasorce_pool_max_used_count
+    metric-family: wildfly_datasource_pool_max_used_count
   - name: Max Wait Count
     path: /statistics=pool
     attribute: MaxWaitCount
-    metric-family: wildfly_datasorce_pool_max_wait_count
+    metric-family: wildfly_datasource_pool_max_wait_count
   - name: Max Wait Time
     path: /statistics=pool
     attribute: MaxWaitTime
-    metric-family: wildfly_datasorce_pool_max_wait_time
+    metric-family: wildfly_datasource_pool_max_wait_time
   - name: Timed Out
     path: /statistics=pool
     attribute: TimedOut
-    metric-family: wildfly_datasorce_pool_timed_out
+    metric-family: wildfly_datasource_pool_timed_out
   - name: Total Blocking Time
     path: /statistics=pool
     attribute: TotalBlockingTime
-    metric-family: wildfly_datasorce_pool_total_blocking_time
+    metric-family: wildfly_datasource_pool_total_blocking_time
   - name: Total Creation Time
     path: /statistics=pool
     attribute: TotalCreationTime
-    metric-family: wildfly_datasorce_pool_total_creation_time
+    metric-family: wildfly_datasource_pool_total_creation_time
 - name: Transactions Metrics
   metric-dmr:
   - name: Number of Aborted Transactions
