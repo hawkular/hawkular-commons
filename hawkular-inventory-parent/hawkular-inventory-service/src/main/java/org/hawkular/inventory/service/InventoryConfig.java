@@ -55,6 +55,7 @@ public class InventoryConfig {
     public static final String RESOURCE_CACHE_NAME = "resource";
     public static final String RESOURCE_TYPE_CACHE_NAME = "resource_type";
     public static final String SCRAPE_CONFIGURATION = "hawkular-inventory-prometheus-scrape-config.yaml";
+    public static final String SCRAPE_DIRECTORY = "hawkular.prometheus.scrape.dir";
 
     private static final MsgLogger log = InventoryLoggers.getLogger(InventoryConfig.class);
 
@@ -67,7 +68,6 @@ public class InventoryConfig {
     private QueryFactory queryResourceType;
 
     private final Path configPath;
-    private final Path dataPath;
 
     private File inventoryLocation;
     private File scrapeLocation;
@@ -78,8 +78,14 @@ public class InventoryConfig {
         ispnReindex = Boolean.parseBoolean(System.getProperty(ISPN_REINDEX, ISPN_REINDEX_DEFAULT));
         configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
         configPath.toFile().mkdirs();
-        dataPath = Paths.get(System.getProperty("jboss.server.data.dir"));
-        scrapeLocation = new File(dataPath.toFile(), "prometheus");
+
+        String scrapeDir = System.getProperty(SCRAPE_DIRECTORY);
+        if (scrapeDir != null) {
+            scrapeLocation = new File(scrapeDir);
+        } else {
+            Path dataPath = Paths.get(System.getProperty("jboss.server.data.dir"));
+            scrapeLocation = new File(dataPath.toFile(), "prometheus");
+        }
         scrapeLocation.mkdirs();
     }
 
