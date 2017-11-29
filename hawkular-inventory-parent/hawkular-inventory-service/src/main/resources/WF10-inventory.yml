@@ -22,6 +22,13 @@ subsystem:
 # DMR
 
 metric-set-dmr:
+- name: Scrape Endpoint Availability
+  metric-dmr:
+  - name: up
+    metric-type: gauge
+    attribute: up
+    metric-family: up
+
 - name: WildFly Memory Metrics
   metric-dmr:
   - name: Heap Used
@@ -550,18 +557,6 @@ metric-set-dmr:
     attribute: server-status
     metric-family: wildfly_server_availability
 
-- name: Domain Host Availability
-  metric-dmr:
-  - name: Domain Host Availability
-    attribute: host-state
-    metric-family: wildfly_domain_host_availability
-
-- name: Domain Server Availability
-  metric-dmr:
-  - name: Domain Server Availability
-    attribute: status
-    metric-family: wildfly_domain_host_server_availability
-
 resource-type-set-dmr:
 - name: Standalone Environment
   resource-type-dmr:
@@ -570,6 +565,7 @@ resource-type-set-dmr:
     notification-dmr:
     - name: resource-added
     metric-sets:
+    - Scrape Endpoint Availability
     - WildFly Memory Metrics
     - WildFly Threading Metrics
     - Undertow Aggregated Web Metrics
@@ -655,325 +651,6 @@ resource-type-set-dmr:
       internal-name: restart-deployment
       modifies: true
 
-- name: Domain Environment
-  resource-type-dmr:
-  - name: Host Controller
-    resource-name-template: "%ManagedServerName"
-    notification-dmr:
-    - name: resource-added
-    resource-config-dmr:
-    - name: Product Name
-      attribute: product-name
-    - name: Version
-      attribute: product-version
-    - name: Process Type
-      attribute: process-type
-    - name: Local Host Name
-      attribute: local-host-name
-    operation-dmr:
-    - name: Reload Servers
-      internal-name: reload-servers
-      modifies: true
-      params:
-      - name: blocking
-        type: bool
-        description: Wait until the servers are stopped before returning from the operation.
-    - name: Restart Servers
-      internal-name: restart-servers
-      modifies: true
-      params:
-      - name: blocking
-        type: bool
-        description: Wait until the servers are stopped before returning from the operation.
-    - name: Resume Servers
-      internal-name: resume-servers
-      modifies: true
-    - name: Start Servers
-      internal-name: start-servers
-      modifies: true
-      params:
-      - name: blocking
-        type: bool
-        description: Wait until the servers are stopped before returning from the operation.
-    - name: Stop Servers
-      internal-name: stop-servers
-      modifies: true
-      params:
-      - name: blocking
-        type: bool
-        description: Wait until the servers are stopped before returning from the operation.
-      - name: timeout
-        type: int
-        default-value: "0"
-        description: Timeout in seconds to allow active connections to drain
-    - name: Suspend Servers
-      internal-name: suspend-servers
-      modifies: true
-      params:
-      - name: timeout
-        type: int
-        default-value: "0"
-        description: Timeout in seconds to allow active connections to drain
-    - name: Deploy
-      internal-name: deploy
-      modifies: true
-    - name: Undeploy
-      internal-name: undeploy
-      modifies: true
-    - name: Enable Deployment
-      internal-name: enable-deployment
-      modifies: true
-    - name: Disable Deployment
-      internal-name: disable-deployment
-      modifies: true
-    - name: Restart Deployment
-      internal-name: restart-deployment
-      modifies: true
-
-  - name: Domain Profile
-    resource-name-template: "%-"
-    path: "/profile=*"
-    parents:
-    - Host Controller
-    resource-config-dmr:
-    - name: Name
-      attribute: name
-
-  - name: Domain Server Group
-    resource-name-template: "%-"
-    path: "/server-group=*"
-    parents:
-    - Host Controller
-    resource-config-dmr:
-    - name: Profile
-      attribute: profile
-    operation-dmr:
-    - name: Reload Servers
-      internal-name: reload-servers
-      modifies: true
-      params:
-      - name: blocking
-        type: bool
-        default-value: false
-        description: Wait until the servers are stopped before returning from the operation.
-    - name: Restart Servers
-      internal-name: restart-servers
-      modifies: true
-      params:
-      - name: blocking
-        type: bool
-        default-value: false
-        description: Wait until the servers are stopped before returning from the operation.
-    - name: Resume Servers
-      internal-name: resume-servers
-      modifies: true
-    - name: Start Servers
-      internal-name: start-servers
-      modifies: true
-      params:
-      - name: blocking
-        type: bool
-        default-value: false
-        description: Wait until the servers are stopped before returning from the operation.
-    - name: Stop Servers
-      internal-name: stop-servers
-      modifies: true
-      params:
-      - name: blocking
-        type: bool
-        default-value: false
-        description: Wait until the servers are stopped before returning from the operation.
-      - name: timeout
-        type: int
-        description: Timeout in seconds to allow active connections to drain
-    - name: Suspend Servers
-      internal-name: suspend-servers
-      modifies: true
-      params:
-      - name: timeout
-        type: int
-        description: Timeout in seconds to allow active connections to drain
-
-  - name: Domain Host
-    resource-name-template: "%-"
-    path: "/host=*"
-    parents:
-    - Host Controller
-    notification-dmr:
-    - name: resource-added
-    metric-sets:
-    - WildFly Memory Metrics
-    - WildFly Threading Metrics
-    - Domain Host Availability
-    metric-labels:
-      host: "%host%"
-    resource-config-dmr:
-    - name: Name
-      attribute: name
-    - name: Product Name
-      attribute: product-name
-    - name: Version
-      attribute: product-version
-    - name: Is Domain Controller
-      attribute: master
-    - name: Host State
-      attribute: host-state
-    - name: Running Mode
-      attribute: running-mode
-    - name: Server State
-      attribute: server-state
-    - name: Suspend State
-      attribute: suspend-state
-    - name: UUID
-      attribute: uuid
-    - name: Home Directory
-      attribute: home-dir
-      path: /core-service=server-environment
-    operation-dmr:
-    - name: Reload
-      internal-name: reload
-      modifies: true
-    - name: Shutdown
-      internal-name: shutdown
-      modifies: true
-      params:
-      - name: restart
-        type: bool
-        description: If true, once shutdown the host controller will be restarted again.
-
-  - name: Domain WildFly Server
-    resource-name-template: "%-"
-    path: "/server=*"
-    parents:
-    - Domain Host
-    notification-dmr:
-    - name: resource-added
-    metric-sets:
-    - WildFly Memory Metrics
-    - WildFly Threading Metrics
-    - Undertow Aggregated Web Metrics
-    - Domain Server Availability
-    metric-labels:
-      host: "%host%"
-      server: "%server%"
-    resource-config-dmr:
-    - name: Name
-      attribute: name
-    - name: Host
-      attribute: host
-    - name: Product Name
-      attribute: product-name
-    - name: Version
-      attribute: product-version
-    - name: Profile Name
-      attribute: profile-name
-    - name: Server Group
-      attribute: server-group
-    - name: Running Mode
-      attribute: running-mode
-    - name: Server State
-      attribute: server-state
-    - name: Suspend State
-      attribute: suspend-state
-    - name: UUID
-      attribute: uuid
-    - name: Hostname
-      attribute: qualified-host-name
-      path: /core-service=server-environment
-    - name: Node Name
-      attribute: node-name
-      path: /core-service=server-environment
-    - name: Initial Running Mode
-      attribute: initial-running-mode
-      path: /core-service=server-environment
-    - name: Base Directory
-      attribute: base-dir
-      path: /core-service=server-environment
-    - name: Bound Address
-      attribute: bound-address
-      path: /socket-binding-group=full-sockets/socket-binding=http
-    operation-dmr:
-    - name: JDR
-      internal-name: generate-jdr-report
-      path: /subsystem=jdr
-
-  - name: Domain WildFly Server Controller
-    resource-name-template: "%-"
-    path: "/server-config=*"
-    parents:
-    - Domain Host
-    notification-dmr:
-    - name: resource-added
-    resource-config-dmr:
-    - name: Name
-      attribute: name
-    - name: Server Group
-      attribute: group
-    - name: Auto Start
-      attribute: auto-start
-    - name: Status
-      attribute: status
-    operation-dmr:
-    - name: Destroy
-      internal-name: destroy
-      modifies: true
-    - name: Kill
-      internal-name: kill
-      modifies: true
-    - name: Reload
-      internal-name: reload
-      modifies: true
-      params:
-      - name: server
-        description: The name of the server.
-      - name: blocking
-        type: bool
-        default-value: "false"
-        description: Wait until the servers are stopped before returning from the operation.
-    - name: Restart
-      internal-name: restart
-      modifies: true
-      params:
-      - name: server
-        description: The name of the server.
-      - name: blocking
-        type: bool
-        default-value: "false"
-        description: Wait until the servers are stopped before returning from the operation.
-    - name: Resume
-      internal-name: resume
-      modifies: true
-    - name: Start
-      internal-name: start
-      modifies: true
-      params:
-      - name: server
-        description: The name of the server.
-      - name: blocking
-        type: bool
-        default-value: "false"
-        description: Wait until the servers are stopped before returning from the operation.
-    - name: Stop
-      internal-name: stop
-      modifies: true
-      params:
-      - name: server
-        description: The name of the server.
-      - name: blocking
-        type: bool
-        default-value: "false"
-        description: Wait until the servers are stopped before returning from the operation.
-      - name: timeout
-        type: int
-        description: Timeout in seconds to allow active connections to drain
-    - name: Suspend
-      internal-name: suspend
-      modifies: true
-      params:
-      - name: timeout
-        type: int
-        description: Timeout in seconds to allow active connections to drain
-
 - name: Undertow Subsystem
   resource-type-dmr:
   - name: Undertow Server
@@ -981,7 +658,6 @@ resource-type-set-dmr:
     path: "/subsystem=undertow/server=*"
     parents:
     - WildFly Server
-    - Domain WildFly Server
   - name: HTTP Listener
     parents:
     - Undertow Server
@@ -1012,7 +688,6 @@ resource-type-set-dmr:
     path: "/deployment=*"
     parents:
     - WildFly Server
-    - Domain WildFly Server
     metric-sets:
     - Undertow Metrics
     - Deployment Status
@@ -1091,7 +766,6 @@ resource-type-set-dmr:
     path: "/subsystem=datasources/data-source=*"
     parents:
     - WildFly Server
-    - Domain WildFly Server
     metric-sets:
     - Datasource Pool Metrics
     - Datasource JDBC Metrics
@@ -1128,7 +802,6 @@ resource-type-set-dmr:
     path: "/subsystem=datasources/xa-data-source=*"
     parents:
     - WildFly Server
-    - Domain WildFly Server
     metric-sets:
     - Datasource Pool Metrics
     - Datasource JDBC Metrics
@@ -1160,7 +833,6 @@ resource-type-set-dmr:
     path: "/subsystem=datasources/jdbc-driver=*"
     parents:
     - WildFly Server
-    - Domain WildFly Server
     resource-config-dmr:
     - name: Driver Class
       attribute: driver-class-name
@@ -1178,7 +850,6 @@ resource-type-set-dmr:
     path: /subsystem=transactions
     parents:
     - WildFly Server
-    - Domain WildFly Server
     metric-sets:
     - Transactions Metrics
 
@@ -1189,7 +860,6 @@ resource-type-set-dmr:
     path: "/subsystem=messaging-activemq/server=*"
     parents:
     - WildFly Server
-    - Domain WildFly Server
   - name: JMS Queue
     resource-name-template: "%-"
     path: "/jms-queue=*"
@@ -1218,7 +888,6 @@ resource-type-set-dmr:
     path: "/socket-binding-group=*"
     parents:
     - WildFly Server
-    - Host Controller
     resource-config-dmr:
     - name: Name
       attribute: name
@@ -1263,7 +932,6 @@ resource-type-set-dmr:
     path: /subsystem=modcluster
     parents:
     - WildFly Server
-    - Domain WildFly Server
     resource-config-dmr:
     - name: Connector
       attribute: connector
@@ -1276,7 +944,6 @@ resource-type-set-dmr:
     path: /subsystem=jgroups
     parents:
     - WildFly Server
-    - Domain WildFly Server
   - name: JGroups Channel
     resource-name-template: "%-"
     path: "/channel=*"
@@ -1295,7 +962,6 @@ resource-type-set-dmr:
     path: /subsystem=infinispan
     parents:
     - WildFly Server
-    - Domain WildFly Server
   - name: Infinispan Cache Container
     resource-name-template: "%-"
     path: "/cache-container=*"

@@ -1,0 +1,78 @@
+#
+# Copyright 2014-2017 Red Hat, Inc. and/or its affiliates
+# and other contributors as indicated by the @author tags.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+---
+startDelaySeconds: 1
+lowercaseOutputName: true
+lowercaseOutputLabelNames: true
+whitelistObjectNames: [
+  "org.hawkular.agent:type=platform,subtype=*",
+  "org.hawkular.agent:type=platform,subtype=*,name=*",
+  "jboss.as:host=*",
+  "jboss.as:host=*,server-config=*"
+]
+rules:
+
+  # HAWKULAR PLATFORM MBEANS
+
+  - pattern: "org.hawkular.agent<type=platform, subtype=(.+)><>(?:operating system|memory)_(.+):"
+    attrNameSnakeCase: true
+    name: hawkular_platform_$1_$2
+    type: GAUGE
+
+  - pattern: "org.hawkular.agent<type=platform, subtype=(.+), name=(.+)><>(?:file store|processor|power source)_(.+):"
+    attrNameSnakeCase: true
+    name: hawkular_platform_$1_$3
+    type: GAUGE
+    labels:
+      name: $2
+
+  # DOMAIN AVAILABILITY
+
+  - pattern: "jboss.as<host=(.*)><>host_state: (run.*|.*-required)"
+    attrNameSnakeCase: true
+    name: wildfly_domain_host_availability
+    type: GAUGE
+    value: 1
+    labels:
+      host: $1
+
+  - pattern: "jboss.as<host=(.*)><>host_state: (?!(run.*|.*-required)).*"
+    attrNameSnakeCase: true
+    name: wildfly_domain_host_availability
+    type: GAUGE
+    value: 0
+    labels:
+      host: $1
+
+  - pattern: "jboss.as<host=(.*), server-config=(.*)><>status: (STARTED)"
+    attrNameSnakeCase: true
+    name: wildfly_domain_host_server_availability
+    type: GAUGE
+    value: 1
+    labels:
+      host: $1
+      server: $2
+
+  - pattern: "jboss.as<host=(.*), server-config=(.*)><>status: (?!(STARTED)).*"
+    attrNameSnakeCase: true
+    name: wildfly_domain_host_server_availability
+    type: GAUGE
+    value: 0
+    labels:
+      host: $1
+      server: $2
