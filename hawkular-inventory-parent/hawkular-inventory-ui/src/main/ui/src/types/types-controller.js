@@ -171,6 +171,10 @@ angular.module('hwk.typesModule').controller( 'hwk.typesController', ['$scope', 
       });
     });
 
+    $scope.getLength = function (json) {
+      return json ? Object.keys(json).length : 0;
+    };
+
     updateTypes();
   }
 ]);

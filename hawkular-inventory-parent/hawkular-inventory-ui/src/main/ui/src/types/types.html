@@ -84,17 +84,10 @@
                 </div>
               </div>
 
-              <!-- Configuration -->
-              <div class="list-view-pf-additional-info-item">
-                <div class="list-view-pf-expand">
-                  <span class="fa fa-angle-right"></span> <span class="pficon pficon-settings"></span> <strong>{{ typeItem.properties ? typeItem.properties.length : 0 }}</strong> Configuration
-                </div>
-              </div>
-
               <!-- Properties -->
               <div class="list-view-pf-additional-info-item">
                 <div class="list-view-pf-expand">
-                  <span class="fa fa-angle-right"></span> <span class="pficon pficon-info"></span> <strong>{{ typeItem.properties ? typeItem.properties.length : 0 }}</strong> Properties
+                  <span class="fa fa-angle-right"></span> <span class="pficon pficon-info"></span> <strong>{{ getLength(typeItem.properties) }}</strong> Properties
                 </div>
               </div>
 
@@ -114,21 +107,6 @@
               <p>
                 <b>Name:</b> {{ op.name }} <br />
               </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Configuration -->
-        <div class="list-group-item-container container-fluid hidden">
-          <div class="close">
-            <span class="pficon pficon-close"></span>
-          </div>
-          <div class="row">
-            <div class="col-md-12">
-              <dl class="dl-horizontal">
-                <dt ng-repeat-start="prop in typeItem.properties">{{ prop.key }}:</dt>
-                <dd ng-repeat-end>{{ prop.value }}</dd>
-              </dl>
             </div>
           </div>
         </div>
