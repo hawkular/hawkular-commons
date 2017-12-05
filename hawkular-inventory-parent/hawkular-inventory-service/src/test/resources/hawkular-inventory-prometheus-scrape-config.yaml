@@ -17,5 +17,5 @@
 
 ---
 filter:
-  # <RawResource type to filter>: <RawResource.config key where Metrics Endpoint in format <host:port> can be found
-  Hawkular Java Agent: Metrics Endpoint
+  # <RawResource type to filter>: <RawResource.config key where Metrics Endpoints in format "<host:port>,..." is found
+  Hawkular Java Agent: Metrics Endpoints
