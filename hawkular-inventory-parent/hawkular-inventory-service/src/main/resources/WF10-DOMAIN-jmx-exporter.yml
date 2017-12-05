@@ -49,7 +49,7 @@ rules:
     type: GAUGE
     value: 1
     labels:
-      host: $1
+      domain_host: $1
 
   - pattern: "jboss.as<host=(.*)><>host_state: (?!(run.*|.*-required)).*"
     attrNameSnakeCase: true
@@ -57,7 +57,7 @@ rules:
     type: GAUGE
     value: 0
     labels:
-      host: $1
+      domain_host: $1
 
   - pattern: "jboss.as<host=(.*), server-config=(.*)><>status: (STARTED)"
     attrNameSnakeCase: true
@@ -65,8 +65,8 @@ rules:
     type: GAUGE
     value: 1
     labels:
-      host: $1
-      server: $2
+      domain_host: $1
+      domain_server: $2
 
   - pattern: "jboss.as<host=(.*), server-config=(.*)><>status: (?!(STARTED)).*"
     attrNameSnakeCase: true
@@ -74,5 +74,5 @@ rules:
     type: GAUGE
     value: 0
     labels:
-      host: $1
-      server: $2
+      domain_host: $1
+      domain_server: $2
