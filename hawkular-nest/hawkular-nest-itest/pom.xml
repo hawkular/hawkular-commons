@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.hawkular.commons</groupId>
     <artifactId>hawkular-nest-parent</artifactId>
-    <version>0.9.7.Final</version>
+    <version>0.9.8-SNAPSHOT</version>
   </parent>
   <artifactId>hawkular-nest-itest</artifactId>
   <name>Hawkular Nest Integration Tests</name>

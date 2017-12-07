@@ -28,7 +28,7 @@
 
   <groupId>org.hawkular.commons</groupId>
   <artifactId>hawkular-commons-parent</artifactId>
-  <version>0.9.7.Final</version>
+  <version>0.9.8-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Hawkular Commons</name>
@@ -123,6 +123,7 @@
           <excludes combine.children="append">
             <exclude>**/*.log</exclude>
             <exclude>hawkular-rest-status/src/test/resources/manifests/*.txt</exclude>
+            <exclude>**/pom.xml.versionsBackup</exclude>
           </excludes>
         </configuration>
       </plugin>
