@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.hawkular.commons</groupId>
     <artifactId>hawkular-command-gateway</artifactId>
-    <version>0.9.8</version>
+    <version>0.9.9-SNAPSHOT</version>
   </parent>
 
   <artifactId>hawkular-command-gateway-war</artifactId>
