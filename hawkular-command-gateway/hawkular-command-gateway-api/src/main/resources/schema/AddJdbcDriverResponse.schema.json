@@ -5,6 +5,7 @@
     "javaType": "org.hawkular.cmdgw.api.ResourcePathResponse"
   },
   "javaType": "org.hawkular.cmdgw.api.AddJdbcDriverResponse",
+  "javaInterfaces" : ["org.hawkular.cmdgw.api.EventDestination"],
   "description": "Results of an Add Driver request.",
   "additionalProperties": false,
   "properties": {

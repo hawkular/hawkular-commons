@@ -5,6 +5,7 @@
     "javaType": "org.hawkular.cmdgw.api.ResourcePathResponse"
   },
   "javaType": "org.hawkular.cmdgw.api.RemoveJdbcDriverResponse",
+  "javaInterfaces" : ["org.hawkular.cmdgw.api.EventDestination"],
   "description": "Results of an RemoveJdbcDriverRequest.",
   "additionalProperties": false
 }
