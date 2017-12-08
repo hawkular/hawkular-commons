@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,6 +41,7 @@ import org.hawkular.inventory.api.model.Resource;
 import org.hawkular.inventory.api.model.ResourceNode;
 import org.hawkular.inventory.api.model.ResourceType;
 import org.hawkular.inventory.api.model.ResultSet;
+import org.hawkular.inventory.service.FileSdConfig.Entry;
 import org.infinispan.Cache;
 import org.infinispan.configuration.cache.SingleFileStoreConfiguration;
 import org.infinispan.manager.DefaultCacheManager;
@@ -404,16 +406,49 @@ public class InventoryServiceIspnTest {
     }
 
     @Test
-    public void shouldGenerateScrapeConfig() {
+    public void shouldGenerateScrapeConfig() throws Exception {
+        // a single endpoint
         RawResource agent = RawResource.builder()
                 .id("my-test-agent")
                 .feedId("my-test-feed")
                 .typeId("Hawkular Java Agent")
-                .config("Metrics Endpoint", "localhost:1234")
+                .config("Metrics Endpoints", "localhost:1234")
                 .build();
         service.addResource(agent);
         File testFile = new File(PROMETHEUS_SCRAPE_CONFIG, "my-test-feed.json");
         Assert.assertTrue(testFile.exists());
+        Assert.assertTrue(new String(Files.readAllBytes(testFile.getAbsoluteFile().toPath()))
+                .contains("\"localhost:1234\""));
+        testFile.delete();
+        Assert.assertFalse(testFile.exists());
+        service.buildMetricsEndpoints();
+        Assert.assertTrue(testFile.exists());
+
+        // multiple endpoints
+        agent = RawResource.builder()
+                .id("my-test-agent2")
+                .feedId("my-test-feed2")
+                .typeId("Hawkular Java Agent")
+                .config("Metrics Endpoints", "localhost:12345|localhost:6789{label1=value1, l2=v2}")
+                .build();
+        service.addResource(agent);
+        testFile = new File(PROMETHEUS_SCRAPE_CONFIG, "my-test-feed2.json");
+        Assert.assertTrue(testFile.exists());
+        String fileContent = new String(Files.readAllBytes(testFile.getAbsoluteFile().toPath()));
+        FileSdConfig config = FileSdConfig.fromJson(fileContent);
+        Assert.assertEquals(2, config.getEntries().size());
+        Entry entry = config.getEntries().get(0);
+        Assert.assertEquals(1, entry.getTargets().size());
+        Assert.assertEquals("localhost:12345", entry.getTargets().get(0));
+        Assert.assertEquals(1, entry.getLabels().size());
+        Assert.assertEquals("my-test-feed2", entry.getLabels().get("feed_id"));
+        entry = config.getEntries().get(1);
+        Assert.assertEquals(1, entry.getTargets().size());
+        Assert.assertEquals("localhost:6789", entry.getTargets().get(0));
+        Assert.assertEquals(3, entry.getLabels().size());
+        Assert.assertEquals("my-test-feed2", entry.getLabels().get("feed_id"));
+        Assert.assertEquals("value1", entry.getLabels().get("label1"));
+        Assert.assertEquals("v2", entry.getLabels().get("l2"));
         testFile.delete();
         Assert.assertFalse(testFile.exists());
         service.buildMetricsEndpoints();
@@ -426,7 +461,7 @@ public class InventoryServiceIspnTest {
                 .id("my-test-agent")
                 .feedId("my-test-feed")
                 .typeId("Hawkular Java Agent")
-                .config("Metrics Endpoint", "localhost:1234")
+                .config("Metrics Endpoints", "localhost:1234")
                 .build();
         service.addResource(agent);
         File testFile = new File(PROMETHEUS_SCRAPE_CONFIG, "my-test-feed.json");

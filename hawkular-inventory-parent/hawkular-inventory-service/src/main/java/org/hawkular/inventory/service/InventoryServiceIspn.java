@@ -48,6 +48,7 @@ import org.hawkular.inventory.api.model.ResourceType;
 import org.hawkular.inventory.api.model.ResultSet;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
+import org.hawkular.inventory.service.FileSdConfig.Entry;
 import org.hawkular.inventory.service.ispn.IspnResource;
 import org.hawkular.inventory.service.ispn.IspnResourceType;
 import org.infinispan.Cache;
@@ -415,9 +416,9 @@ public class InventoryServiceIspn implements InventoryService {
 
     private void writeMetricsEndpoint(RawResource rawResource) {
         String feedId = rawResource.getFeedId();
-        String metricsEndpoint = rawResource.getConfig().get(scrapeConfig.getFilter().get(rawResource.getTypeId()));
+        String metricsEndpoints = rawResource.getConfig().get(scrapeConfig.getFilter().get(rawResource.getTypeId()));
 
-        if (isEmpty(feedId) || isEmpty(metricsEndpoint)) {
+        if (isEmpty(feedId) || isEmpty(metricsEndpoints)) {
             log.errorMissingInfoInAgentRegistration(rawResource.getId());
             return;
         }
@@ -426,16 +427,20 @@ public class InventoryServiceIspn implements InventoryService {
             throw new IllegalArgumentException("Cannot write metrics endpoint file with '..' in path: " + feedId);
         }
 
-        // Prometheus file format. See: https://prometheus.io/docs/operating/configuration/#<file_sd_config>
-        String content = String.format("[ { \"targets\": [ \"%s\" ], \"labels\": { \"feed_id\": \"%s\" } } ]",
-                metricsEndpoint,
-                feedId);
         try {
+            FileSdConfig fileSdConfig = new FileSdConfig();
+            for (String oneEndpoint : metricsEndpoints.split("\\|")) {
+                Entry entry = FileSdConfig.Entry.buildFromString(oneEndpoint);
+                entry.addLabel("feed_id", feedId);
+                fileSdConfig.addEntry(entry);
+            }
+
+            String content = fileSdConfig.toJson();
             File newScrapeConfig = new File(scrapeLocation, feedId + ".json");
             Files.write(newScrapeConfig.toPath(), content.getBytes(StandardCharsets.UTF_8));
-            log.infoRegisteredMetricsEndpoint(feedId, metricsEndpoint, newScrapeConfig.toString());
+            log.infoRegisteredMetricsEndpoint(feedId, metricsEndpoints, newScrapeConfig.toString());
         } catch (Exception e) {
-            log.errorCannotRegisterMetricsEndpoint(feedId, metricsEndpoint, e);
+            log.errorCannotRegisterMetricsEndpoint(feedId, metricsEndpoints, e);
         }
     }
 

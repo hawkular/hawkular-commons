@@ -647,7 +647,7 @@ public class InventoryRestTest extends AbstractInventoryITest {
                     .id(id + "-" + i)
                     .feedId(feedId + "-" + i)
                     .typeId(type)
-                    .config("Metrics Endpoint", "localhost:1234")
+                    .config("Metrics Endpoints", "localhost:1234")
                     .build();
 
             Inventory inventory = new Inventory(Arrays.asList(agent), null);
