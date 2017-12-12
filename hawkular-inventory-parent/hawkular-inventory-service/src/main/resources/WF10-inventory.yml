@@ -861,6 +861,8 @@ resource-type-set-dmr:
     notification-dmr:
     - name: resource-added
     metric-sets:
+    - WildFly Memory Metrics
+    - WildFly Threading Metrics
     - Domain Server Availability
     metric-labels:
       domain_server: "%server%"
