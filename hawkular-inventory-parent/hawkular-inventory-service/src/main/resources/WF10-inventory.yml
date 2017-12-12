@@ -863,6 +863,7 @@ resource-type-set-dmr:
     metric-sets:
     - WildFly Memory Metrics
     - WildFly Threading Metrics
+    - Undertow Aggregated Web Metrics
     - Domain Server Availability
     metric-labels:
       domain_server: "%server%"
