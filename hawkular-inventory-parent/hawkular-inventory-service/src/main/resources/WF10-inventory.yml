@@ -565,7 +565,7 @@ metric-set-dmr:
 
 - name: Domain Server Availability
   metric-dmr:
-  - name: Domain Server Availability
+  - name: Server Availability
     attribute: status
     metric-family: wildfly_domain_host_server_availability
 
