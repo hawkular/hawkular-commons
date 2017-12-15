@@ -19,10 +19,12 @@
 startDelaySeconds: 1
 lowercaseOutputName: true
 lowercaseOutputLabelNames: true
+whitelistObjectInstances: [
+  "jboss.as:management-root=server"
+]
 whitelistObjectNames: [
   "org.hawkular.agent:type=platform,subtype=*",
   "org.hawkular.agent:type=platform,subtype=*,name=*",
-  "jboss.as:management-root=server",
   "jboss.as:path=*",
   "jboss.as:deployment=*",
   "jboss.as:deployment=*,subsystem=ejb3,stateless-session-bean=*",
