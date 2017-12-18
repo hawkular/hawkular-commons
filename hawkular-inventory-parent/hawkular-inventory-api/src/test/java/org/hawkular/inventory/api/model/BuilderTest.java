@@ -52,9 +52,10 @@ public class BuilderTest {
     @Test
     public void resourceTest() {
         Metric m = Metric.builder()
-                .name("metric.name")
-                .type("metric.type")
+                .displayName("My metric")
+                .family("metric.name")
                 .property("metric.prop", "metric.value")
+                .label("label1", "label.value.1")
                 .unit(MetricUnit.HOURS)
                 .build();
         RawResource r = RawResource.builder()
@@ -68,10 +69,11 @@ public class BuilderTest {
                 .metric(m)
                 .build();
 
-        assertThat(m.getName()).isEqualTo("metric.name");
-        assertThat(m.getType()).isEqualTo("metric.type");
+        assertThat(m.getDisplayName()).isEqualTo("My metric");
+        assertThat(m.getFamily()).isEqualTo("metric.name");
         assertThat(m.getUnit()).isEqualTo(MetricUnit.HOURS);
         assertThat(m.getProperties()).containsOnly(entry("metric.prop", "metric.value"));
+        assertThat(m.getLabels()).containsOnly(entry("label1", "label.value.1"));
 
         assertThat(r.getId()).isEqualTo("res.id");
         assertThat(r.getName()).isEqualTo("res.name");

@@ -36,13 +36,13 @@ import org.hawkular.inventory.api.model.ResourceType;
 public final class Resources {
 
     public static final Metric METRIC1
-            = new Metric("memory1", "Memory", MetricUnit.BYTES, new HashMap<>());
+            = new Metric("Memory", "memory1", MetricUnit.BYTES, null, new HashMap<>(), new HashMap<>());
     public static final Metric METRIC2
-            = new Metric("gc1", "GC", MetricUnit.NONE, new HashMap<>());
+            = new Metric("GC", "gc1", MetricUnit.NONE, null, new HashMap<>(), new HashMap<>());
     public static final Metric METRIC3
-            = new Metric("memory2", "Memory", MetricUnit.BYTES, new HashMap<>());
+            = new Metric("Memory", "memory2", MetricUnit.BYTES, null, new HashMap<>(), new HashMap<>());
     public static final Metric METRIC4
-            = new Metric("gc2", "GC", MetricUnit.NONE, new HashMap<>());
+            = new Metric("GC", "gc2", MetricUnit.NONE, null, new HashMap<>(), new HashMap<>());
 
     public static final RawResource EAP1 = new RawResource("EAP-1", "EAP-1", "feed1", "EAP", null,
             Arrays.asList(METRIC1, METRIC2), new HashMap<>(), new HashMap<>());

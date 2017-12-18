@@ -132,6 +132,7 @@
         <configuration>
           <excludes combine.children="append">
             <exclude>**/*.log</exclude>
+            <exclude>**/.*.sw*</exclude>
             <exclude>hawkular-rest-status/src/test/resources/manifests/*.txt</exclude>
           </excludes>
         </configuration>
@@ -155,7 +156,6 @@
         <module>hawkular-cors-jaxrs-filter</module>
         <module>hawkular-command-gateway</module>
         <module>utils</module>
-        <module>embedded-cassandra</module>
       </modules>
     </profile>
 

@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$scope', '$rootScope', '$q', '$modal', 'hwk.resourcesService', 'Notifications',
-  function ($scope, $rootScope, $q, $modal, resourcesService, Notifications) {
+angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$scope', '$rootScope', '$q', '$modal', '$window', 'hwk.resourcesService', 'Notifications',
+  function ($scope, $rootScope, $q, $modal, $window, resourcesService, Notifications) {
     'use strict';
 
     console.debug("[Resources] Start: " + new Date());
@@ -37,36 +37,74 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
       readOnly: false
     };
 
-    $scope.detail = "Click Resource to See Detail";
+    $scope.resource = {
+      json: "Click Resource to See Detail",
+      metrics: []
+    };
+
+    $scope.promBaseUrl = 'http://localhost:9090';
+
+    $scope.filter = {
+      feedId: 'All Feeds',
+      feedIds: ['All Feeds']
+    };
 
     var updateTree = function () {
       console.debug("[Resources] refresh tree roots at " + new Date());
 
-      // fetch root resources
-      var promise1 = resourcesService.Roots().query();
+      // fetch root resources with possible feed filter
+      var criteria = {
+        root:true
+      };
+      if ( $scope.filter.feedId && $scope.filter.feedId !== 'All Feeds' ) {
+        criteria.feedId = $scope.filter.feedId;
+      }
+
+      var promise1 = resourcesService.Resources(criteria).query();
       $q.all([promise1.$promise]).then(function (result) {
         var resources = result[0].results;
-        resources.sort(function(a,b) {
-          return sortResource(a,b);
-        });
 
-        $scope.tree = [];
-        for (var i = 0; i < resources.length; ++i) {
-          var resource = resources[i];
-          var text = '[' + resource.type.id + '] ' + resource.name;
-          $scope.tree.push({
-            checkable: false,
-            lazyLoad: true,
-            selectable: true,
-            text: text,
-            // store entire resource json as custom prop
-            resource: resource
-          });
-        }
-
+        updateRootFeedIds(resources);
+        updateRootResources(resources);
         refreshTreeView();
 
       }, toastError);
+    };
+
+    var updateRootFeedIds = function (resources) {
+      // only update the feed filter if we have just fetched all of the root resources
+      if ( $scope.filter.feedId !== 'All Feeds') {
+        return;
+      }
+
+      var uniqueFeedIds = new Set();
+      for (var i = 0; i < resources.length; ++i) {
+        uniqueFeedIds.add(resources[i].feedId);
+      }
+
+      $scope.filter.feedIds = Array.from(uniqueFeedIds);
+      $scope.filter.feedIds.sort();
+      $scope.filter.feedIds.unshift('All Feeds');
+    };
+
+    var updateRootResources = function (resources) {
+      resources.sort(function(a,b) {
+        return sortRootResource(a,b);
+      });
+
+      $scope.tree = [];
+      for (var i = 0; i < resources.length; ++i) {
+        var resource = resources[i];
+        var text = '[' + resource.feedId + '] [' + resource.type.id + '] ' + resource.name;
+        $scope.tree.push({
+          checkable: false,
+          lazyLoad: true,
+          selectable: true,
+          text: text,
+          // store entire resource json as custom prop
+          resource: resource
+        });
+      }
     };
 
     var refreshTreeView = function () {
@@ -77,7 +115,13 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
         },
 
         onNodeSelected: function(event, data) {
-          $scope.detail = angular.toJson(data.resource,true);
+          $scope.resource.json = angular.toJson(data.resource,true);
+          $scope.resource.metrics = data.resource.metrics;
+          $scope.resource.metrics.sort(
+            function(a,b) {
+              return a.displayName.localeCompare(b.displayName);
+            });
+
           $scope.$apply();
         },
 
@@ -119,6 +163,12 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
       }, toastError);
     };
 
+    var sortRootResource = function (r1,r2) {
+      return r1.feedId.localeCompare(r2.feedId)
+        || r1.type.id.localeCompare(r2.type.id)
+        || r1.name.localeCompare(r2.name);
+    };
+
     var sortResource = function (r1,r2) {
       return r1.type.id.localeCompare(r2.type.id) || r1.name.localeCompare(r2.name);
     };
@@ -158,6 +208,33 @@ angular.module('hwk.resourcesModule').controller( 'hwk.resourcesController', ['$
 
     $scope.refreshTree = function() {
       updateTree();
+    };
+
+    $scope.showMetric = function (metric) {
+      var expression;
+      if ( metric.expression) {
+        expression = metric.expression;
+
+      } else if ( metric.family && metric.labels ) {
+        // construct the prometheus expression
+        var labels = "{";
+        var comma = "";
+        for (var l in metric.labels) {
+          if (metric.labels.hasOwnProperty(l)) {
+            labels = labels + comma + l + "='" + metric.labels[l] + "'";
+            comma = ",";
+          }
+        }
+        labels += "}";
+        expression = metric.family + labels;
+
+      } else {
+        console.log("Unable to show graph for metric [" + metric.displayName + "]. No expression or family and labels.");
+        return;
+      }
+
+      var url = $scope.promBaseUrl + "/graph?g0.range_input=1h&g0.tab=0&g0.expr=" + encodeURIComponent(expression);
+      $window.open(url, '_blank');
     };
 
     // initial population of root nodes

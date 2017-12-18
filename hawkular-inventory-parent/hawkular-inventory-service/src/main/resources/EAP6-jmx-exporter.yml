@@ -19,29 +19,48 @@
 startDelaySeconds: 1
 lowercaseOutputName: true
 lowercaseOutputLabelNames: true
+whitelistObjectInstances: [
+  "jboss.as:management-root=server"
+]
 whitelistObjectNames: [
+  "org.hawkular.agent:type=platform,subtype=*",
+  "org.hawkular.agent:type=platform,subtype=*,name=*",
   "jboss.as:path=*",
+  "jboss.as:deployment=*",
   "jboss.as:deployment=*,subsystem=ejb3,stateless-session-bean=*",
   "jboss.as:deployment=*,subsystem=ejb3,stateful-session-bean=*",
   "jboss.as:deployment=*,subsystem=ejb3,message-driven-bean=*",
   "jboss.as:deployment=*,subsystem=ejb3,singleton-bean=*",
-  "jboss.as:deployment=*,subsystem=undertow",
-  "jboss.as:deployment=*,subsystem=undertow,servlet=*",
+  "jboss.as:deployment=*,subsystem=web",
+  "jboss.as:deployment=*,subsystem=web,servlet=*",
   "jboss.as:deployment=*,subdeployment=*,subsystem=ejb3,stateless-session-bean=*",
   "jboss.as:deployment=*,subdeployment=*,subsystem=ejb3,stateful-session-bean=*",
   "jboss.as:deployment=*,subdeployment=*,subsystem=ejb3,message-driven-bean=*",
   "jboss.as:deployment=*,subdeployment=*,subsystem=ejb3,singleton-bean=*",
-  "jboss.as:deployment=*,subdeployment=*,subsystem=undertow",
-  "jboss.as:deployment=*,subdeployment=*,subsystem=undertow,servlet=*",
-  "jboss.as:subsystem=messaging-activemq,server=*,jms-queue=*",
-  "jboss.as:subsystem=messaging-activemq,server=*,jms-topic=*",
+  "jboss.as:deployment=*,subdeployment=*,subsystem=web",
+  "jboss.as:deployment=*,subdeployment=*,subsystem=web,servlet=*",
+  "jboss.as:subsystem=messaging,hornetq-server=*,jms-queue=*",
+  "jboss.as:subsystem=messaging,hornetq-server=*,jms-topic=*",
   "jboss.as:subsystem=datasources,data-source=*,statistics=*",
   "jboss.as:subsystem=datasources,xa-data-source=*,statistics=*",
   "jboss.as:subsystem=transactions",
-  "jboss.as:subsystem=undertow,server=*,http-listener=*",
-  "jboss.as:subsystem=undertow,server=*,https-listener=*"
+  "jboss.as:subsystem=web,connector=*"
 ]
 rules:
+
+  # HAWKULAR PLATFORM MBEANS
+
+  - pattern: "org.hawkular.agent<type=platform, subtype=(.+)><>(?:operating system|memory)_(.+):"
+    attrNameSnakeCase: true
+    name: hawkular_platform_$1_$2
+    type: GAUGE
+
+  - pattern: "org.hawkular.agent<type=platform, subtype=(.+), name=(.+)><>(?:file store|processor|power source)_(.+):"
+    attrNameSnakeCase: true
+    name: hawkular_platform_$1_$3
+    type: GAUGE
+    labels:
+      name: $2
 
   # CONFIG
 
@@ -52,42 +71,56 @@ rules:
       $1: $2
     value: 1
 
+  # SERVER AVAILABILITY
+
+  - pattern: "jboss.as<management-root=server><>server_state: (run.*|.*-required)"
+    attrNameSnakeCase: true
+    name: wildfly_server_availability
+    type: GAUGE
+    value: 1
+
+  - pattern: "jboss.as<management-root=server><>server_state: (?!(run.*|.*-required)).*"
+    attrNameSnakeCase: true
+    name: wildfly_server_availability
+    type: GAUGE
+    value: 0
+
   # DEPLOYMENTS
 
-  - pattern: "jboss.as<deployment=(.+), subdeployment=(.+), subsystem=undertow><>(.+_sessions|session_.+):"
+  - pattern: "jboss.as<deployment=(.+), subdeployment=(.+), subsystem=web><>(.+_sessions|sessions_.+):"
     attrNameSnakeCase: true
     name: wildfly_deployment_$3
     type: GAUGE
     labels:
-      name: $1
+      deployment: $1
       subdeployment: $2
 
-  - pattern: "jboss.as<deployment=(.+), subsystem=undertow><>(.+_sessions|session_.+):"
+  - pattern: "jboss.as<deployment=(.+), subsystem=web><>(.+_sessions|sessions_.+):"
     attrNameSnakeCase: true
     name: wildfly_deployment_$2
     type: GAUGE
     labels:
-      name: $1
+      deployment: $1
 
-  - pattern: "^jboss.as<deployment=(.+)><>status: OK"
+  - pattern: "jboss.as<deployment=(.+)><>status: OK"
     attrNameSnakeCase: true
     name: wildfly_deployment_availability
     value: 1
     type: GAUGE
     labels:
-      name: $1
+      deployment: $1
 
-  - pattern: "^jboss.as<deployment=(.+)><>status: (FAILED|STOPPED)"
+  - pattern: "jboss.as<deployment=(.+)><>status: (FAILED|STOPPED)"
     attrNameSnakeCase: true
     name: wildfly_deployment_availability
     value: 0
     type: GAUGE
     labels:
-      name: $1
+      deployment: $1
 
   # MESSAGING
 
-  - pattern: "jboss.as<subsystem=messaging-activemq, server=(.+), jms-(queue|topic)=(.+)><>(.+):"
+  - pattern: "jboss.as<subsystem=messaging, hornetq-server=(.+), jms-(queue|topic)=(.+)><>(.+):"
     attrNameSnakeCase: true
     name: wildfly_messaging_$4
     type: GAUGE
@@ -113,33 +146,31 @@ rules:
 
   # WEB SUBSYSTEM
 
-  - pattern: "jboss.as<subsystem=undertow, server=(.+), (https?)-listener=(.+)><>(bytes_.+|error_count|processing_time|request_count):"
+  - pattern: "jboss.as<subsystem=web, connector=(.+)><>(bytes_.+|error_count|processing_time|request_count):"
     attrNameSnakeCase: true
-    name: wildfly_undertow_$4
+    name: wildfly_web_$2
     type: GAUGE
     labels:
-      server: $1
-      listener: $3
-      protocol: $2
+      connector: $1
 
   # SERVLET
 
-  - pattern: "jboss.as<deployment=(.+), subdeployment=(.+), subsystem=undertow, servlet=(.+)><>(.+_time|.+_count):"
+  - pattern: "jboss.as<deployment=(.+), subdeployment=(.+), subsystem=web, servlet=(.+)><>(.+_time|.+_count):"
     attrNameSnakeCase: true
     name: wildfly_servlet_$4
     type: GAUGE
     labels:
-      name: $3
       deployment: $1
       subdeployment: $2
+      name: $3
 
-  - pattern: "jboss.as<deployment=(.+), subsystem=undertow, servlet=(.+)><>(.+_time|.+_count):"
+  - pattern: "jboss.as<deployment=(.+), subsystem=web, servlet=(.+)><>(.+_time|.+_count):"
     attrNameSnakeCase: true
     name: wildfly_servlet_$3
     type: GAUGE
     labels:
-      name: $2
       deployment: $1
+      name: $2
 
   # EJB
 
@@ -148,16 +179,16 @@ rules:
     name: wildfly_ejb_$5
     type: GAUGE
     labels:
-      name: $4
-      type: $3
       deployment: $1
       subdeployment: $2
+      type: $3
+      name: $4
 
   - pattern: "jboss.as<deployment=(.+), subsystem=ejb3, (stateless-session|stateful-session|message-driven|singleton)-bean=(.+)><>(.+):"
     attrNameSnakeCase: true
     name: wildfly_ejb_$4
     type: GAUGE
     labels:
-      name: $3
-      type: $2
       deployment: $1
+      type: $2
+      name: $3

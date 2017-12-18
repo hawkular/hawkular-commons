@@ -14,29 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-angular.module('hwk.resourcesModule').service('hwk.resourcesService', ['$resource', '$rootScope',
-  function ($resource, $rootScope) {
-    'use strict';
+package org.hawkular.inventory.service;
 
-    this.Resources = function (criteria) {
-      return $resource($rootScope.appConfig.server.baseUrl + '/resources', criteria, {
-        query: {
-          method: 'GET',
-          isArray: false
-        }
-      });
-    };
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-    this.Children = function (parentId) {
-      return $resource($rootScope.appConfig.server.baseUrl + '/resources/' + parentId + '/children', {
-        parentId: parentId
-      }, {
-        query: {
-          method: 'GET',
-          isArray: false
-        }
-      });
-    };
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-  }
-]);
+import javax.inject.Qualifier;
+
+/**
+ * @author Jay Shaughnessy
+ * @author Lucas Ponce
+ */
+@Qualifier
+@Retention(RUNTIME)
+@Target({TYPE, METHOD, FIELD, PARAMETER})
+public @interface InventoryConfigPath {
+}

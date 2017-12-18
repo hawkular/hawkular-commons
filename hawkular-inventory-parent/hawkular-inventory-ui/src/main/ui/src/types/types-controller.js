@@ -27,6 +27,11 @@ angular.module('hwk.typesModule').controller( 'hwk.typesController', ['$scope', 
       readOnly: false
     };
 
+    $scope.filter = {
+      name: null,
+      ignoreCase: false
+    };
+
     var toastError = function (reason) {
       console.debug('[Types] Backend error ' + new Date());
       console.debug(reason);
@@ -44,13 +49,11 @@ angular.module('hwk.typesModule').controller( 'hwk.typesController', ['$scope', 
         types.sort(function(a,b) {
           return a.id.localeCompare(b.id);
         });
-        $scope.typesList = types;
-        console.debug("[Types] Types query returned [" + $scope.typesList.length + "] types");
+        $scope.allTypes = types;
+        $scope.filteredTypes = filterTypes();
+        console.debug("[Types] Types query returned [" + $scope.allTypes.length + "] types");
+        console.debug("[Types] Types query returned [" + $scope.filteredTypes.length + "] filtered types");
       }, toastError);
-    };
-
-    $scope.refreshTypes = function () {
-      updateTypes();
     };
 
     $scope.deleteType = function (typeId) {
@@ -82,6 +85,32 @@ angular.module('hwk.typesModule').controller( 'hwk.typesController', ['$scope', 
           }
         }
       });
+    };
+
+    $scope.refreshTypes = function () {
+      updateTypes();
+    };
+
+    $scope.refreshFilter = function () {
+      console.log("Filter=" + $scope.filter.name);
+      $scope.filteredTypes = filterTypes();
+    };
+
+    var filterTypes = function(types) {
+      var filteredTypes = $scope.allTypes;
+
+      if ( $scope.filter.name && $scope.filter.name.length > 0 ) {
+        filteredTypes = [];
+        var f = $scope.filter.ignoreCase ? $scope.filter.name.toLowerCase() : $scope.filter.name;
+        for ( var i = 0; i < $scope.allTypes.length; ++i ) {
+          var t = $scope.allTypes[i];
+          var id = $scope.filter.ignoreCase ? t.id.toLowerCase() : t.id;
+          if (id.includes(f)) {
+            filteredTypes.push(t);
+          }
+        }
+      }
+      return filteredTypes;
     };
 
     $scope.$on('ngRepeatDoneTypes', function(ngRepeatDoneEvent) {
@@ -141,6 +170,10 @@ angular.module('hwk.typesModule').controller( 'hwk.typesController', ['$scope', 
           .find(".fa-angle-right").removeClass("fa-angle-down");
       });
     });
+
+    $scope.getLength = function (json) {
+      return json ? Object.keys(json).length : 0;
+    };
 
     updateTypes();
   }

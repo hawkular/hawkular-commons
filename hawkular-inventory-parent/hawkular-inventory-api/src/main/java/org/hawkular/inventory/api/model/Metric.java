@@ -35,27 +35,34 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Metric implements Serializable {
 
     public static class Builder {
-        private String name;
-        private String type;
+        private String displayName;
+        private String family;
         private MetricUnit unit;
+        private String expression;
+        private Map<String, String> labels = new HashMap<>();
         private Map<String, String> properties = new HashMap<>();
 
         public Metric build() {
-            return new Metric(name, type, unit, properties);
+            return new Metric(displayName, family, unit, expression, labels, properties);
         }
 
-        public Builder name(String name) {
-            this.name = name;
+        public Builder displayName(String displayName) {
+            this.displayName = displayName;
             return this;
         }
 
-        public Builder type(String type) {
-            this.type = type;
+        public Builder family(String family) {
+            this.family = family;
             return this;
         }
 
         public Builder unit(MetricUnit unit) {
             this.unit = unit;
+            return this;
+        }
+
+        public Builder expression(String expression) {
+            this.expression = expression;
             return this;
         }
 
@@ -68,57 +75,92 @@ public class Metric implements Serializable {
             this.properties.putAll(props);
             return this;
         }
+
+        public Builder label(String name, String value) {
+            this.labels.put(name, value);
+            return this;
+        }
+
+        public Builder labels(Map<String, String> labels) {
+            this.labels.putAll(labels);
+            return this;
+        }
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    @DocModelProperty(description = "Metric name.",
+    @DocModelProperty(description = "Metric name for display.",
             position = 0,
             required = true)
     @JsonInclude(Include.NON_NULL)
-    private final String name;  // Name (for display?)
+    private final String displayName;
 
-    @DocModelProperty(description = "Metric type.",
+    @DocModelProperty(description = "Metric family name.",
             position = 1,
             required = true)
     @JsonInclude(Include.NON_NULL)
-    private final String type;  // Ex: Deployment status, Server availability
+    private final String family;  // Ex: Prometheus family name
 
-    @DocModelProperty(description = "Metric type.",
+    @DocModelProperty(description = "Metric unit.",
             position = 2,
             required = true,
             defaultValue = "NONE")
     @JsonInclude(Include.NON_NULL)
     private final MetricUnit unit;
 
-    @DocModelProperty(description = "Metric properties.",
+    @DocModelProperty(description = "Metric expression used to evaluate the metric value.",
             position = 3,
+            required = true,
+            defaultValue = "NONE")
+    @JsonInclude(Include.NON_NULL)
+    private final String expression;
+
+    @DocModelProperty(description = "Metric labels.",
+            position = 4,
             required = false)
     @JsonInclude(Include.NON_NULL)
-    private final Map<String, String> properties;   // properties may contain, for instance, the full prometheus metric name
+    private final Map<String, String> labels;   // Ex: Prometheus labels
 
-    public Metric(@JsonProperty("name") String name,
-                  @JsonProperty("type") String type,
+    @DocModelProperty(description = "Metric properties.",
+            position = 5,
+            required = false)
+    @JsonInclude(Include.NON_NULL)
+    private final Map<String, String> properties;
+
+    public Metric(@JsonProperty("displayName") String displayName,
+                  @JsonProperty("family") String family,
                   @JsonProperty("unit") MetricUnit unit,
+                  @JsonProperty("expression") String expression,
+                  @JsonProperty("labels") Map<String, String> labels,
                   @JsonProperty("properties") Map<String, String> properties) {
-        this.name = name;
-        this.type = type;
+        this.displayName = displayName;
+        this.family = family;
         this.unit = unit;
+        this.expression = expression;
+        this.labels = labels;
         this.properties = properties;
     }
 
-    public String getName() {
-        return name;
+    public String getDisplayName() {
+        return displayName;
     }
 
-    public String getType() {
-        return type;
+    public String getFamily() {
+        return family;
     }
 
     public MetricUnit getUnit() {
         return unit;
+    }
+
+    public String getExpression() {
+        return expression;
+    }
+
+    public Map<String, String> getLabels() {
+        return Collections.unmodifiableMap(labels);
     }
 
     public Map<String, String> getProperties() {
@@ -128,9 +170,11 @@ public class Metric implements Serializable {
     @Override
     public String toString() {
         return "Metric{" +
-                "name='" + name + '\'' +
-                ", type='" + type + '\'' +
+                "displayName='" + displayName + '\'' +
+                ", family='" + family + '\'' +
                 ", unit=" + unit +
+                ", expression='" + expression + '\'' +
+                ", labels=" + labels +
                 ", properties=" + properties +
                 '}';
     }

@@ -47,30 +47,6 @@
       </plugin>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>**/.sass-cach/**,**/bower_components/**,**/dist/**,**/node_modules/**</excludes>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>com.mycila</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <configuration>
-          <excludes combine.children="append">
-            <exclude>**/*.htmlhintrc</exclude>
-            <exclude>**/*.scss</exclude>
-            <exclude>**/ui/.sass-cache/**</exclude>
-            <exclude>**/ui/bower_components/**</exclude>
-            <exclude>**/ui/dist/**</exclude>
-            <exclude>**/ui/node_modules/**</exclude>
-            <exclude>**/ui/src/templates/**</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-
-      <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <version>${version.org.apache.maven.plugins.maven-resources-plugin}</version>
         <executions>

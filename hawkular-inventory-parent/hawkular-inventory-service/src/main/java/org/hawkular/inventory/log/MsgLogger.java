@@ -69,4 +69,31 @@ public interface MsgLogger {
     @Message(id = 100009, value = "Changing polling stats interval to [%s] ms")
     void infoChangingPollingStatsInterval(long newPollingInterval);
 
+    @LogMessage(level = Level.ERROR)
+    @Message(id = 100010, value = "Agent [%s] has not feedId or Metrics endpoint data")
+    void errorMissingInfoInAgentRegistration(String resourceId);
+
+    @LogMessage(level = Level.INFO)
+    @Message(id = 100011, value = "Registered feed [%s] metrics endpoint [%s]: %s")
+    void infoRegisteredMetricsEndpoint(String feedId, String metricsEndpoint, String fileName);
+
+    @LogMessage(level = Level.ERROR)
+    @Message(id = 100012, value = "Cannot register feed [%s] metrics endpoint [%s]")
+    void errorCannotRegisterMetricsEndpoint(String feedId, String metricsEndpoint, @Cause Throwable throwable);
+
+    @LogMessage(level = Level.INFO)
+    @Message(id = 100013, value = "Rebuild registered metrics endpoints")
+    void infoRebuildRegisteredMetricsEndpoints();
+
+    @LogMessage(level = Level.INFO)
+    @Message(id = 100014, value = "Using scrape config file [%s]")
+    void infoUsingScrapeConfigFile(String file);
+
+    @LogMessage(level = Level.INFO)
+    @Message(id = 100015, value = "Unregistered feed [%s] metrics endpoint")
+    void infoUnregisteredMetricsEndpoint(String feedId);
+
+    @LogMessage(level = Level.ERROR)
+    @Message(id = 100016, value = "Cannot unregister feed [%s] metrics endpoint")
+    void errorCannotUnregisterMetricsEndpoint(String feedId);
 }

@@ -32,9 +32,9 @@ public class ResourceTest {
 
     private static final ResourceType EAP = new ResourceType("EAP", new ArrayList<>(), new HashMap<>());
     private static final Metric METRIC1
-            = new Metric("memory", "Memory", MetricUnit.BYTES, new HashMap<>());
+            = new Metric("Memory", "jvm.memory", MetricUnit.BYTES, null, new HashMap<>(), new HashMap<>());
     private static final Metric METRIC2
-            = new Metric("gc", "GC", MetricUnit.NONE, new HashMap<>());
+            = new Metric("GC", "jvm.gc", MetricUnit.NONE, null, new HashMap<>(), new HashMap<>());
 
     private static final RawResource RAW = new RawResource("id", "name", "feedX", "EAP",
             null, Arrays.asList(METRIC1, METRIC2), new HashMap<>(), new HashMap<>());
@@ -43,6 +43,6 @@ public class ResourceTest {
     public void shouldCreateFromRaw() {
         Resource r = Resource.fromRaw(RAW, id -> Optional.of(EAP));
         assertThat(r.getType().getId()).isEqualTo("EAP");
-        assertThat(r.getMetrics()).extracting(Metric::getName).containsExactly("memory", "gc");
+        assertThat(r.getMetrics()).extracting(Metric::getDisplayName).containsExactly("Memory", "GC");
     }
 }

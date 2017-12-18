@@ -112,12 +112,10 @@ public class InventoryPerfTest extends AbstractInventoryITest {
             String name = "Server " + typeId + " with Id " + id;
             String feedX = "feedX";
             List<RawResource> childrenResource = new ArrayList<>();
-            List<String> childrenIds = new ArrayList<>();
             for (int j = 0; j < children; j++) {
                 String childType = (j % 2 == 0) ? "FOO" : "BAR";
                 String childIdX = id + "-child-" + j;
                 String childNameX = "Child "+ j + " from " + id;
-                childrenIds.add(childIdX);
                 RawResource childX = new RawResource(childIdX, childNameX, feedX, childType, id,
                         new ArrayList<>(), new HashMap<>(), new HashMap<>());
 
@@ -126,7 +124,8 @@ public class InventoryPerfTest extends AbstractInventoryITest {
 
             List<Metric> metricsResource = new ArrayList<>();
             for (int k = 0; k < metrics; k++) {
-                Metric metricX = new Metric("metric-" + k, "Metric " + k, MetricUnit.BYTES, new HashMap<>());
+                Metric metricX = new Metric("Metric " + k, "metric-" + k, MetricUnit.BYTES, null, new HashMap<>(),
+                        new HashMap<>());
                 metricsResource.add(metricX);
             }
 

@@ -8,9 +8,14 @@
   <!-- Toolbar -->
   <div class="row toolbar-pf" id="toolbar">
     <div class="col-md-12">
-      <form class="toolbar-pf-actions" ng-submit="updateFilter()">
+      <form class="toolbar-pf-actions">
+        <div class="form-group toolbar-pf-filter">
+          <input type="checkbox" id="ignoreCase" ng-model="filter.ignoreCase" ng-change="refreshFilter()" />
+          <label for="ignoreCase" style="padding-left:5px; padding-right:10px;">Ignore Case</label>
+          <input type="text" placeholder="Filter By Name..." ng-model="filter.name" ng-change="refreshFilter()" style="width:125px"/>
+        </div>
         <div class="form-group">
-          <div class="dropdown btn-group  dropdown-kebab-pf">
+          <div class="dropdown btn-group dropdown-kebab-pf">
             <button class="btn btn-link dropdown-toggle" type="button" id="triggersKebab" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
               <span class="fa fa-ellipsis-v"></span>
             </button>
@@ -31,7 +36,7 @@
 
       <!-- Full Row details-->
 
-      <div class="list-group-item" ng-repeat="typeItem in typesList" repeat-done>
+      <div class="list-group-item" ng-repeat="typeItem in filteredTypes" repeat-done>
 
         <!-- Action column found on the right of each row -->
 
@@ -79,17 +84,10 @@
                 </div>
               </div>
 
-              <!-- Configuration -->
-              <div class="list-view-pf-additional-info-item">
-                <div class="list-view-pf-expand">
-                  <span class="fa fa-angle-right"></span> <span class="pficon pficon-settings"></span> <strong>{{ typeItem.properties ? typeItem.properties.length : 0 }}</strong> Configuration
-                </div>
-              </div>
-
               <!-- Properties -->
               <div class="list-view-pf-additional-info-item">
                 <div class="list-view-pf-expand">
-                  <span class="fa fa-angle-right"></span> <span class="pficon pficon-info"></span> <strong>{{ typeItem.properties ? typeItem.properties.length : 0 }}</strong> Properties
+                  <span class="fa fa-angle-right"></span> <span class="pficon pficon-info"></span> <strong>{{ getLength(typeItem.properties) }}</strong> Properties
                 </div>
               </div>
 
@@ -109,21 +107,6 @@
               <p>
                 <b>Name:</b> {{ op.name }} <br />
               </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Configuration -->
-        <div class="list-group-item-container container-fluid hidden">
-          <div class="close">
-            <span class="pficon pficon-close"></span>
-          </div>
-          <div class="row">
-            <div class="col-md-12">
-              <dl class="dl-horizontal">
-                <dt ng-repeat-start="prop in typeItem.properties">{{ prop.key }}:</dt>
-                <dd ng-repeat-end>{{ prop.value }}</dd>
-              </dl>
             </div>
           </div>
         </div>

@@ -21,12 +21,15 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
+import javax.ejb.AccessTimeout;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.enterprise.inject.Produces;
 
+import org.hawkular.commons.json.JsonUtil;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
 import org.infinispan.Cache;
@@ -43,6 +46,7 @@ import org.infinispan.query.dsl.QueryFactory;
  */
 @Startup
 @Singleton
+@AccessTimeout(value = 300, unit = TimeUnit.SECONDS)
 public class InventoryConfig {
 
     private static final String ISPN_REINDEX = "hawkular-inventory.reindex";
@@ -50,6 +54,8 @@ public class InventoryConfig {
     public static final String CACHE_CONFIGURATION = "hawkular-inventory-ispn.xml";
     public static final String RESOURCE_CACHE_NAME = "resource";
     public static final String RESOURCE_TYPE_CACHE_NAME = "resource_type";
+    public static final String SCRAPE_CONFIGURATION = "hawkular-inventory-prometheus-scrape-config.yaml";
+    public static final String SCRAPE_DIRECTORY = "hawkular.prometheus.scrape.dir";
 
     private static final MsgLogger log = InventoryLoggers.getLogger(InventoryConfig.class);
 
@@ -64,10 +70,23 @@ public class InventoryConfig {
     private final Path configPath;
 
     private File inventoryLocation;
+    private File scrapeLocation;
+
+    private ScrapeConfig scrapeConfig;
 
     public InventoryConfig() {
-        configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
         ispnReindex = Boolean.parseBoolean(System.getProperty(ISPN_REINDEX, ISPN_REINDEX_DEFAULT));
+        configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
+        configPath.toFile().mkdirs();
+
+        String scrapeDir = System.getProperty(SCRAPE_DIRECTORY);
+        if (scrapeDir != null) {
+            scrapeLocation = new File(scrapeDir);
+        } else {
+            Path dataPath = Paths.get(System.getProperty("jboss.server.data.dir"));
+            scrapeLocation = new File(dataPath.toFile(), "prometheus");
+        }
+        scrapeLocation.mkdirs();
     }
 
     @PostConstruct
@@ -119,6 +138,14 @@ public class InventoryConfig {
                     .stores()
                     .iterator()
                     .next()).location());
+            File scrapeConfigFile = new File(configPath.toFile(), SCRAPE_CONFIGURATION);
+            if (scrapeConfigFile.exists()) {
+                scrapeConfig = JsonUtil.getYamlMapper().readValue(scrapeConfigFile, ScrapeConfig.class);
+                log.infoUsingScrapeConfigFile(scrapeConfigFile.getAbsolutePath());
+            } else {
+                scrapeConfig = JsonUtil.getYamlMapper().readValue(InventoryConfig.class.getResourceAsStream("/" + SCRAPE_CONFIGURATION), ScrapeConfig.class);
+                log.infoUsingScrapeConfigFile("internal default");
+            }
             log.infoInventoryAppStarted();
         } catch (IOException e) {
             log.errorInventoryCacheConfigurationNotFound(e);
@@ -155,5 +182,22 @@ public class InventoryConfig {
     @InventoryLocation
     public File getInventoryLocation() {
         return inventoryLocation;
+    }
+
+    @Produces
+    public ScrapeConfig getScrapeConfig() {
+        return scrapeConfig;
+    }
+
+    @Produces
+    @ScrapeLocation
+    public File getScrapeLocation() {
+        return scrapeLocation;
+    }
+
+    @Produces
+    @InventoryConfigPath
+    public Path getConfigPath() {
+        return configPath;
     }
 }

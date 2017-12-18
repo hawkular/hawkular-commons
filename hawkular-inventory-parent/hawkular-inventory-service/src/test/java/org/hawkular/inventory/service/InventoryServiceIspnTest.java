@@ -22,13 +22,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import org.hawkular.commons.json.JsonUtil;
 import org.hawkular.inventory.Resources;
 import org.hawkular.inventory.api.ResourceFilter;
 import org.hawkular.inventory.api.model.Inventory;
@@ -38,10 +41,12 @@ import org.hawkular.inventory.api.model.Resource;
 import org.hawkular.inventory.api.model.ResourceNode;
 import org.hawkular.inventory.api.model.ResourceType;
 import org.hawkular.inventory.api.model.ResultSet;
+import org.hawkular.inventory.service.FileSdConfig.Entry;
 import org.infinispan.Cache;
 import org.infinispan.configuration.cache.SingleFileStoreConfiguration;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -55,6 +60,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class InventoryServiceIspnTest {
 
     private static final String ISPN_CONFIG_LOCAL = "/hawkular-inventory-ispn-test.xml";
+    private static final String SCRAPE_CONFIG_LOCAL = "/hawkular-inventory-prometheus-scrape-config.yaml";
+    private static final String PROMETHEUS_SCRAPE_CONFIG = "target/prometheus";
     private static EmbeddedCacheManager CACHE_MANAGER;
     private final InventoryServiceIspn service;
     private final InventoryStats inventoryStats;
@@ -86,7 +93,15 @@ public class InventoryServiceIspnTest {
                         .iterator()
                         .next()).location()));
         inventoryStats.init();
-        service = new InventoryServiceIspn(resource, resourceType, getClass().getClassLoader().getResource("").getPath(), inventoryStats);
+        ScrapeConfig scrapeConfig = null;
+        try {
+            scrapeConfig = JsonUtil.getYamlMapper().readValue(InventoryServiceIspn.class.getResourceAsStream(SCRAPE_CONFIG_LOCAL), ScrapeConfig.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        File scrapeLocation = new File(PROMETHEUS_SCRAPE_CONFIG);
+        scrapeLocation.mkdirs();
+        service = new InventoryServiceIspn(resource, resourceType, getClass().getClassLoader().getResource("").getPath(), inventoryStats, scrapeConfig, scrapeLocation);
     }
 
     @Before
@@ -234,7 +249,7 @@ public class InventoryServiceIspnTest {
     public void shouldGetJMXExporterConfig() throws IOException {
         assertThat(service.getJMXExporterConfig("test")).isPresent()
                 .hasValueSatisfying(s -> assertThat(s).contains("JMX EXPORTER TEST"));
-        assertThat(service.getJMXExporterConfig("wildfly-10")).isPresent()
+        assertThat(service.getJMXExporterConfig("WF10")).isPresent()
                 .hasValueSatisfying(s -> assertThat(s).contains("- pattern:"));
     }
 
@@ -348,5 +363,110 @@ public class InventoryServiceIspnTest {
         assertThat(health.getInventoryStats().getNumberOfResources()).isGreaterThan(10000);
         assertThat(health.getInventoryStats().getNumberOfResourcesInMemory()).isEqualTo(5000);
         assertThat(health.getDiskStats().getInventoryTotalSpace()).isGreaterThan(4000000L);
+    }
+
+    @Test
+    public void shouldDeleteAResourceAndCheckIsNotIndexed() throws IOException {
+        String idXaDs = "itest-rest-feed~Local DMR~/subsystem=datasources/xa-data-source=testXaDs";
+        String typeIdXaDs = "XA Datasource";
+        String parentIdXaDs = "itest-rest-feed~Local DMR~~";
+        String feedId = "itest-rest-feed";
+        int numIterations = 1000;
+
+        ResourceType xaDsType = ResourceType.builder().id(typeIdXaDs).build();
+        service.addResourceType(xaDsType);
+
+        for (int i = 0; i < numIterations; i++) {
+            String idXaDsX = idXaDs + "-" + i;
+            RawResource xaDs = RawResource.builder().id(idXaDsX)
+                    .typeId(typeIdXaDs)
+                    .parentId(parentIdXaDs)
+                    .feedId(feedId)
+                    .build();
+
+            service.addResource(xaDs);
+
+            Collection<Resource> resources = service.getResources(new ResourceFilter(false, feedId, null)).getResults();
+            assertThat(resources)
+                    .extracting(Resource::getId)
+                    .contains(idXaDsX);
+
+            service.deleteResources(Arrays.asList(idXaDsX));
+
+            resources = service.getResources(new ResourceFilter(false, feedId, null)).getResults();
+            assertThat(resources)
+                    .extracting(Resource::getId)
+                    .doesNotContain(idXaDsX);
+
+            resources = service.getResources(new ResourceFilter(false, feedId, typeIdXaDs)).getResults();
+            assertThat(resources)
+                    .extracting(Resource::getId)
+                    .doesNotContain(idXaDsX);
+        }
+    }
+
+    @Test
+    public void shouldGenerateScrapeConfig() throws Exception {
+        // a single endpoint
+        RawResource agent = RawResource.builder()
+                .id("my-test-agent")
+                .feedId("my-test-feed")
+                .typeId("Hawkular Java Agent")
+                .config("Metrics Endpoints", "localhost:1234")
+                .build();
+        service.addResource(agent);
+        File testFile = new File(PROMETHEUS_SCRAPE_CONFIG, "my-test-feed.json");
+        Assert.assertTrue(testFile.exists());
+        Assert.assertTrue(new String(Files.readAllBytes(testFile.getAbsoluteFile().toPath()))
+                .contains("\"localhost:1234\""));
+        testFile.delete();
+        Assert.assertFalse(testFile.exists());
+        service.buildMetricsEndpoints();
+        Assert.assertTrue(testFile.exists());
+
+        // multiple endpoints
+        agent = RawResource.builder()
+                .id("my-test-agent2")
+                .feedId("my-test-feed2")
+                .typeId("Hawkular Java Agent")
+                .config("Metrics Endpoints", "localhost:12345|localhost:6789{label1=value1, l2=v2}")
+                .build();
+        service.addResource(agent);
+        testFile = new File(PROMETHEUS_SCRAPE_CONFIG, "my-test-feed2.json");
+        Assert.assertTrue(testFile.exists());
+        String fileContent = new String(Files.readAllBytes(testFile.getAbsoluteFile().toPath()));
+        FileSdConfig config = FileSdConfig.fromJson(fileContent);
+        Assert.assertEquals(2, config.getEntries().size());
+        Entry entry = config.getEntries().get(0);
+        Assert.assertEquals(1, entry.getTargets().size());
+        Assert.assertEquals("localhost:12345", entry.getTargets().get(0));
+        Assert.assertEquals(1, entry.getLabels().size());
+        Assert.assertEquals("my-test-feed2", entry.getLabels().get("feed_id"));
+        entry = config.getEntries().get(1);
+        Assert.assertEquals(1, entry.getTargets().size());
+        Assert.assertEquals("localhost:6789", entry.getTargets().get(0));
+        Assert.assertEquals(3, entry.getLabels().size());
+        Assert.assertEquals("my-test-feed2", entry.getLabels().get("feed_id"));
+        Assert.assertEquals("value1", entry.getLabels().get("label1"));
+        Assert.assertEquals("v2", entry.getLabels().get("l2"));
+        testFile.delete();
+        Assert.assertFalse(testFile.exists());
+        service.buildMetricsEndpoints();
+        Assert.assertTrue(testFile.exists());
+    }
+
+    @Test
+    public void shouldRemoveScrapeConfig() {
+        RawResource agent = RawResource.builder()
+                .id("my-test-agent")
+                .feedId("my-test-feed")
+                .typeId("Hawkular Java Agent")
+                .config("Metrics Endpoints", "localhost:1234")
+                .build();
+        service.addResource(agent);
+        File testFile = new File(PROMETHEUS_SCRAPE_CONFIG, "my-test-feed.json");
+        Assert.assertTrue(testFile.exists());
+        service.deleteResources(Collections.singleton(agent.getId()));
+        Assert.assertFalse(testFile.exists());
     }
 }

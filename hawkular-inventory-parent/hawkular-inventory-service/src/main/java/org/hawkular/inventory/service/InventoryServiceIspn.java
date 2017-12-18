@@ -16,6 +16,7 @@
  */
 package org.hawkular.inventory.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,10 +48,10 @@ import org.hawkular.inventory.api.model.ResourceType;
 import org.hawkular.inventory.api.model.ResultSet;
 import org.hawkular.inventory.log.InventoryLoggers;
 import org.hawkular.inventory.log.MsgLogger;
+import org.hawkular.inventory.service.FileSdConfig.Entry;
 import org.hawkular.inventory.service.ispn.IspnResource;
 import org.hawkular.inventory.service.ispn.IspnResourceType;
 import org.infinispan.Cache;
-import org.infinispan.context.Flag;
 import org.infinispan.query.Search;
 import org.infinispan.query.dsl.FilterConditionContextQueryBuilder;
 import org.infinispan.query.dsl.Query;
@@ -71,7 +72,9 @@ public class InventoryServiceIspn implements InventoryService {
     // TODO [lponce] this should be configurable
     private static final int MAX_RESULTS = 100;
 
-    private final Path configPath;
+    @Inject
+    @InventoryConfigPath
+    private Path configPath;
 
     @Inject
     @InventoryResource
@@ -92,17 +95,25 @@ public class InventoryServiceIspn implements InventoryService {
     @EJB
     private InventoryStatsMBean inventoryStatsMBean;
 
+    @Inject
+    private ScrapeConfig scrapeConfig;
+
+    @Inject
+    @ScrapeLocation
+    private File scrapeLocation;
+
     public InventoryServiceIspn() {
-        configPath = Paths.get(System.getProperty("jboss.server.config.dir"), "hawkular");
     }
 
-    InventoryServiceIspn(Cache<String, Object> resource, Cache<String, Object> resourceType, String configPath, InventoryStatsMBean inventoryStatsMBean) {
+    InventoryServiceIspn(Cache<String, Object> resource, Cache<String, Object> resourceType, String configPath, InventoryStatsMBean inventoryStatsMBean, ScrapeConfig scrapeConfig, File scrapeLocation) {
         this.resource = resource;
         this.resourceType = resourceType;
         qResource = Search.getQueryFactory(resource);
         qResourceType = Search.getQueryFactory(resourceType);
         this.configPath = Paths.get(configPath);
         this.inventoryStatsMBean = inventoryStatsMBean;
+        this.scrapeConfig = scrapeConfig;
+        this.scrapeLocation = scrapeLocation;
     }
 
     @Override
@@ -117,8 +128,9 @@ public class InventoryServiceIspn implements InventoryService {
         }
         Map<String, IspnResource> map = resources.stream()
                 .parallel()
+                .peek(this::checkAddingAgent)
                 .collect(Collectors.toMap(r -> r.getId(), r -> new IspnResource(r)));
-        resource.getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES).putAll(map);
+        resource.putAll(map);
     }
 
     @Override
@@ -134,7 +146,7 @@ public class InventoryServiceIspn implements InventoryService {
         Map<String, IspnResourceType> map = resourceTypes.stream()
                 .parallel()
                 .collect(Collectors.toMap(rt -> rt.getId(), rt -> new IspnResourceType(rt)));
-        resourceType.getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES).putAll(map);
+        resourceType.putAll(map);
     }
 
     @Override
@@ -142,7 +154,9 @@ public class InventoryServiceIspn implements InventoryService {
         if (isEmpty(ids)) {
             throw new IllegalArgumentException("Ids must be not null or empty");
         }
-        ids.forEach(resource.getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES)::remove);
+        ids.stream().parallel()
+                .peek(this::checkRemovingAgent)
+                .forEach(resource::remove);
     }
 
     @Override
@@ -155,7 +169,7 @@ public class InventoryServiceIspn implements InventoryService {
         if (isEmpty(typeIds)) {
             throw new IllegalArgumentException("Types must be not null or empty");
         }
-        typeIds.forEach(resourceType.getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES)::remove);
+        typeIds.forEach(resourceType::remove);
     }
 
     @Override
@@ -261,8 +275,10 @@ public class InventoryServiceIspn implements InventoryService {
     }
 
     private Optional<String> getConfig(String fileName) {
-        // TODO: maybe some defensive check against file traversal attack?
-        //  Or check that "resourceType" is in a whitelist of types?
+        if (fileName.contains("..")) {
+            throw new IllegalArgumentException("Cannot get file with '..' in path: " + fileName);
+        }
+
         try {
             byte[] encoded = Files.readAllBytes(configPath.resolve(fileName));
             return Optional.of(new String(encoded, StandardCharsets.UTF_8.name()));
@@ -371,5 +387,78 @@ public class InventoryServiceIspn implements InventoryService {
     @Override
     public InventoryHealth getHealthStatus() {
         return inventoryStatsMBean.lastHealth();
+    }
+
+    @Override
+    public void buildMetricsEndpoints() {
+        for (Map.Entry<String, String> filter : scrapeConfig.getFilter().entrySet()) {
+            int nResults, offSet = 0;
+            do {
+                Query qb = qResource.from(IspnResource.class)
+                        .having("typeId")
+                        .equal(filter.getKey())
+                        .startOffset(offSet)
+                        .maxResults(MAX_RESULTS)
+                        .build();
+                nResults = qb.getResultSize();
+                List<IspnResource> results = qb.list();
+                offSet = results.size();
+                results.forEach(r -> writeMetricsEndpoint(r.getRawResource()));
+            } while (offSet < nResults);
+        }
+    }
+
+    private void checkAddingAgent(RawResource rawResource) {
+        if (scrapeConfig.filter(rawResource)) {
+            writeMetricsEndpoint(rawResource);
+        }
+    }
+
+    private void writeMetricsEndpoint(RawResource rawResource) {
+        String feedId = rawResource.getFeedId();
+        String metricsEndpoints = rawResource.getConfig().get(scrapeConfig.getFilter().get(rawResource.getTypeId()));
+
+        if (isEmpty(feedId) || isEmpty(metricsEndpoints)) {
+            log.errorMissingInfoInAgentRegistration(rawResource.getId());
+            return;
+        }
+
+        if (feedId.contains("..")) {
+            throw new IllegalArgumentException("Cannot write metrics endpoint file with '..' in path: " + feedId);
+        }
+
+        try {
+            FileSdConfig fileSdConfig = new FileSdConfig();
+            for (String oneEndpoint : metricsEndpoints.split("\\|")) {
+                Entry entry = FileSdConfig.Entry.buildFromString(oneEndpoint);
+                entry.addLabel("feed_id", feedId);
+                fileSdConfig.addEntry(entry);
+            }
+
+            String content = fileSdConfig.toJson();
+            File newScrapeConfig = new File(scrapeLocation, feedId + ".json");
+            Files.write(newScrapeConfig.toPath(), content.getBytes(StandardCharsets.UTF_8));
+            log.infoRegisteredMetricsEndpoint(feedId, metricsEndpoints, newScrapeConfig.toString());
+        } catch (Exception e) {
+            log.errorCannotRegisterMetricsEndpoint(feedId, metricsEndpoints, e);
+        }
+    }
+
+    private void checkRemovingAgent(String id) {
+        getRawResource(id)
+                .filter(scrapeConfig::filter)
+                .map(RawResource::getFeedId)
+                .ifPresent(feedId -> {
+                    if (feedId.contains("..")) {
+                        throw new IllegalArgumentException("Cannot write metrics endpoint file with '..' in path: " + feedId);
+                    }
+
+                    File scrapeConfig = new File(scrapeLocation, feedId + ".json");
+                    if (scrapeConfig.delete()) {
+                        log.infoUnregisteredMetricsEndpoint(feedId);
+                    } else {
+                        log.errorCannotUnregisterMetricsEndpoint(feedId);
+                    }
+                });
     }
 }
